@@ -1,6 +1,6 @@
 variables:
     PROJECT_DIR: "vivado"
-    VIVADO_PATH: "/opt/Xilinx/Vivado/2018.1/bin/vivado"
+    VIVADO_PATH: "/opt/Xilinx/Vivado/2018.3/bin/vivado"
     PROJECT_NAME: "thinpad_top"
 
 stages:
