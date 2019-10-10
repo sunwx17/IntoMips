@@ -1,6 +1,14 @@
+variables:
+    PROJECT_DIR: "vivado"
+    VIVADO_PATH: "/opt/Xilinx/Vivado/2018.1/bin/vivado"
+    PROJECT_NAME: "thinpad_top"
+
 stages:
   - build
   - test
+
+before_script:
+    - cd ${PROJECT_DIR}
 
 bitstream:
   stage: build
@@ -9,7 +17,7 @@ bitstream:
   image: vivado2018:2018.3
   script:
     - env
-    - /opt/Xilinx/Vivado/2018.3/bin/vivado -mode tcl -source build.tcl thinpad_top.xpr
+    - ${VIVADO_PATH} -mode tcl -source scripts/build.tcl ${PROJECT_NAME}.xpr
 
   artifacts:
     paths:
