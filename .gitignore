@@ -1,1 +1,7 @@
 .DS_Store
+vivado/.Xil
+vivado/*.run
+vivado/*.sim
+vivado/*.cache
+vivado/*.hw
+vivado/*.ip_user_files
