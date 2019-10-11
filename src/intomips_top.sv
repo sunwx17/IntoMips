@@ -80,5 +80,8 @@ module intomips_top(
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
 
+reg a;
+assign a = 1;
+
 
 endmodule

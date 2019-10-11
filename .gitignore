@@ -1,6 +1,6 @@
 .DS_Store
 vivado/.Xil
-vivado/*.run
+vivado/*.runs
 vivado/*.sim
 vivado/*.cache
 vivado/*.hw
