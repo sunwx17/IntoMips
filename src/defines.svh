@@ -35,5 +35,13 @@ typedef logic[`INST_ADDR_BUS]   Inst_addr_t;
 `define INST_BYTE_NUM  4
 
 
+//register
+`define REG_ADDR_BUS       4:0
+`define REG_WIDTH           32
+`define REG_BUS             31:0
+`define REG_NUM             32
+`define REG_NUM_LOG2        5
+
+
 
 `endif
