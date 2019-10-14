@@ -1,4 +1,5 @@
 `default_nettype wire
+`include "peripheral/sram_controller.sv"
 
 module intomips_top(
     input wire clk_50M,           //50MHz 时钟输入
@@ -79,9 +80,23 @@ module intomips_top(
     output wire video_clk,         //像素时钟输出
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
-
 reg a;
-assign a = 1;
+assign a = 1'b0;
 
-
+//云端sram测试模块导入
+/*
+tb_cloud_sram_controller(
+    .clock_btn(clock_btn),
+    .reset_btn(reset_btn),
+    .base_ram_data(base_ram_data),
+    .base_ram_addr(base_ram_addr),
+    .base_ram_be_n(base_ram_be_n),
+    .base_ram_ce_n(base_ram_ce_n),
+    .base_ram_oe_n(base_ram_oe_n),
+    .base_ram_we_n(base_ram_we_n),
+    .leds(leds),
+    .dpy0(dpy0),
+    .dpy1(dpy1)
+);
+*/
 endmodule

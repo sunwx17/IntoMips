@@ -17,11 +17,17 @@ typedef logic[15:0] Halfword_t;
 typedef logic[31:0] Word_t;
 typedef logic[63:0] Doubleword_t;
 
+//ram data format
+typedef logic[19:0] RamAddr_t;
+
 `define ZERO_BIT    1'b0
 `define ZERO_BYTE   8'h0
 `define ZERO_HWORD  16'h0
 `define ZERO_WORD   32'h0
 `define ZERO_DWORD  64'h0
+
+`define HIGH_WORD   32'bZ
+
 
 //instruction
 `define INST_WIDTH          32
