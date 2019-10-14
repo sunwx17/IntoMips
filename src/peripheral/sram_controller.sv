@@ -9,7 +9,7 @@ module sram_controller (
     input Bit_t write_op, //是否写
     inout Word_t bus_data, //总线数据
     //inout wire[31:0] bus_data,
-    input RamAddr_t bus_addr, //数据地址
+    input Ram_addr_t bus_addr, //数据地址
     input logic[3:0] byte_mask,
     output Bit_t bus_stall, //总线使能
     
@@ -17,7 +17,7 @@ module sram_controller (
     //RAM信号
     inout Word_t ram_data,
     //inout wire[31:0] ram_data,
-    output RamAddr_t ram_addr,
+    output Ram_addr_t ram_addr,
     output logic[3:0] ram_be_n,
     output logic ram_ce_n,
     output logic ram_oe_n,
@@ -34,7 +34,7 @@ module sram_controller (
     assign bus_data = read_op ? data_read: `ZERO_WORD;
     assign ram_data = write_op ? data_write: `HIGH_WORD;
 
-    RamAddr_t inner_addr;
+    Ram_addr_t inner_addr;
     assign inner_addr = bus_addr;
 
 
