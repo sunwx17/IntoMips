@@ -38,16 +38,20 @@ typedef logic[`INST_BUS]    Inst_t;
 `define INST_ADDR_BUS           `INST_ADDR_WIDTH - 1:0
 typedef logic[`INST_ADDR_BUS]   Inst_addr_t;
 
-`define INST_BYTE_NUM  4
+`define INST_BYTE_NUM  4  
 
 
 //register
-`define REG_ADDR_BUS       4:0
-`define REG_WIDTH           32
-`define REG_BUS             31:0
-`define REG_NUM             32
-`define REG_NUM_LOG2        5
+`define REG_NUM                 32
+`define REG_NUM_LOG2            5
+`define REG_ADDR_BUS            `REG_NUM_LOG2 - 1:0
+typedef logic[`REG_ADDR_BUS]    Reg_addr_t;
 
+`define REG_DATA_WIDTH           32
+`define REG_DATA_BUS             31:0
+typedef logic[`REG_DATA_BUS]     Reg_data_t;
+
+`define REG_ZERO    5'b00000
 
 
 `endif
