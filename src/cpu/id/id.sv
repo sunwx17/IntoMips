@@ -25,6 +25,7 @@ module id(
 Opcode_t    opcode;
 Reg_addr_t  rs;
 Reg_addr_t  rt;
+Reg_addr_t  rd;
 Halfword_t  imm;
 
 assign opcode = inst[31:26];
@@ -33,34 +34,64 @@ assign rt     = inst[20:16];
 assign rd     = inst[15:11];
 assign imm    = inst[15:0];
 
-always @ (*)
-    if (rst = `ENABLE) begin
+always @ (*) begin
+    if (rst == `ENABLE) begin
+        oper_o <= OP_NOP;
+        wreg_write_o <= `DISABLE;
+        wreg_addr_o  <= `REG_ZERO;
+
         reg1_read_o <= `DISABLE;
         reg2_read_o <= `DISABLE;
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
-        
+    end else begin        
         oper_o <= OP_NOP;
-        reg1_o <= `ZERO_WORD;
-        reg2_o <= `ZERO_WORD;
         wreg_write_o <= `DISABLE;
-        wreg_addr_o  <= `REG_ZERO;
-    end else begin
+        wreg_addr_o  <= rd;
+
         reg1_read_o <= `DISABLE;
         reg2_read_o <= `DISABLE;
         reg1_addr_o <= rs;
         reg2_addr_o <= rt;
-        
-        oper_o <= OP_NOP;
-        reg1_o <= `ZERO_WORD;
-        reg2_o <= `ZERO_WORD;
-        wreg_write_o <= `DISABLE;
-        wreg_addr_o  <= rd;
-
         case (opcode)
             `OPCODE_ORI: begin
+                oper_o <= OP_ORI;
                 wreg_write_o <= `ENABLE;
+                wreg_addr_o  <= rt;
+
+                reg1_read_o <= `ENABLE;
+                reg2_read_o <= `DISABLE;
+                reg1_addr_o <= rs;
+                reg2_addr_o <= `ZERO_WORD;
             end
+            default:begin end
+        endcase
+    end
+end
+    
+always @ (*) begin
+    if (rst == `DISABLE) begin
+        reg1_o <= `ZERO_WORD;
+    end else if (reg1_read_o == `ENABLE) begin
+        reg1_o <= reg1_data_i;
+    end else if (reg1_read_o == `DISABLE) begin
+        reg1_o <= imm;
+    end else begin
+        reg1_o <= `ZERO_WORD;
+    end
+end
+
+always @ (*) begin
+    if (rst == `DISABLE) begin
+        reg2_o <= `ZERO_WORD;
+    end else if (reg2_read_o == `ENABLE) begin
+        reg2_o <= reg1_data_i;
+    end else if (reg2_read_o == `DISABLE) begin
+        reg2_o <= imm;
+    end else begin
+        reg2_o <= `ZERO_WORD;
+    end
+end
 
 
 

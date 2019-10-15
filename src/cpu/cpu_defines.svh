@@ -14,7 +14,7 @@ typedef logic[`OPCODE_BUS]  Opcode_t;
 //operator
 typedef enum {
     OP_NOP,
-    OP_OPI
+    OP_ORI
 } Oper_t;
 
 `define OPCODE_ORI  6'b001101
