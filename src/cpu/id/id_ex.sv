@@ -11,7 +11,7 @@ module id_ex(
     output  Word_t      ex_reg1,
     output  Word_t      ex_reg2,
     output  Bit_t       ex_wreg_write,
-    output  Reg_addr_t  ex_wreg_addr,
+    output  Reg_addr_t  ex_wreg_addr
 );
 
 always @ (posedge clk) begin
@@ -28,5 +28,6 @@ always @ (posedge clk) begin
         ex_wreg_write <= id_wreg_write;
         ex_wreg_addr  <= id_wreg_addr;
     end
-    
+end
+
 endmodule
