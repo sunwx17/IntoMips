@@ -34,7 +34,7 @@ assign rt     = inst[20:16];
 assign rd     = inst[15:11];
 assign imm    = inst[15:0];
 
-always @ (*) begin
+always_comb begin
     if (rst == `ENABLE) begin
         oper_o <= OP_NOP;
         wreg_write_o <= `DISABLE;
@@ -69,7 +69,7 @@ always @ (*) begin
     end
 end
     
-always @ (*) begin
+always_comb begin
     if (rst == `DISABLE) begin
         reg1_o <= `ZERO_WORD;
     end else if (reg1_read_o == `ENABLE) begin
@@ -81,7 +81,7 @@ always @ (*) begin
     end
 end
 
-always @ (*) begin
+always_comb begin
     if (rst == `DISABLE) begin
         reg2_o <= `ZERO_WORD;
     end else if (reg2_read_o == `ENABLE) begin
