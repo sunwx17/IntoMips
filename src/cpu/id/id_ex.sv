@@ -2,11 +2,13 @@
 
 module id_ex(
     input               clk, rst,
+    
     input   Oper_t      id_oper,
     input   Word_t      id_reg1,
     input   Word_t      id_reg2,
     input   Bit_t       id_wreg_write,
     input   Reg_addr_t  id_wreg_addr,
+
     output  Oper_t      ex_oper,
     output  Word_t      ex_reg1,
     output  Word_t      ex_reg2,

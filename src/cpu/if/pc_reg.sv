@@ -6,7 +6,7 @@ module pc_reg(
     input   Bit_t           clk, rst,
     output  Inst_addr_t     pc,
     output  Bit_t           ce
-    );
+);
 
 always @ (posedge clk) begin
     if (rst == `ENABLE) begin

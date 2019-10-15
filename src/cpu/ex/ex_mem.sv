@@ -2,9 +2,11 @@
 
 module ex_mem(
     input               clk, rst,
+    
     input   Bit_t       ex_wreg_write,
     input   Reg_addr_t  ex_wreg_addr,
     input   Word_t      ex_wreg_data,
+
     output  Bit_t       mem_wreg_write,
     output  Reg_addr_t  mem_wreg_addr,
     output  Word_t      mem_wreg_data

@@ -75,7 +75,7 @@ always_comb begin
     end else if (reg1_read_o == `ENABLE) begin
         reg1_o <= reg1_data_i;
     end else if (reg1_read_o == `DISABLE) begin
-        reg1_o <= imm;
+        reg1_o <= {`ZERO_HWORD, imm};
     end else begin
         reg1_o <= `ZERO_WORD;
     end
@@ -87,7 +87,7 @@ always_comb begin
     end else if (reg2_read_o == `ENABLE) begin
         reg2_o <= reg1_data_i;
     end else if (reg2_read_o == `DISABLE) begin
-        reg2_o <= imm;
+        reg2_o <= {`ZERO_HWORD, imm};
     end else begin
         reg2_o <= `ZERO_WORD;
     end
