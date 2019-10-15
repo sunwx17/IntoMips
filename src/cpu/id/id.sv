@@ -70,7 +70,7 @@ always_comb begin
 end
     
 always_comb begin
-    if (rst == `DISABLE) begin
+    if (rst == `ENABLE) begin
         reg1_o <= `ZERO_WORD;
     end else if (reg1_read_o == `ENABLE) begin
         reg1_o <= reg1_data_i;
@@ -82,7 +82,7 @@ always_comb begin
 end
 
 always_comb begin
-    if (rst == `DISABLE) begin
+    if (rst == `ENABLE) begin
         reg2_o <= `ZERO_WORD;
     end else if (reg2_read_o == `ENABLE) begin
         reg2_o <= reg1_data_i;

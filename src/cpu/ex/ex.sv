@@ -16,7 +16,7 @@ module ex(
 );
 
 always_comb begin
-    if (rst == `DISABLE) begin
+    if (rst == `ENABLE) begin
         wreg_write_o <= `DISABLE;
         wreg_addr_o  <= `REG_ZERO;
         wreg_data_o  <= `ZERO_WORD;

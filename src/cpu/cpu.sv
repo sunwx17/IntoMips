@@ -47,8 +47,10 @@ Inst_t      id_inst_i;
 if_id if_id_instance(
     .clk,
     .rst,
-    .if_pc(id_pc_i),
-    .if_inst(id_inst_i)
+    .if_pc(rom_addr_o),
+    .if_inst(rom_data_i),
+    .id_pc(id_pc_i),
+    .id_inst(id_inst_i)
 );
 
 

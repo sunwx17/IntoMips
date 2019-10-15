@@ -11,7 +11,7 @@ module mem_wb(
 );
 
 always @ (clk) begin
-    if (rst == `DISABLE) begin 
+    if (rst == `ENABLE) begin 
         wb_wreg_write <= `DISABLE;
         wb_wreg_addr  <= `REG_ZERO;
         wb_wreg_data  <= `ZERO_WORD;
