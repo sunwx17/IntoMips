@@ -24,7 +24,19 @@ module registers(
 
 );
 
-Regs_t regs;
+Reg_data_t regs[0:`REG_NUM - 1];
+integer i;
+
+
+
+always_comb begin
+    if (rst == `ENABLE) begin
+        for (i = 0; i < `REG_NUM; i = i + 1) begin
+            regs[i] <= `ZERO_WORD;
+        end
+    end
+end
+
 
 always @ (posedge clk) begin
     if (rst == `DISABLE) begin

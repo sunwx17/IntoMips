@@ -112,7 +112,7 @@ always_comb begin
             reg2_o <= `ZERO_WORD;
         end
     end else if (reg2_read_o == `ENABLE) begin
-        reg2_o <= reg1_data_i;
+        reg2_o <= reg2_data_i;
     end else if (reg2_read_o == `DISABLE) begin
         reg2_o <= {`ZERO_HWORD, immediate};
     end else begin

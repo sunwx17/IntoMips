@@ -81,10 +81,10 @@ always_comb begin
         `OPER_TYPE_R_1 : begin
             wreg_write <= `ENABLE;
             wreg_addr  <= rd;
-            reg1_read  <= `ENABLE;
-            reg2_read  <= `DISABLE;
-            reg1_addr  <= rt;
-            reg2_addr  <= `ZERO_WORD;
+            reg1_read  <= `DISABLE;
+            reg2_read  <= `ENABLE;
+            reg1_addr  <= `ZERO_WORD;
+            reg2_addr  <= rt;
             immediate  <= sa;
         end
         default : begin end
