@@ -17,9 +17,16 @@ module id(
     output  Word_t      reg1_o,
     output  Word_t      reg2_o,
     output  Bit_t       wreg_write_o,
-    output  Reg_addr_t  wreg_addr_o
+    output  Reg_addr_t  wreg_addr_o,
 
+    //below for solve data conflict
+    input  Bit_t       ex_wreg_write_i,
+    input  Reg_addr_t  ex_wreg_addr_i,
+    input  Word_t      ex_wreg_data_i,
 
+    input  Bit_t       mem_wreg_write_i,
+    input  Reg_addr_t  mem_wreg_addr_i,
+    input  Word_t      mem_wreg_data_i 
 );
 
 Opcode_t    opcode;
@@ -72,6 +79,12 @@ end
 always_comb begin
     if (rst == `ENABLE) begin
         reg1_o <= `ZERO_WORD;
+    end else if (reg1_read_o == `ENABLE && ex_wreg_write_i == `ENABLE && ex_wreg_addr_i == reg1_addr_o) begin
+        //$display("ex $%0d: %x", ex_wreg_addr_i, ex_wreg_data_i);
+        reg1_o <= ex_wreg_data_i;
+    end else if (reg1_read_o == `ENABLE && mem_wreg_write_i == `ENABLE && mem_wreg_addr_i == reg1_addr_o) begin
+        //$display("mem $%0d: %x", mem_wreg_addr_i, mem_wreg_data_i);
+        reg1_o <= mem_wreg_data_i;
     end else if (reg1_read_o == `ENABLE) begin
         reg1_o <= reg1_data_i;
     end else if (reg1_read_o == `DISABLE) begin
@@ -84,6 +97,10 @@ end
 always_comb begin
     if (rst == `ENABLE) begin
         reg2_o <= `ZERO_WORD;
+    end else if (reg2_read_o == `ENABLE && ex_wreg_write_i == `ENABLE && ex_wreg_addr_i == reg2_addr_o) begin
+        reg2_o <= ex_wreg_data_i;
+    end else if (reg2_read_o == `ENABLE && mem_wreg_write_i == `ENABLE && mem_wreg_addr_i == reg2_addr_o) begin
+        reg2_o <= mem_wreg_data_i;
     end else if (reg2_read_o == `ENABLE) begin
         reg2_o <= reg1_data_i;
     end else if (reg2_read_o == `DISABLE) begin

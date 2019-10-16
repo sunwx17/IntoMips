@@ -12,7 +12,7 @@ module ex_mem(
     output  Word_t      mem_wreg_data
 );
 
-always @ (clk) begin
+always @ (posedge clk) begin
     if (rst == `ENABLE) begin 
         mem_wreg_write <= `DISABLE;
         mem_wreg_addr  <= `REG_ZERO;

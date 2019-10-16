@@ -61,6 +61,18 @@ Word_t      id_reg2_o;
 Bit_t       id_wreg_write_o;
 Reg_addr_t  id_wreg_addr_o;
 
+
+//connext ex and ex_mem
+Bit_t       ex_wreg_write_o;
+Reg_addr_t  ex_wreg_addr_o;
+Word_t      ex_wreg_data_o;
+
+//connect mem and mem_wb
+Bit_t       mem_wreg_write_o;
+Reg_addr_t  mem_wreg_addr_o;
+Word_t      mem_wreg_data_o;
+
+
 //stage id
 id id_instance(
     .rst,
@@ -76,9 +88,21 @@ id id_instance(
     .reg1_o(id_reg1_o),
     .reg2_o(id_reg2_o),
     .wreg_write_o(id_wreg_write_o),
-    .wreg_addr_o(id_wreg_addr_o)
+    .wreg_addr_o(id_wreg_addr_o),
+    .ex_wreg_write_i(ex_wreg_write_o),
+    .ex_wreg_addr_i(ex_wreg_addr_o),
+    .ex_wreg_data_i(ex_wreg_data_o),
+    .mem_wreg_write_i(mem_wreg_write_o),
+    .mem_wreg_addr_i(mem_wreg_addr_o),
+    .mem_wreg_data_i(mem_wreg_data_o) 
 );
 
+
+/*always @ (posedge clk) begin
+    $display("ex write: %0d $%0d=0x%x", ex_wreg_write_o, ex_wreg_addr_o, ex_wreg_data_o);
+    $display("mem write: %0d $%0d=0x%x", mem_wreg_write_o, mem_wreg_addr_o, mem_wreg_data_o);
+    $display("wb write: %0d $%0d=0x%x", reg_write_enable, reg_write_addr, reg_write_data);
+end*/
 
 //connect id_ex and ex
 Oper_t      ex_oper_i;
@@ -104,10 +128,6 @@ id_ex id_ex_instance(
 );
 
 
-//connext ex and ex_mem
-Bit_t       ex_wreg_write_o;
-Reg_addr_t  ex_wreg_addr_o;
-Word_t      ex_wreg_data_o;
 
 //stage ex
 ex ex_instance(
@@ -139,10 +159,7 @@ ex_mem ex_mem_instance(
     .mem_wreg_data(mem_wreg_data_i)
 );
 
-//connect mem and mem_wb
-Bit_t       mem_wreg_write_o;
-Reg_addr_t  mem_wreg_addr_o;
-Word_t      mem_wreg_data_o;
+
 
 //stage mem
 mem mem_instance(
