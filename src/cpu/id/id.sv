@@ -29,50 +29,46 @@ module id(
     input  Word_t      mem_wreg_data_i 
 );
 
-Opcode_t    opcode;
-Reg_addr_t  rs;
-Reg_addr_t  rt;
-Reg_addr_t  rd;
-Halfword_t  imm;
 
-assign opcode = inst[31:26];
-assign rs     = inst[25:21];
-assign rt     = inst[20:16];
-assign rd     = inst[15:11];
-assign imm    = inst[15:0];
+Oper_t      oper;
+Bit_t       reg1_read;
+Bit_t       reg2_read;
+Reg_addr_t  reg1_addr;
+Reg_addr_t  reg2_addr;
+Bit_t       wreg_write;
+Reg_addr_t  wreg_addr;
+Halfword_t  immediate;
+
+
+id_type id_type_instance(
+    .inst,
+    .oper,
+    .reg1_read,
+    .reg2_read,
+    .reg1_addr,
+    .reg2_addr,
+    .wreg_write,
+    .wreg_addr,
+    .immediate
+);
 
 always_comb begin
     if (rst == `ENABLE) begin
         oper_o <= OP_NOP;
         wreg_write_o <= `DISABLE;
         wreg_addr_o  <= `REG_ZERO;
-
         reg1_read_o <= `DISABLE;
         reg2_read_o <= `DISABLE;
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
     end else begin        
-        oper_o <= OP_NOP;
-        wreg_write_o <= `DISABLE;
-        wreg_addr_o  <= rd;
-
-        reg1_read_o <= `DISABLE;
-        reg2_read_o <= `DISABLE;
-        reg1_addr_o <= rs;
-        reg2_addr_o <= rt;
-        case (opcode)
-            `OPCODE_ORI: begin
-                oper_o <= OP_ORI;
-                wreg_write_o <= `ENABLE;
-                wreg_addr_o  <= rt;
-
-                reg1_read_o <= `ENABLE;
-                reg2_read_o <= `DISABLE;
-                reg1_addr_o <= rs;
-                reg2_addr_o <= `ZERO_WORD;
-            end
-            default:begin end
-        endcase
+        oper_o <= oper;
+        wreg_write_o <= wreg_write;
+        wreg_addr_o  <= wreg_addr;
+        reg1_read_o <= reg1_read;
+        reg2_read_o <= reg2_read;
+        reg1_addr_o <= reg1_addr;
+        reg2_addr_o <= reg2_addr;
     end
 end
     
@@ -80,15 +76,21 @@ always_comb begin
     if (rst == `ENABLE) begin
         reg1_o <= `ZERO_WORD;
     end else if (reg1_read_o == `ENABLE && ex_wreg_write_i == `ENABLE && ex_wreg_addr_i == reg1_addr_o) begin
-        //$display("ex $%0d: %x", ex_wreg_addr_i, ex_wreg_data_i);
-        reg1_o <= ex_wreg_data_i;
+        if(ex_wreg_addr_i != `REG_ZERO) begin
+            reg1_o <= ex_wreg_data_i;
+        end else begin
+            reg1_o <= `ZERO_WORD;
+        end
     end else if (reg1_read_o == `ENABLE && mem_wreg_write_i == `ENABLE && mem_wreg_addr_i == reg1_addr_o) begin
-        //$display("mem $%0d: %x", mem_wreg_addr_i, mem_wreg_data_i);
-        reg1_o <= mem_wreg_data_i;
+        if(mem_wreg_addr_i != `REG_ZERO) begin
+            reg1_o <= mem_wreg_data_i;
+        end else begin
+            reg1_o <= `ZERO_WORD;
+        end
     end else if (reg1_read_o == `ENABLE) begin
         reg1_o <= reg1_data_i;
     end else if (reg1_read_o == `DISABLE) begin
-        reg1_o <= {`ZERO_HWORD, imm};
+        reg1_o <= {`ZERO_HWORD, immediate};
     end else begin
         reg1_o <= `ZERO_WORD;
     end
@@ -98,13 +100,21 @@ always_comb begin
     if (rst == `ENABLE) begin
         reg2_o <= `ZERO_WORD;
     end else if (reg2_read_o == `ENABLE && ex_wreg_write_i == `ENABLE && ex_wreg_addr_i == reg2_addr_o) begin
-        reg2_o <= ex_wreg_data_i;
+        if(ex_wreg_addr_i != `REG_ZERO) begin
+            reg2_o <= ex_wreg_data_i;
+        end else begin
+            reg2_o <= `ZERO_WORD;
+        end
     end else if (reg2_read_o == `ENABLE && mem_wreg_write_i == `ENABLE && mem_wreg_addr_i == reg2_addr_o) begin
-        reg2_o <= mem_wreg_data_i;
+        if(mem_wreg_addr_i != `REG_ZERO) begin
+            reg2_o <= mem_wreg_data_i;
+        end else begin
+            reg2_o <= `ZERO_WORD;
+        end
     end else if (reg2_read_o == `ENABLE) begin
-        reg2_o <= reg1_data_i;
+        reg2_o <= reg2_data_i;
     end else if (reg2_read_o == `DISABLE) begin
-        reg2_o <= {`ZERO_HWORD, imm};
+        reg2_o <= {`ZERO_HWORD, immediate};
     end else begin
         reg2_o <= `ZERO_WORD;
     end

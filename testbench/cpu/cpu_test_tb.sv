@@ -82,8 +82,9 @@ endtask
 initial begin
     wait (rst == `ENABLE);
     unittest("ori0");
-    unittest("ori1");
-    unittest("ori2");
+    unittest("write_to_reg0");
+    unittest("logic");
+    unittest("shift");
     $finish;
 end
 

@@ -20,6 +20,8 @@ Reg_data_t  reg_data_2;
 
 //regfile
 registers registers_instance(
+    .clk,
+    .rst,
     .write_enable(reg_write_enable),
     .write_addr(reg_write_addr),
     .write_data(reg_write_data),
@@ -98,11 +100,6 @@ id id_instance(
 );
 
 
-/*always @ (posedge clk) begin
-    $display("ex write: %0d $%0d=0x%x", ex_wreg_write_o, ex_wreg_addr_o, ex_wreg_data_o);
-    $display("mem write: %0d $%0d=0x%x", mem_wreg_write_o, mem_wreg_addr_o, mem_wreg_data_o);
-    $display("wb write: %0d $%0d=0x%x", reg_write_enable, reg_write_addr, reg_write_data);
-end*/
 
 //connect id_ex and ex
 Oper_t      ex_oper_i;
@@ -128,10 +125,18 @@ id_ex id_ex_instance(
 );
 
 
+/*always @ (negedge clk) begin
+    $display("0x%x << 0x%x", ex_reg2_i, ex_reg1_i);
+    //$display("reg2 data: 0x%x", reg_data_2);
+    //$display("ex write: %0d $%0d=0x%x", ex_wreg_write_o, ex_wreg_addr_o, ex_wreg_data_o);
+    //$display("mem write: %0d $%0d=0x%x", mem_wreg_write_o, mem_wreg_addr_o, mem_wreg_data_o);
+    //$display("wb write: %0d $%0d=0x%x", reg_write_enable, reg_write_addr, reg_write_data);
+end*/
+
 
 //stage ex
 ex ex_instance(
-    .rst(),
+    .rst,
     .oper(ex_oper_i),
     .reg1(ex_reg1_i),
     .reg2(ex_reg2_i),
