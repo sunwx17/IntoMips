@@ -10,7 +10,7 @@ module mem_wb(
     output  Word_t      wb_wreg_data    
 );
 
-always @ (clk) begin
+always @ (posedge clk) begin
     if (rst == `ENABLE) begin 
         wb_wreg_write <= `DISABLE;
         wb_wreg_addr  <= `REG_ZERO;

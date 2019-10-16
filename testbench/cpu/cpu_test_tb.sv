@@ -57,7 +57,7 @@ count = 0;
 is_ok = 1'b1;
 while(!$feof(ans)) begin @ (negedge clock_50)
     count = count + 1;
-    if (count >= 4) begin
+    if (count > 4) begin
         $fscanf(ans, "%s\n", line);   
         if (reg_write_enable == `ENABLE) begin
             $sformat(out, "$%0d=0x%x", reg_write_addr, reg_write_data);
