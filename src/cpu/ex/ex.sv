@@ -109,20 +109,8 @@ always_comb begin
             OP_SRL, OP_SRLV : wreg_data_o <= reg2 >> reg1[4:0];
             OP_SRA, OP_SRAV : wreg_data_o <= $signed(reg2) >>> reg1[4:0];
             OP_LUI : wreg_data_o <= { reg2[15:0], 16'b0 };
-            OP_MOVN : begin
-                if (reg2 != `ZERO_WORD) begin
-                    wreg_data_o <= reg1;
-                end else begin
-                    wreg_write_o <= `DISABLE;
-                end
-            end
-            OP_MOVZ : begin
-                if (reg2 == `ZERO_WORD) begin
-                    wreg_data_o <= reg1;
-                end else begin
-                    wreg_write_o <= `DISABLE;
-                end
-            end
+            OP_MOVN : { wreg_data_o, wreg_write_o } <= (reg2 != `ZERO_WORD) ? { reg1, `ENABLE } : { `ZERO_WORD, `DISABLE };
+            OP_MOVZ : { wreg_data_o, wreg_write_o } <= (reg2 == `ZERO_WORD) ? { reg1, `ENABLE } : { `ZERO_WORD, `DISABLE };
             OP_MFHI : wreg_data_o <= hi;
             OP_MFLO : wreg_data_o <= lo;
             OP_MTHI : hi_o <= reg1;
@@ -131,7 +119,7 @@ always_comb begin
             OP_SUB, OP_SUBU : wreg_data_o <= sub_u;//sub should not be like this
             OP_SLT, OP_SLTI : wreg_data_o <= signed_lt;
             OP_SLTU, OP_SLTIU : wreg_data_o <= unsigned_lt;
-            OP_MUL  : wreg_data_o <= mul_res[31:0];
+            OP_MUL : wreg_data_o <= mul_res[31:0];
             OP_MULT, OP_MULTU : {hi_o, lo_o} <= mul_res;
             //OP_CLZ  : 
             //OP_CLO  : 
