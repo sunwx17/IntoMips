@@ -109,6 +109,9 @@ initial begin
     unittest("logic");
     unittest("shift");
     unittest("move");
+    unittest("arithmetic_0");
+    unittest("arithmetic_1");
+    unittest("arithmetic_2");
     $finish;
 end
 

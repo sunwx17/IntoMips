@@ -45,6 +45,39 @@ always_comb begin
     end
 end
 
+//unsigned
+Word_t add_u, sub_u;
+assign add_u = reg1 + reg2;
+assign sub_u = reg1 - reg2;
+
+// comparsion
+Bit_t signed_lt, unsigned_lt;
+assign signed_lt = (reg1[31] != reg2[31]) ? reg1[31] : sub_u[31];
+assign unsigned_lt = ({1'b0, reg1} < {1'b0, reg2});
+
+//multiply
+Bit_t is_signed, res_sign;
+assign res_sign = (oper != OP_MULTU) && (reg1[31] ^ reg2[31]);
+
+Word_t abs_reg1, abs_reg2;
+assign abs_reg1 = ((oper != OP_MULTU) && reg1[31]) ? -reg1 : reg1;
+assign abs_reg2 = ((oper != OP_MULTU) && reg2[31]) ? -reg2 : reg2;
+
+Doubleword_t mul_abs, mul_res;
+assign mul_abs = abs_reg1 * abs_reg2;
+assign mul_res = res_sign ? -mul_abs : mul_abs;
+//Below is from TrivialMIPS, but I don't know why
+/*Word_t mul_hi, mul_lo;
+logic[32:0] mul_md;
+assign mul_hi = abs_reg1[31:16] * abs_reg2[31:16];
+assign mul_md = abs_reg1[15:0] * abs_reg2[31:16] + abs_reg1[31:16] * abs_reg2[15:0];
+assign mul_lo = abs_reg1[15:0] * abs_reg2[15:0];
+assign mul_abs = { mul_hi, mul_lo } + { 15'b0, mul_md, 16'b0 };
+*/
+
+
+
+
 always_comb begin
     if (rst == `ENABLE) begin
         wreg_write_o <= `DISABLE;
@@ -58,39 +91,29 @@ always_comb begin
         wreg_addr_o  <= wreg_addr_i;
         wreg_data_o  <= `ZERO_WORD;
         
-        whilo_o      <= `DISABLE;
+        if (`NEED_WRITE_HILO(oper)) begin
+            whilo_o <= `ENABLE;
+            wreg_write_o <= `DISABLE;
+            wreg_addr_o  <= `REG_ZERO;
+        end else begin
+            whilo_o <= `DISABLE;
+        end
         {hi_o, lo_o} <= {hi, lo};
+
         case (oper)
-            OP_AND, OP_ANDI : begin
-                wreg_data_o <= reg1 & reg2;
-            end
-            OP_OR, OP_ORI : begin
-                wreg_data_o <= reg1 | reg2;
-            end
-            OP_XOR, OP_XORI : begin
-                wreg_data_o <= reg1 ^ reg2;
-            end
-            OP_NOR : begin
-                wreg_data_o <= ~(reg1 | reg2);
-            end
-            OP_SLL, OP_SLLV : begin
-                wreg_data_o <= reg2 << reg1[4:0];
-            end
-            OP_SRL, OP_SRLV : begin
-                wreg_data_o <= reg2 >> reg1[4:0];
-            end
-            OP_SRA, OP_SRAV : begin
-                wreg_data_o <= $signed(reg2) >>> reg1[4:0];
-            end
-            OP_LUI  : begin
-                wreg_data_o <= { reg2[15:0], 16'b0 };
-            end
+            OP_AND, OP_ANDI : wreg_data_o <= reg1 & reg2;
+            OP_OR, OP_ORI : wreg_data_o <= reg1 | reg2;
+            OP_XOR, OP_XORI : wreg_data_o <= reg1 ^ reg2;
+            OP_NOR : wreg_data_o <= ~(reg1 | reg2);
+            OP_SLL, OP_SLLV : wreg_data_o <= reg2 << reg1[4:0];
+            OP_SRL, OP_SRLV : wreg_data_o <= reg2 >> reg1[4:0];
+            OP_SRA, OP_SRAV : wreg_data_o <= $signed(reg2) >>> reg1[4:0];
+            OP_LUI : wreg_data_o <= { reg2[15:0], 16'b0 };
             OP_MOVN : begin
                 if (reg2 != `ZERO_WORD) begin
                     wreg_data_o <= reg1;
                 end else begin
                     wreg_write_o <= `DISABLE;
-                    wreg_addr_o  <= `REG_ZERO;
                 end
             end
             OP_MOVZ : begin
@@ -98,27 +121,20 @@ always_comb begin
                     wreg_data_o <= reg1;
                 end else begin
                     wreg_write_o <= `DISABLE;
-                    wreg_addr_o  <= `REG_ZERO;
                 end
             end
-            OP_MFHI : begin
-                wreg_data_o <= hi;
-            end
-            OP_MFLO : begin
-                wreg_data_o <= lo;
-            end
-            OP_MTHI : begin
-                wreg_write_o <= `DISABLE;
-                wreg_addr_o  <= `REG_ZERO;
-                whilo_o <= `ENABLE;
-                hi_o    <= reg1;
-            end
-            OP_MTLO : begin
-                wreg_write_o <= `DISABLE;
-                wreg_addr_o  <= `REG_ZERO;
-                whilo_o <= `ENABLE;
-                lo_o    <= reg1;
-            end
+            OP_MFHI : wreg_data_o <= hi;
+            OP_MFLO : wreg_data_o <= lo;
+            OP_MTHI : hi_o <= reg1;
+            OP_MTLO : lo_o <= reg1;
+            OP_ADD, OP_ADDI, OP_ADDU, OP_ADDIU : wreg_data_o <= add_u;//add and addi should not be like this
+            OP_SUB, OP_SUBU : wreg_data_o <= sub_u;//sub should not be like this
+            OP_SLT, OP_SLTI : wreg_data_o <= signed_lt;
+            OP_SLTU, OP_SLTIU : wreg_data_o <= unsigned_lt;
+            OP_MUL  : wreg_data_o <= mul_res[31:0];
+            OP_MULT, OP_MULTU : {hi_o, lo_o} <= mul_res;
+            //OP_CLZ  : 
+            //OP_CLO  : 
             default: begin
             end
         endcase

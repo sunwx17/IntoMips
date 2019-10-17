@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="296"/>
+    <Option Name="WTXSimLaunchSim" Val="345"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -280,6 +280,27 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../testbench/cpu/testcases/move.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_2.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_2.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_0.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_0.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_1.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_1.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="cpu_test_tb"/>
