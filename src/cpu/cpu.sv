@@ -126,7 +126,8 @@ id_ex id_ex_instance(
 
 
 /*always @ (negedge clk) begin
-    $display("0x%x << 0x%x", ex_reg2_i, ex_reg1_i);
+    $display("0x%x < 0x%x", ex_reg2_i, ex_reg1_i);
+    $display("imm : 0x%x", id_instance.id_type_instance.imm);
     //$display("reg2 data: 0x%x", reg_data_2);
     //$display("ex write: %0d $%0d=0x%x", ex_wreg_write_o, ex_wreg_addr_o, ex_wreg_data_o);
     //$display("mem write: %0d $%0d=0x%x", mem_wreg_write_o, mem_wreg_addr_o, mem_wreg_data_o);

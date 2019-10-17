@@ -37,7 +37,7 @@ Reg_addr_t  reg1_addr;
 Reg_addr_t  reg2_addr;
 Bit_t       wreg_write;
 Reg_addr_t  wreg_addr;
-Halfword_t  immediate;
+Word_t      immediate;
 
 
 id_type id_type_instance(
@@ -90,7 +90,7 @@ always_comb begin
     end else if (reg1_read_o == `ENABLE) begin
         reg1_o <= reg1_data_i;
     end else if (reg1_read_o == `DISABLE) begin
-        reg1_o <= {`ZERO_HWORD, immediate};
+        reg1_o <= immediate;
     end else begin
         reg1_o <= `ZERO_WORD;
     end
@@ -114,7 +114,7 @@ always_comb begin
     end else if (reg2_read_o == `ENABLE) begin
         reg2_o <= reg2_data_i;
     end else if (reg2_read_o == `DISABLE) begin
-        reg2_o <= {`ZERO_HWORD, immediate};
+        reg2_o <= immediate;
     end else begin
         reg2_o <= `ZERO_WORD;
     end
