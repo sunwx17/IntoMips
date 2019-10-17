@@ -33,12 +33,18 @@ registers registers_instance(
     .data_2(reg_data_2)
 );
 
+//branch
+Bit_t branch_flag;
+Inst_addr_t branch_target_addr;
+
 //pc
 pc_reg pc_reg_instance(
     .clk,
     .rst,
     .pc(rom_addr_o),
-    .ce(rom_ce_o)
+    .ce(rom_ce_o),
+    .branch_flag_i(branch_flag),
+    .branch_target_addr_i(branch_target_addr) 
 );
 
 //connect if_id and id
@@ -62,6 +68,7 @@ Word_t      id_reg1_o;
 Word_t      id_reg2_o;
 Bit_t       id_wreg_write_o;
 Reg_addr_t  id_wreg_addr_o;
+Inst_addr_t id_pc_o;
 
 
 //connext ex and ex_mem
@@ -96,7 +103,10 @@ id id_instance(
     .ex_wreg_data_i(ex_wreg_data_o),
     .mem_wreg_write_i(mem_wreg_write_o),
     .mem_wreg_addr_i(mem_wreg_addr_o),
-    .mem_wreg_data_i(mem_wreg_data_o) 
+    .mem_wreg_data_i(mem_wreg_data_o), 
+    .branch_flag_o(branch_flag),
+    .branch_target_addr_o(branch_target_addr),
+    .pc_o(id_pc_o) 
 );
 
 
@@ -107,6 +117,7 @@ Word_t      ex_reg1_i;
 Word_t      ex_reg2_i;
 Bit_t       ex_wreg_write_i;
 Reg_addr_t  ex_wreg_addr_i;
+Inst_addr_t ex_pc_i; 
 
 //stage id_ex
 id_ex id_ex_instance(
@@ -117,11 +128,13 @@ id_ex id_ex_instance(
     .id_reg2(id_reg2_o),
     .id_wreg_write(id_wreg_write_o),
     .id_wreg_addr(id_wreg_addr_o),
+    .id_pc(id_pc_o),
     .ex_oper(ex_oper_i),
     .ex_reg1(ex_reg1_i),
     .ex_reg2(ex_reg2_i),
     .ex_wreg_write(ex_wreg_write_i),
-    .ex_wreg_addr(ex_wreg_addr_i)
+    .ex_wreg_addr(ex_wreg_addr_i),
+    .ex_pc(ex_pc_i)
 );
 
 
@@ -172,6 +185,7 @@ hilo hilo_instance(
 //stage ex
 ex ex_instance(
     .rst,
+    .pc(ex_pc_i),
     .oper(ex_oper_i),
     .reg1(ex_reg1_i),
     .reg2(ex_reg2_i),

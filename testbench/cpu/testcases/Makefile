@@ -13,7 +13,7 @@ all: $(MEMORY) $(ANSWER)
 %.o : %.s	
 	$(ARCH)as -O0 -mips32 -EB $^ -o $@
 
-%.ans : %.s
+%.ans : %.s make_answer.py
 	python make_answer.py -i $< -o $@
 
 

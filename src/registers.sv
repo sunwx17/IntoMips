@@ -1,8 +1,7 @@
 `include "defines.svh"
 module registers(
     // clock
-    input   Bit_t    clk,
-    input   Bit_t    rst,
+    input               clk, rst,
 
     // write
     input   Bit_t       write_enable,
