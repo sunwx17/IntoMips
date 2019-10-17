@@ -7,7 +7,16 @@ module mem(
 
     output  Bit_t       wreg_write_o,
     output  Reg_addr_t  wreg_addr_o,
-    output  Word_t      wreg_data_o
+    output  Word_t      wreg_data_o,
+
+    //hilo
+    input   Bit_t       whilo_i,
+    input   Word_t      hi_i,
+    input   Word_t      lo_i,
+
+    output  Bit_t       whilo_o,
+    output  Word_t      hi_o,
+    output  Word_t      lo_o
 );
 
 always_comb begin
@@ -15,10 +24,18 @@ always_comb begin
         wreg_write_o <= `DISABLE;
         wreg_addr_o  <= `REG_ZERO;
         wreg_data_o  <= `ZERO_WORD;
+
+        whilo_o      <= `DISABLE;
+        hi_o         <= `ZERO_WORD;
+        lo_o         <= `ZERO_WORD;
     end else begin
         wreg_write_o <= wreg_write_i;
         wreg_addr_o  <= wreg_addr_i;
         wreg_data_o  <= wreg_data_i;
+
+        whilo_o      <= whilo_i;
+        hi_o         <= hi_i;
+        lo_o         <= lo_i;
     end
 end
 

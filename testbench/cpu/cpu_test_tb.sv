@@ -8,9 +8,17 @@ Bit_t       reg_write_enable;
 Reg_addr_t  reg_write_addr;
 Reg_data_t  reg_write_data;
 
+Bit_t       hilo_we;
+Reg_data_t  hi_data;
+Reg_data_t  lo_data;
+
 assign reg_write_enable = cpu_test_instance.cpu_instance.reg_write_enable;
 assign reg_write_addr = cpu_test_instance.cpu_instance.reg_write_addr;
 assign reg_write_data = cpu_test_instance.cpu_instance.reg_write_data;
+
+assign hilo_we = cpu_test_instance.cpu_instance.hilo_we;
+assign hi_data = cpu_test_instance.cpu_instance.hi_i;
+assign lo_data = cpu_test_instance.cpu_instance.lo_i;
 
 initial begin
     clock_50 = 1'b0;
@@ -67,6 +75,21 @@ while(!$feof(ans)) begin @ (negedge clock_50)
                 $display("[Fail] Expected: %0s, Got: %0s", line, out);
                 is_ok = 1'b0;
             end
+        end else if (hilo_we == `ENABLE) begin
+            $sformat(out, "hi=0x%x,lo=0x%x", hi_data, lo_data);
+            if (out == line) begin
+                $display("[pass] %0s", out);
+            end else begin
+                $display("[Fail] Expected: %0s, Got: %0s", line, out);
+                is_ok = 1'b0;
+            end
+        end else begin
+            if (line == "skip") begin
+                $display("[pass] %0s", line);
+            end else begin
+                $display("[Fail] Expected: %0s, Got: skip", line);
+                is_ok = 1'b0;
+            end
         end
     end
 end
@@ -85,6 +108,7 @@ initial begin
     unittest("write_to_reg0");
     unittest("logic");
     unittest("shift");
+    unittest("move");
     $finish;
 end
 
