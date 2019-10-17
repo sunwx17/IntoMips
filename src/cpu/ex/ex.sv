@@ -3,6 +3,8 @@
 module ex(
     input               rst,
     
+    input   Inst_t      pc,
+
     input   Oper_t      oper,
     input   Word_t      reg1,
     input   Word_t      reg2,
@@ -53,7 +55,7 @@ assign sub_u = reg1 - reg2;
 // comparsion
 Bit_t signed_lt, unsigned_lt;
 assign signed_lt = (reg1[31] != reg2[31]) ? reg1[31] : sub_u[31];
-assign unsigned_lt = ({1'b0, reg1} < {1'b0, reg2});
+assign unsigned_lt = (reg1 < reg2);
 
 //multiply
 Bit_t is_signed, res_sign;
@@ -121,6 +123,8 @@ always_comb begin
             OP_SLTU, OP_SLTIU : wreg_data_o <= unsigned_lt;
             OP_MUL : wreg_data_o <= mul_res[31:0];
             OP_MULT, OP_MULTU : {hi_o, lo_o} <= mul_res;
+            OP_JALR : wreg_data_o <= pc + 8;
+            OP_JAL, OP_BLTZAL, OP_BGEZAL : begin wreg_write_o <= `ENABLE;  wreg_data_o <= pc + 8; end
             //OP_CLZ  : 
             //OP_CLO  : 
             default: begin

@@ -22,10 +22,21 @@ def main(argv):
     answer = ''
     with open(inputfile, 'r') as f:
         lines = f.readlines()
+        count = 0
+        m = {}
         for line in lines:
             if '#' in line:
+                count = count + 1
+                ans = line.split(' ')[-1]
+                if ':' in line:
+                    temp = ans.split(':')
+                    num = int(temp[0])
+                    m[num] = temp[1];
+                else:
+                    m[count] = ans;
                 #print(line)
-                answer += line.split(' ')[-1].strip() + '\n'
+        for i in range(1, count + 1):
+            answer += str(i) + ':' + m[i].strip() + '\n'
     with open(outputfile, 'w') as f:
         f.write(answer)
 

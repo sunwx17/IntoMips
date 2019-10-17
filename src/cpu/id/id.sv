@@ -2,11 +2,11 @@
 
 
 module id(
-    input                   rst,
-    input   Inst_addr_t     pc,
-    input   Inst_t          inst,
-    input   Reg_data_t      reg1_data_i,
-    input   Reg_data_t      reg2_data_i,
+    input               rst,
+    input   Inst_addr_t pc,
+    input   Inst_t      inst,
+    input   Reg_data_t  reg1_data_i,
+    input   Reg_data_t  reg2_data_i,
     
     output  Bit_t       reg1_read_o,
     output  Bit_t       reg2_read_o,
@@ -20,15 +20,20 @@ module id(
     output  Reg_addr_t  wreg_addr_o,
 
     //below for solve data conflict
-    input  Bit_t       ex_wreg_write_i,
-    input  Reg_addr_t  ex_wreg_addr_i,
-    input  Word_t      ex_wreg_data_i,
+    input   Bit_t       ex_wreg_write_i,
+    input   Reg_addr_t  ex_wreg_addr_i,
+    input   Word_t      ex_wreg_data_i,
 
-    input  Bit_t       mem_wreg_write_i,
-    input  Reg_addr_t  mem_wreg_addr_i,
-    input  Word_t      mem_wreg_data_i 
+    input   Bit_t       mem_wreg_write_i,
+    input   Reg_addr_t  mem_wreg_addr_i,
+    input   Word_t      mem_wreg_data_i, 
+
+    //branch
+    output  Bit_t       branch_flag_o,
+    output  Inst_addr_t branch_target_addr_o,
+
+    output  Inst_addr_t pc_o
 );
-
 
 Oper_t      oper;
 Bit_t       reg1_read;
@@ -52,6 +57,17 @@ id_type id_type_instance(
     .immediate
 );
 
+branch branch_instance(
+    .rst,
+    .oper,
+    .pc,
+    .reg1(reg1_o),
+    .reg2(reg2_o),
+    .imm(immediate),
+    .branch_flag(branch_flag_o),
+    .branch_target_addr(branch_target_addr_o)
+);
+
 always_comb begin
     if (rst == `ENABLE) begin
         oper_o <= OP_NOP;
@@ -61,6 +77,7 @@ always_comb begin
         reg2_read_o <= `DISABLE;
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
+        pc_o <= `PC_RESET_ADDR;
     end else begin        
         oper_o <= oper;
         wreg_write_o <= wreg_write;
@@ -69,6 +86,7 @@ always_comb begin
         reg2_read_o <= reg2_read;
         reg1_addr_o <= reg1_addr;
         reg2_addr_o <= reg2_addr;
+        pc_o <= pc;
     end
 end
     

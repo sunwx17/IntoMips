@@ -60,6 +60,8 @@ always_comb begin
                 `SEPC_OPCODE_SLTU : oper <= OP_SLTU ;
                 `SEPC_OPCODE_MULT : oper <= OP_MULT ;
                 `SEPC_OPCODE_MULTU: oper <= OP_MULTU;
+                `SEPC_OPCODE_JR   : oper <= OP_JR   ;
+                `SEPC_OPCODE_JALR : oper <= OP_JALR ;
                 default: oper <= OP_NOP;
             endcase
         end
@@ -68,6 +70,15 @@ always_comb begin
                 `SPEC2_OPCODE_CLZ : oper <= OP_CLZ;
                 `SPEC2_OPCODE_CLO : oper <= OP_CLO;
                 `SPEC2_OPCODE_MUL : oper <= OP_MUL;
+                default: oper <= OP_NOP;
+            endcase
+        end
+        `OPCODE_REGIMM : begin
+            case (rt)
+                `REGIMM_OPCODE_BLTZ   : oper <= OP_BLTZ  ;
+                `REGIMM_OPCODE_BLTZAL : oper <= OP_BLTZAL;
+                `REGIMM_OPCODE_BGEZ   : oper <= OP_BGEZ  ;
+                `REGIMM_OPCODE_BGEZAL : oper <= OP_BGEZAL;
                 default: oper <= OP_NOP;
             endcase
         end
@@ -80,6 +91,12 @@ always_comb begin
         `OPCODE_ADDIU: oper <= OP_ADDIU;  
         `OPCODE_SLTI : oper <= OP_SLTI ;  
         `OPCODE_SLTIU: oper <= OP_SLTIU;  
+        `OPCODE_J    : oper <= OP_J    ;
+        `OPCODE_JAL  : oper <= OP_JAL  ;
+        `OPCODE_BEQ  : oper <= OP_BEQ  ;
+        `OPCODE_BGTZ : oper <= OP_BGTZ ;
+        `OPCODE_BLEZ : oper <= OP_BLEZ ;
+        `OPCODE_BNE  : oper <= OP_BNE  ;
         default: oper <= OP_NOP;
     endcase
 end
@@ -92,7 +109,7 @@ always_comb begin
             reg1_read  <= `ENABLE;
             reg2_read  <= `DISABLE;
             reg1_addr  <= rs;
-            reg2_addr  <= `ZERO_WORD;
+            reg2_addr  <= `REG_ZERO;
             immediate  <= {`ZERO_HWORD, imm}; 
         end
         `OPER_TYPE_I_S : begin
@@ -101,10 +118,27 @@ always_comb begin
             reg1_read  <= `ENABLE;
             reg2_read  <= `DISABLE;
             reg1_addr  <= rs;
-            reg2_addr  <= `ZERO_WORD;
+            reg2_addr  <= `REG_ZERO;
             immediate  <= {{16{imm[15]}}, imm}; 
         end
-        //OPER_TYPE_J :
+        `OPER_TYPE_I_B : begin
+            wreg_write <= `DISABLE;
+            wreg_addr  <= 5'b11111;
+            reg1_read  <= `ENABLE;
+            reg2_read  <= `ENABLE;
+            reg1_addr  <= rs;
+            reg2_addr  <= rt;
+            immediate  <= {{16{imm[15]}}, imm}; 
+        end
+        `OPER_TYPE_J   : begin
+            wreg_write <= `DISABLE;
+            wreg_addr  <= 5'b11111;
+            reg1_read  <= `DISABLE;
+            reg2_read  <= `DISABLE;
+            reg1_addr  <= `REG_ZERO;
+            reg2_addr  <= `REG_ZERO;
+            immediate  <= {6'b0, addr}; 
+        end
         `OPER_TYPE_R_0 : begin
             wreg_write <= `ENABLE;
             wreg_addr  <= rd;
@@ -112,14 +146,14 @@ always_comb begin
             reg2_read  <= `ENABLE;
             reg1_addr  <= rs;
             reg2_addr  <= rt;
-            immediate  <= `ZERO_WORD;
+            immediate  <= `REG_ZERO;
         end
         `OPER_TYPE_R_1 : begin
             wreg_write <= `ENABLE;
             wreg_addr  <= rd;
             reg1_read  <= `DISABLE;
             reg2_read  <= `ENABLE;
-            reg1_addr  <= `ZERO_WORD;
+            reg1_addr  <= `REG_ZERO;
             reg2_addr  <= rt;
             immediate  <= {27'b0, sa};
         end
