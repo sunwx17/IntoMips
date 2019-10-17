@@ -45,6 +45,12 @@ always_comb begin
                 `SEPC_OPCODE_SLLV : oper <= OP_SLLV; 
                 `SEPC_OPCODE_SRLV : oper <= OP_SRLV; 
                 `SEPC_OPCODE_SRAV : oper <= OP_SRAV; 
+                `SEPC_OPCODE_MOVN : oper <= OP_MOVN;
+                `SEPC_OPCODE_MOVZ : oper <= OP_MOVZ;
+                `SEPC_OPCODE_MFHI : oper <= OP_MFHI;
+                `SEPC_OPCODE_MFLO : oper <= OP_MFLO;
+                `SEPC_OPCODE_MTHI : oper <= OP_MTHI;
+                `SEPC_OPCODE_MTLO : oper <= OP_MTLO;
                 default: oper <= OP_NOP;
             endcase
         end

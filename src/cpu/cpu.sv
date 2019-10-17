@@ -133,6 +133,40 @@ id_ex id_ex_instance(
     //$display("wb write: %0d $%0d=0x%x", reg_write_enable, reg_write_addr, reg_write_data);
 end*/
 
+//hilo
+Bit_t       ex_whilo_o;
+Word_t      ex_hi_o;
+Word_t      ex_lo_o;
+
+Bit_t       mem_whilo_i;
+Word_t      mem_hi_i;
+Word_t      mem_lo_i;
+
+Bit_t       mem_whilo_o;
+Word_t      mem_hi_o;
+Word_t      mem_lo_o;
+
+Bit_t       hilo_we;
+Word_t      hi_i;
+Word_t      lo_i;
+Word_t      hi_o;
+Word_t      lo_o;
+
+
+
+hilo hilo_instance(
+    .clk,
+    .rst,
+    .we(hilo_we),
+    .hi_i,
+    .lo_i,
+    .hi_o,
+    .lo_o
+);
+
+
+
+
 
 //stage ex
 ex ex_instance(
@@ -144,7 +178,18 @@ ex ex_instance(
     .wreg_addr_i(ex_wreg_addr_i),
     .wreg_write_o(ex_wreg_write_o),
     .wreg_addr_o(ex_wreg_addr_o),
-    .wreg_data_o(ex_wreg_data_o)
+    .wreg_data_o(ex_wreg_data_o),
+    .hi_i(hi_o),
+    .lo_i(lo_o),
+    .mem_whilo_i(mem_whilo_o),
+    .mem_hi_i(mem_hi_o),
+    .mem_lo_i(mem_lo_o),
+    .wb_whilo_i(hilo_we),
+    .wb_hi_i(hi_i),
+    .wb_lo_i(lo_i),
+    .whilo_o(ex_whilo_o),
+    .hi_o(ex_hi_o),
+    .lo_o(ex_lo_o) 
 );
 
 //connext ex_mem and mem
@@ -161,7 +206,13 @@ ex_mem ex_mem_instance(
     .ex_wreg_data(ex_wreg_data_o),
     .mem_wreg_write(mem_wreg_write_i),
     .mem_wreg_addr(mem_wreg_addr_i),
-    .mem_wreg_data(mem_wreg_data_i)
+    .mem_wreg_data(mem_wreg_data_i),
+    .ex_whilo(ex_whilo_o),
+    .ex_hi(ex_hi_o),
+    .ex_lo(ex_lo_o),
+    .mem_whilo(mem_whilo_i),
+    .mem_hi(mem_hi_i),
+    .mem_lo(mem_lo_i) 
 );
 
 
@@ -174,7 +225,13 @@ mem mem_instance(
     .wreg_data_i(mem_wreg_data_i),
     .wreg_write_o(mem_wreg_write_o),
     .wreg_addr_o(mem_wreg_addr_o),
-    .wreg_data_o(mem_wreg_data_o)
+    .wreg_data_o(mem_wreg_data_o),
+    .whilo_i(mem_whilo_i),
+    .hi_i(mem_hi_i),
+    .lo_i(mem_lo_i),
+    .whilo_o(mem_whilo_o),
+    .hi_o(mem_hi_o),
+    .lo_o(mem_lo_o) 
 );
 
 //stage mem_wb
@@ -186,8 +243,15 @@ mem_wb mem_wb_instance(
     .mem_wreg_data(mem_wreg_data_o),
     .wb_wreg_write(reg_write_enable),
     .wb_wreg_addr(reg_write_addr),
-    .wb_wreg_data(reg_write_data)
+    .wb_wreg_data(reg_write_data),
+    .mem_whilo(mem_whilo_o),
+    .mem_hi(mem_hi_o),
+    .mem_lo(mem_lo_o),
+    .wb_whilo(hilo_we),
+    .wb_hi(hi_i),
+    .wb_lo(lo_i) 
 );
+
 
 
 

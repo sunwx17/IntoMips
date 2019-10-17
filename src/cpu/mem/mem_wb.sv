@@ -7,7 +7,16 @@ module mem_wb(
 
     output  Bit_t       wb_wreg_write,
     output  Reg_addr_t  wb_wreg_addr,
-    output  Word_t      wb_wreg_data    
+    output  Word_t      wb_wreg_data,    
+    
+    //hilo    
+    input   Bit_t       mem_whilo,
+    input   Word_t      mem_hi,
+    input   Word_t      mem_lo,
+
+    output  Bit_t       wb_whilo,
+    output  Word_t      wb_hi,
+    output  Word_t      wb_lo
 );
 
 always @ (posedge clk) begin
@@ -15,10 +24,18 @@ always @ (posedge clk) begin
         wb_wreg_write <= `DISABLE;
         wb_wreg_addr  <= `REG_ZERO;
         wb_wreg_data  <= `ZERO_WORD;
+
+        wb_whilo      <= `DISABLE;
+        wb_hi         <= `ZERO_WORD;
+        wb_lo         <= `ZERO_WORD;
     end else begin
         wb_wreg_write <= mem_wreg_write;
         wb_wreg_addr  <= mem_wreg_addr;
         wb_wreg_data  <= mem_wreg_data;
+
+        wb_whilo      <= mem_whilo;
+        wb_hi         <= mem_hi;
+        wb_lo         <= mem_lo;
     end
 end
     
