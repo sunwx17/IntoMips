@@ -19,6 +19,8 @@ typedef logic[63:0] Doubleword_t;
 
 //ram data format
 typedef logic[19:0] Ram_addr_t;
+//flash data format
+typedef logic[22:0] Flash_addr_t;
 
 `define ZERO_BIT    1'b0
 `define ZERO_BYTE   8'h0

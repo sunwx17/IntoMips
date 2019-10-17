@@ -44,8 +44,7 @@ module sram_controller (
         if (rst) begin
             cur_state <= IDLE;
             $display("rst to idle time = %t", $time);
-        end
-        else begin
+        end else begin
             cur_state <= nxt_state;
             $display("cur_state = %b time = %t", cur_state, $time);
         end
