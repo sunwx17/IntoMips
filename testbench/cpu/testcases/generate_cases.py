@@ -2,7 +2,6 @@ import sys, abc, random, math
 
 target_path = "instructions/"
 n = 100
-insts = ["ori", "lui"]
 
 class Imm(object):
     def __init__(self, width, value = 0):
@@ -24,7 +23,7 @@ class Reg(object):
     def __init__(self, num ,value = 0):
         self.num = num;
         self.value = value;
-        assert num >= 0 and num < 32 and value >= 0 and value < 2 ** 32
+        assert num >= 0 and num < 34 and value >= 0 and value < 2 ** 32
     
     def getNum(self):
         return self.num
@@ -38,7 +37,15 @@ class Reg(object):
             assert v >= 0 and v < 2 ** 32
 
     def to_string(self):
-        return "${}".format(self.num)
+        if(self.num < 32):
+            return "${}".format(self.num)
+        elif(self.num == 32):
+            return "hi"
+        elif(self.num == 33):
+            return "lo"
+    
+    def clear(self):
+        self.value = 0
 
 regs = []
 
@@ -57,8 +64,11 @@ class Inst(object):
         if (to_be_writen == -1):
             ans = "skip"
         else:
-            param_list[0].setValue(res);
-            ans = "${}=0x{:08x}".format(to_be_writen.getNum(), res)
+            to_be_writen.setValue(res);
+            if(to_be_writen.getNum() < 32):
+                ans = "{}=0x{:08x}".format(to_be_writen.to_string(), res)
+            else:
+                ans = "hi=0x{:08x},lo=0x{:08x}".format(regs[32].getValue(), regs[33].getValue())
         return ans
 
     def generate_line(self, param_list):
@@ -77,45 +87,50 @@ class Lui(Inst):
     def run(self, param_list):
         return (param_list[0], param_list[1].getValue() << 16)
 
+class Mthi(Inst):
+    name = 'mthi'
+    params = ['r']
+    def run(self, param_list):
+        return (regs[32], param_list[0].getValue())
 
-def factory(name):
-    if (name == "ori"):
-        return Ori();
-    elif (name == "lui"):
-        return Lui();
 
+insts = [Ori(), Lui(), Mthi()]
 
 def init():
-    for i in range(0, 32):
+    # 32 is hi, 33 is lo
+    for i in range(0, 34):
         regs.append(Reg(i));
 
 
 def main(argv):
-    init()
+    
 
     head = "    .org 0x0\n    .global _start\n    .set noat\n    .set noreorder\n    .set nomacro\n_start:\n"
 
-    o = Ori();
-    l = Lui();
-    for i in range(0, 32):
-        params_lui = [regs[i], Imm(16, random.randint(0, 2 ** 16))]
-        head += l.generate_line(params_lui)
-        params_ori = [regs[i], regs[i], Imm(16, random.randint(0, 2 ** 16))]
-        head += o.generate_line(params_ori)
 
-    for name in insts:
-        now_string = head;
-        inst_ins = factory(name)
+    for inst in insts:
+        regs.clear()
+        init()
+
+        o = Ori();
+        l = Lui();
+        for i in range(0, 32):
+            params_lui = [regs[i], Imm(16, random.randint(0, 2 ** 16))]
+            head += l.generate_line(params_lui)
+            params_ori = [regs[i], regs[i], Imm(16, random.randint(0, 2 ** 16))]
+            head += o.generate_line(params_ori)
+
+        now_string = head
         for i in range(0, n):
             params = []
-            for p in inst_ins.params:
+            for p in inst.params:
                 assert p == 'r' or p > 0 and p < 32
                 if (p == 'r'):
                     params.append(regs[random.randint(0, 31)])
                 else:
                     params.append(Imm(p, random.randint(0, 2 ** p)))
-            now_string += inst_ins.generate_line(params)
-        with open(target_path + "auto_" + name + ".s", 'w') as f:
+            now_string += inst.generate_line(params)
+        with open(target_path + "auto_" + inst.name + ".s", 'w') as f:
             f.write(now_string)
             f.flush()
 

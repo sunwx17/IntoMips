@@ -119,6 +119,7 @@ initial begin
     unittest("branch");
     unittest("auto_ori");
     unittest("auto_lui");
+    unittest("auto_mthi");
     $finish;
 end
 
