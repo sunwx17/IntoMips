@@ -43,12 +43,15 @@ def flash(test_num):
     addr = 0
     with open("testcases/flash.mem", "w") as f:
         for _ in range(test_num):
-            ans = rand_half_word()
-            f.write(ans + "\n")
-            ans_list.append("addr:" + str(addr) + "=" + ans)
-            addr += 4
+            ans0 = rand_half_word()
+            ans1 = rand_half_word()
+            f.write(ans0 + "\n")
+            f.write(ans1 + "\n")
+            ans_list.append("addr:" + str(addr) + "=" + ans1 + ans0)
+            addr += 4 
     with open("testcases/flash.ans", "w") as f:
-        f.write('\n'.join(ans_list))
+        for ans in ans_list:
+            f.write(ans + "\n")
     
 if __name__ == "__main__":
     main(sys.argv[1:])

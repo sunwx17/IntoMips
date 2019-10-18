@@ -39,40 +39,36 @@ end
 
 task unittest();
 //读 测试
-integer count;
 logic is_ok;
 logic read_flag;
 integer ans;
-integer addr0, addr1;
-Halfword_t content0, content1;
+integer addr;
+Word_t content;
 
 ans = $fopen("flash.ans", "r");
 
 $display("---------------unittest: flash read------------------");
-count = 0;
 is_ok = 1'b1;
 read_flag = 1'b0;
 read_op = 1'b0;
-while(!$feof(ans)) begin @(negedge clk_10)
-    count = count + 1;
+while(1) begin @(negedge clk_10)
     if (read_flag == 1'b0) begin
-        $fscanf(ans, "addr:%d=%h\n", addr0, content0);
-        //$display("addr = %d, content = %b", addr, content);
-        bus_addr = addr0;
+        $fscanf(ans, "addr:%d=%h\n", addr, content);
+        //$display("addr = %d, content = %h", addr, content);
+        bus_addr = addr;
         read_op = 1'b1;
         
         read_flag = 1'b1;
     end else begin
-        $fscanf(ans, "addr:%d=%h\n", addr1, content1);
-        if (bus_data == {content1, content0}) begin
-            $display("[Pass] Addr: %d", addr0);
+        if (bus_data == content) begin
+            $display("[Pass] Addr: %d", addr);
         end else begin
-            $display("[Fail] Addr: %d, Expected:%h, Got:%h", addr0, {content1, content0}, bus_data);
+            $display("[Fail] Addr: %d, Expected:%h, Got:%h", addr, content, bus_data);
             is_ok = 1'b0;
         end
         read_op = 1'b0;
-        
         read_flag = 1'b0;
+        if ($feof(ans)) break;
     end
 end
  

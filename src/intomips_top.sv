@@ -99,4 +99,20 @@ tb_cloud_sram_controller(
     .dpy1(dpy1)
 );
 */
+//云端flash测试模块导入
+tb_cloud_flash_controller(
+    .clock_btn(clock_btn),
+    .reset_btn(reset_btn),
+    .flash_a(flash_a),
+    .flash_d(flash_d),
+    .flash_rp_n(flash_rp_n),
+    .flash_vpen(flash_vpen),
+    .flash_ce_n(flash_ce_n),
+    .flash_oe_n(flash_oe_n),
+    .flash_we_n(flash_we_n),
+    .flash_byte_n(flash_byte_n),
+    .leds(leds),
+    .dpy0(dpy0),
+    .dpy1(dpy1)
+);
 endmodule
