@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="D:/Desktop/SECO/IntoMips/vivado/intomips.xpr">
+<Project Version="7" Minor="39" Path="/home/monell/code/IntoMips/vivado/intomips.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="8de52a4ed05c44eda4fb54cbd590c16f"/>
@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="423"/>
+    <Option Name="WTXSimLaunchSim" Val="407"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -70,13 +70,6 @@
       <File Path="$PPRDIR/../src/defines.svh">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/intomips_top.sv">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -177,7 +170,21 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/cpu/id/branch.sv">
+      <File Path="$PPRDIR/../testbench/tb_cloud_flash_controller.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/intomips_top.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/peripheral/flash_controller.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -250,110 +257,107 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/ori0.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/ori0.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_1.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/ori0.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/ori1.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/ori2.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/write_to_reg0.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_2.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/jump.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/write_to_reg0.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/shift.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/branch.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/shift.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/logic.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/logic.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/branch.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/ori0.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/jump.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_0.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/logic.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/move.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_2.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_1.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_0.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/move.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_2.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_2.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/move.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/ori0.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/logic.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/shift.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/write_to_reg0.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/logic.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/move.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_0.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_0.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_0.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/jump.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/shift.mem">
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_1.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/arithmetic_1.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/write_to_reg0.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/write_to_reg0.mem">
+      <File Path="$PPRDIR/../src/peripheral/flash_controller.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/peripheral/testcases/flash.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_1.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/arithmetic_2.mem">
+      <File Path="$PPRDIR/../testbench/peripheral/flash_test_tb.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/move.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/shift.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/branch.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_lui.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_ori.s"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_ori.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_ori.mem">
+      <File Path="$PPRDIR/../testbench/peripheral/flash_test.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_lui.ans"/>
-      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_lui.mem">
+      <File Path="$PPRDIR/../testbench/peripheral/fake_flash.sv">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../testbench/peripheral/testcases/flash.ans"/>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="cpu_test_tb"/>
+        <Option Name="TopModule" Val="flash_test_tb"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
         <Option Name="TransportPathDelay" Val="0"/>
         <Option Name="TransportIntDelay" Val="0"/>
         <Option Name="SrcSet" Val="sources_1"/>
-        <Option Name="xsim.simulate.runtime" Val="100000ns"/>
+        <Option Name="xsim.simulate.runtime" Val="6000ns"/>
       </Config>
     </FileSet>
     <FileSet Name="utils_1" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
@@ -374,29 +378,32 @@
     <Simulator Name="Questa">
       <Option Name="Description" Val="Questa Advanced Simulator"/>
     </Simulator>
+    <Simulator Name="IES">
+      <Option Name="Description" Val="Incisive Enterprise Simulator (IES)"/>
+    </Simulator>
+    <Simulator Name="Xcelium">
+      <Option Name="Description" Val="Xcelium Parallel Simulator"/>
+    </Simulator>
+    <Simulator Name="VCS">
+      <Option Name="Description" Val="Verilog Compiler Simulator (VCS)"/>
+    </Simulator>
     <Simulator Name="Riviera">
       <Option Name="Description" Val="Riviera-PRO Simulator"/>
     </Simulator>
-    <Simulator Name="ActiveHDL">
-      <Option Name="Description" Val="Active-HDL Simulator"/>
-    </Simulator>
   </Simulators>
   <Runs Version="1" Minor="10">
-    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a100tfgg676-2L" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" IncludeInArchive="true">
+    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a100tfgg676-2L" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
     <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
