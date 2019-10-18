@@ -1,6 +1,8 @@
 ARCH = mips-mti-elf-
 
-COMPILATION = $(wildcard *.s)
+TARGETDIR = instructions
+
+COMPILATION = $(wildcard $(TARGETDIR)/*.s)
 MEMORY = $(COMPILATION:.s=.mem)
 ANSWER = $(COMPILATION:.s=.ans)
 
@@ -21,5 +23,5 @@ all: $(MEMORY) $(ANSWER)
 
 .PHONY : clean
 clean :
-	-rm *.mem *.ans
+	-rm $(TARGETDIR)/*.mem $(TARGETDIR)/*.ans $(TARGETDIR)/auto_*.s
 

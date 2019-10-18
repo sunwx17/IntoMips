@@ -28,8 +28,8 @@ end
 initial begin
     rst = `ENABLE;
     #200 rst = `DISABLE;
-    #5600 rst = `ENABLE;
-    #6000 $stop;
+    #100000 rst = `ENABLE;
+    #100200 $stop;
 end
 
 cpu_test cpu_test_instance(
@@ -117,6 +117,8 @@ initial begin
     unittest("arithmetic_2");
     unittest("jump");
     unittest("branch");
+    unittest("auto_ori");
+    unittest("auto_lui");
     $finish;
 end
 
