@@ -3,9 +3,13 @@
 
 
 module pc_reg(
-    input   Bit_t           clk, rst,
-    output  Inst_addr_t     pc,
-    output  Bit_t           ce
+    input               clk, rst,
+    output  Inst_addr_t pc,
+    output  Bit_t       ce,
+
+    //branch
+    input   Bit_t       branch_flag_i,
+    input   Inst_addr_t branch_target_addr_i    
 );
 
 always @ (posedge clk) begin
@@ -19,11 +23,17 @@ end
 always @ (posedge clk) begin
     if (ce == `DISABLE) begin
         pc <= `PC_RESET_ADDR;
+    end else if(branch_flag_i == `ENABLE) begin
+        pc <= branch_target_addr_i;
     end else begin
         pc <= pc + `INST_BYTE_NUM;
     end
 
 end
+
+/*always @ (negedge clk) begin
+    $display("pc is 0x%x", pc);
+end*/
 
 
 endmodule

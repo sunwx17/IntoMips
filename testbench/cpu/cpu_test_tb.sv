@@ -28,8 +28,8 @@ end
 initial begin
     rst = `ENABLE;
     #200 rst = `DISABLE;
-    #5600 rst = `ENABLE;
-    #6000 $stop;
+    #100000 rst = `ENABLE;
+    #100200 $stop;
 end
 
 cpu_test cpu_test_instance(
@@ -43,7 +43,7 @@ task unittest(
 );
 
 logic is_ok;
-integer i, ans, count;
+integer i, ans, count, true_count;
 string line, out;
 
 for (i = 0; i < $size(cpu_test_instance.fake_rom_instance.inst_mem); i = i + 1) begin
@@ -62,13 +62,15 @@ end
 $display("----------------unittest: %0s----------------", name);
 
 count = 0;
+true_count = 0;
 is_ok = 1'b1;
 while(!$feof(ans)) begin @ (negedge clock_50)
     count = count + 1;
-    if (count > 4) begin
+    if (count > 5) begin
+        true_count = true_count + 1;
         $fscanf(ans, "%s\n", line);   
         if (reg_write_enable == `ENABLE) begin
-            $sformat(out, "$%0d=0x%x", reg_write_addr, reg_write_data);
+            $sformat(out, "%0d:$%0d=0x%x", true_count, reg_write_addr, reg_write_data);
             if (out == line) begin
                 $display("[pass] %0s", out);
             end else begin
@@ -76,7 +78,7 @@ while(!$feof(ans)) begin @ (negedge clock_50)
                 is_ok = 1'b0;
             end
         end else if (hilo_we == `ENABLE) begin
-            $sformat(out, "hi=0x%x,lo=0x%x", hi_data, lo_data);
+            $sformat(out, "%0d:hi=0x%x,lo=0x%x", true_count, hi_data, lo_data);
             if (out == line) begin
                 $display("[pass] %0s", out);
             end else begin
@@ -84,10 +86,11 @@ while(!$feof(ans)) begin @ (negedge clock_50)
                 is_ok = 1'b0;
             end
         end else begin
-            if (line == "skip") begin
+            $sformat(out, "%0d:skip", true_count);
+            if (line == out) begin
                 $display("[pass] %0s", line);
             end else begin
-                $display("[Fail] Expected: %0s, Got: skip", line);
+                $display("[Fail] Expected: %0s, Got: %0d:skip", line, true_count);
                 is_ok = 1'b0;
             end
         end
@@ -112,6 +115,10 @@ initial begin
     unittest("arithmetic_0");
     unittest("arithmetic_1");
     unittest("arithmetic_2");
+    unittest("jump");
+    unittest("branch");
+    unittest("auto_ori");
+    unittest("auto_lui");
     $finish;
 end
 
