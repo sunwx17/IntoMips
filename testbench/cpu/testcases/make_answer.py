@@ -36,7 +36,7 @@ def main(argv):
                 #print(line)
         for i in range(1, count + 1):
             answer += str(i) + ':' + m[i].strip() + '\n'
-    with open(outputfile, 'w') as f:
+    with open(outputfile, 'w', newline='\n') as f:
         f.write(answer)
 
 if __name__ == "__main__":
