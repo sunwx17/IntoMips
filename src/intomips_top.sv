@@ -83,6 +83,8 @@ module intomips_top(
 reg a;
 assign a = 1'b0;
 
+//assign leds[7:0] = base_ram_data[7:0];
+
 //云端sram测试模块导入
 /*
 tb_cloud_sram_controller(
@@ -99,6 +101,7 @@ tb_cloud_sram_controller(
     .dpy1(dpy1)
 );
 */
+/*
 //云端flash测试模块导入
 tb_cloud_flash_controller(
     .clock_btn(clock_btn),
@@ -115,4 +118,25 @@ tb_cloud_flash_controller(
     .dpy0(dpy0),
     .dpy1(dpy1)
 );
+*/
+
+//云端serial测试模块导入
+serial_controller_cloud_tb(
+    .rst(reset_btn),
+    .clk(clock_btn),
+    .base_ram_ce_n(base_ram_ce_n),
+    .base_ram_oe_n(base_ram_oe_n),
+    .base_ram_we_n(base_ram_we_n),
+    .uart_rdn(uart_rdn),
+    .uart_wrn(uart_wrn),
+    .uart_dataready(uart_dataready),
+    .uart_tbre(uart_tbre),
+    .uart_tsre(uart_tsre),
+    .uart_data(base_ram_data[7:0]),
+    .dip_sw(dip_sw),
+    .leds(leds),
+    .dpy0(dpy0),
+    .dpy1(dpy1)
+);
+
 endmodule
