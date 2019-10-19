@@ -29,6 +29,7 @@ typedef logic[22:0] Flash_addr_t;
 `define ZERO_DWORD  64'h0
 
 `define HIGH_WORD   32'bZ
+`define HIGH_BYTE   8'bZ
 
 
 //instruction

@@ -2,8 +2,7 @@
 module tb_cloud_sram_controller(
     //时钟信号
     input Bit_t clock_btn,
-    input Bit_t reset_btn,
-
+    input Bit_t reset_btn, 
     //BaseRAM信号
     inout wire[31:0] base_ram_data,  //BaseRAM数据，低8位与CPLD串口控制器共享
     output wire[19:0] base_ram_addr, //BaseRAM地址
