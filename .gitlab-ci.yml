@@ -1,14 +1,34 @@
 variables:
     PROJECT_DIR: "vivado"
     VIVADO_PATH: "/opt/Xilinx/Vivado/2018.3/bin/vivado"
-    PROJECT_NAME: "thinpad_top"
+    PROJECT_NAME: "intomips"
+    
 
 stages:
+  - run_simulation
   - build
   - test
 
 before_script:
     - cd ${PROJECT_DIR}
+
+
+
+# from https://github.com/trivialmips/TrivialMIPS/blob/master/.gitlab-ci.yml
+run_all_testbenches:
+  image: vivado:2018.3
+  tags:
+    - vivado
+  stage: run_simulation
+  script:
+    - export SIMULATION=sim_1
+    - ${VIVADO_PATH} -mode tcl -source scripts/run_simulation.tcl ${PROJECT_NAME}.xpr
+    - bash scripts/check_simulation.sh
+  artifacts:
+    paths:
+      - ${PROJECT_DIR}/${PROJECT_NAME}.sim/*/behav/xsim/simulate.log
+    when: always
+
 
 bitstream:
   stage: build
@@ -21,9 +41,11 @@ bitstream:
 
   artifacts:
     paths:
-      - ${PROJECT_DIR}/thinpad_top.runs/impl_1/thinpad_top.bit
-      - ${PROJECT_DIR}/thinpad_top.runs/impl_1/runme.log
-      - ${PROJECT_DIR}/thinpad_top.runs/synth_1/runme.log
+      - ${PROJECT_DIR}/$(PROJECT_NAME).runs/impl_1/$(PROJECT_NAME).bit
+      - ${PROJECT_DIR}/$(PROJECT_NAME).runs/impl_1/runme.log
+      - ${PROJECT_DIR}/$(PROJECT_NAME).runs/synth_1/runme.log
+
+
 
 sonar-scanner:
   image: harryleafchen/debian-curl-tar
