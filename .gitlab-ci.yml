@@ -16,7 +16,7 @@ before_script:
 
 # from https://github.com/trivialmips/TrivialMIPS/blob/master/.gitlab-ci.yml
 run_all_testbenches:
-  image: vivado:2018.3
+  image: vivado2018:2018.3
   tags:
     - vivado
   stage: run_simulation
