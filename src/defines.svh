@@ -12,6 +12,8 @@
 
 //data format
 typedef logic       Bit_t;
+typedef logic[1:0]  Doublebit_t;
+typedef logic[2:0]  Triblebit_t;
 typedef logic[7:0]  Byte_t;
 typedef logic[15:0] Halfword_t;
 typedef logic[31:0] Word_t;
@@ -21,6 +23,8 @@ typedef logic[63:0] Doubleword_t;
 typedef logic[19:0] Ram_addr_t;
 //flash data format
 typedef logic[22:0] Flash_addr_t;
+//vga data format
+typedef logic[18:0] Vga_addr_t;
 
 `define ZERO_BIT    1'b0
 `define ZERO_BYTE   8'h0
@@ -31,6 +35,13 @@ typedef logic[22:0] Flash_addr_t;
 `define HIGH_WORD   32'bZ
 `define HIGH_BYTE   8'bZ
 
+//vga
+`define VGA_HEIGHT  800
+`define VGA_WIDTH   600
+`define VGA_HFP     856
+`define VGA_HSP     976     
+`define VGA_VFP     637
+`define VGA_VSP     643
 
 //instruction
 `define INST_WIDTH          32
