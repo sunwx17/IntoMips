@@ -2,6 +2,7 @@ variables:
     PROJECT_DIR: "vivado"
     VIVADO_PATH: "/opt/Xilinx/Vivado/2018.3/bin/vivado"
     PROJECT_NAME: "intomips"
+    TOP_DISIGN: "intomips_top"
     
 
 stages:
@@ -44,7 +45,7 @@ bitstream:
 
   artifacts:
     paths:
-      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/${PROJECT_NAME}.bit
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/${TOP_DISIGN}.bit
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/runme.log
       - ${PROJECT_DIR}/${PROJECT_NAME}.runs/synth_1/runme.log
 
