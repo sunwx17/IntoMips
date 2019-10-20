@@ -30,6 +30,7 @@ initial begin
     wait (rst == 1'b0)
     flash_test_instance.unittest();
     sram_test_instance.unittest();
+    $finish;
 end
 
 endmodule
