@@ -8,7 +8,7 @@ def rand_half_word():
 
 def usage():
     print('python make_testcase -m <module> -n <test_num>')
-    print('       module: flash')
+    print('       module: flash, sram')
     print('       test_num: (default = 10)')
 
 def main(argv):
@@ -36,7 +36,8 @@ def main(argv):
     #print(module, test_num)
     if module == "flash":
         flash(test_num)
-    #TODO: sram...
+    if module == "sram":
+        sram(test_num)
 
 def flash(test_num):
     ans_list = []
@@ -50,6 +51,37 @@ def flash(test_num):
             ans_list.append("addr:" + str(addr) + "=" + ans1 + ans0)
             addr += 4 
     with open("testcases/flash.ans", "w") as f:
+        for ans in ans_list:
+            f.write(ans + "\n")
+
+def sram(test_num):
+    sram_read(test_num)
+    sram_write(test_num)
+    
+def sram_write(test_num):
+    addr = 0
+    with open("testcases/sram_write.mem", "w") as f:
+        for _ in range(test_num):
+            origin = rand_half_word() + rand_half_word()
+            f.write(origin + "\n")
+            addr += 1
+    addr = 0
+    with open("testcases/sram_write.ans", "w") as f:
+        for _ in range(test_num):
+            ans = rand_half_word() + rand_half_word()
+            f.write("write addr:" + str(addr) + "=" + ans + "\n")
+            addr += 1
+
+def sram_read(test_num):
+    ans_list = []
+    addr = 0
+    with open("testcases/sram_read.mem", "w") as f:
+        for _ in range(test_num):
+            ans = rand_half_word() + rand_half_word()
+            f.write(ans + "\n")
+            ans_list.append("read addr:" + str(addr) + "=" + ans)
+            addr += 1
+    with open("testcases/sram_read.ans", "w") as f:
         for ans in ans_list:
             f.write(ans + "\n")
     
