@@ -31,6 +31,7 @@ initial begin
     flash_test_instance.unittest();
     sram_test_instance.unittest();
     $finish;
+    $stop;
 end
 
 endmodule

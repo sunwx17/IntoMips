@@ -6,7 +6,7 @@ def main(argv):
     inputfile = ''
     outputfile = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+        opts, _ = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
     except getopt.GetoptError:
         print ('test.py -i <inputfile> -o <outputfile>')
         sys.exit(2)
@@ -30,9 +30,9 @@ def main(argv):
                 if ':' in line:
                     temp = ans.split(':')
                     num = int(temp[0])
-                    m[num] = temp[1];
+                    m[num] = temp[1]
                 else:
-                    m[count] = ans;
+                    m[count] = ans
                 #print(line)
         for i in range(1, count + 1):
             answer += str(i) + ':' + m[i].strip() + '\n'
