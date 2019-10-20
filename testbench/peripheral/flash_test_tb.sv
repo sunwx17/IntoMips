@@ -1,10 +1,12 @@
 `include "defines.svh"
-module flash_test_tb();
-Bit_t clk_10, clk_40, rst;
+module flash_test_tb(
+    input clk_10, clk_40, rst
+);
+//Bit_t clk_10, clk_40, rst;
 
-Flash_addr_t    bus_addr;
-Bit_t           read_op;
-Word_t          bus_data;
+Flash_addr_t    bus_addr = 0;
+Bit_t           read_op = 0;
+wire[31:0]      bus_data;
 
 
 
@@ -15,27 +17,6 @@ flash_test flash_test_instance(
     .read_op(read_op),
     .bus_data(bus_data)
 );
-
-
-initial begin
-    clk_10 = 1'b0;
-    forever #50 clk_10 = ~clk_10;
-end
-
-initial begin
-    clk_40 = 1'b0;
-    forever #12.5 clk_40 = ~clk_40;
-end
-
-initial begin
-    rst = 1'b1;
-    #200 rst = 1'b0;
-end
-
-initial begin
-    read_op = 1'b0;
-    bus_addr = 0;
-end
 
 task unittest();
 //读 测试
@@ -81,12 +62,4 @@ end
 
 endtask
 
-
-
-
-initial begin
-    wait (rst == 1'b0)
-    unittest();
-    $finish;
-end
 endmodule
