@@ -1,5 +1,5 @@
 `include "defines.svh"
-module tb_cloud_sram_controller(
+module sram_controller_cloud_tb(
     //时钟信号
     input Bit_t clock_btn,
     input Bit_t reset_btn, 
