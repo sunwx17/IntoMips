@@ -4,7 +4,7 @@ Bit_t clk_10, clk_40, rst;
 
 Flash_addr_t    bus_addr;
 Bit_t           read_op;
-wire [31:0]    bus_data;
+Word_t          bus_data;
 
 
 
@@ -47,7 +47,7 @@ Word_t content;
 
 ans = $fopen("flash.ans", "r");
 
-$display("---------------unittest: flash read------------------");
+$display("---------------unittest: flash_read------------------");
 is_ok = 1'b1;
 read_flag = 1'b0;
 read_op = 1'b0;
@@ -74,9 +74,9 @@ end
  
 
 if (is_ok == 1'b1) begin
-    $display("---------------Pass unittest: flash read------------------");
+    $display("---------------Pass unittest: flash_read------------------");
 end else begin
-    $display("---------------Fail unittest: flash read------------------");
+    $display("---------------Fail unittest: flash_read------------------");
 end
 
 endtask

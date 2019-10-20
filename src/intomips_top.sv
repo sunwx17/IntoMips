@@ -87,7 +87,7 @@ assign a = 1'b0;
 
 //云端sram测试模块导入
 /*
-tb_cloud_sram_controller(
+sram_controller_cloud_tb(
     .clock_btn(clock_btn),
     .reset_btn(reset_btn),
     .base_ram_data(base_ram_data),
@@ -103,7 +103,7 @@ tb_cloud_sram_controller(
 */
 /*
 //云端flash测试模块导入
-tb_cloud_flash_controller(
+flash_controller_cloud_tb(
     .clock_btn(clock_btn),
     .reset_btn(reset_btn),
     .flash_a(flash_a),
@@ -120,6 +120,7 @@ tb_cloud_flash_controller(
 );
 */
 
+/*
 //云端serial测试模块导入
 serial_controller_cloud_tb(
     .rst(reset_btn),
@@ -138,5 +139,5 @@ serial_controller_cloud_tb(
     .dpy0(dpy0),
     .dpy1(dpy1)
 );
-
+*/
 endmodule
