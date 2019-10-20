@@ -44,9 +44,9 @@ bitstream:
 
   artifacts:
     paths:
-      - ${PROJECT_DIR}/$(PROJECT_NAME).runs/impl_1/$(PROJECT_NAME).bit
-      - ${PROJECT_DIR}/$(PROJECT_NAME).runs/impl_1/runme.log
-      - ${PROJECT_DIR}/$(PROJECT_NAME).runs/synth_1/runme.log
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/${PROJECT_NAME}.bit
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/impl_1/runme.log
+      - ${PROJECT_DIR}/${PROJECT_NAME}.runs/synth_1/runme.log
 
 
 
