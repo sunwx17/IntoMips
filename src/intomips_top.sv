@@ -1,5 +1,4 @@
 `default_nettype wire
-`include "peripheral/sram_controller.sv"
 
 module intomips_top(
     input wire clk_50M,           //50MHz 时钟输入

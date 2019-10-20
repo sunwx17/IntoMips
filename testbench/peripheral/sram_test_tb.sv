@@ -1,6 +1,9 @@
 `include "defines.svh"
-module sram_test_tb();
-Bit_t clk_10 = 0, clk_40, rst;
+module sram_test_tb(
+    input clk_10, clk_40, rst
+);
+
+//Bit_t clk_10 = 0, clk_40, rst;
 
 Ram_addr_t  bus_addr;
 Bit_t       read_op;
@@ -12,7 +15,6 @@ assign bus_data = write_op? bus_data_assign: `HIGH_WORD;
 
 Bit_t       bus_stall;
 
-
 sram_test sram_test_instance(
     .clk(clk_40),
     .rst(rst),
@@ -23,29 +25,7 @@ sram_test sram_test_instance(
     .bus_stall(bus_stall)
 );
 
-initial begin
-    clk_10 = 1'b0;
-    forever #50 clk_10 = ~clk_10;
-end
-
-initial begin
-    clk_40 = 1'b0;
-    forever #12.5 clk_40 = ~clk_40;
-end
-
-initial begin
-    rst = 1'b1;
-    #200 rst = 1'b0;
-end
-
-initial begin
-    read_op = 1'b0;
-    write_op = 1'b0;
-    bus_addr = 0;
-end
-
-
-task unittest(
+task sram_unittest(
     input [128 * 5 - 1:0] name
 );
 
@@ -122,13 +102,10 @@ end
 endtask
 
 
-initial begin
-    wait (rst == 1'b0)
-    unittest("sram_read");
-    unittest("sram_write");
-    $finish;
-end
 
-
+task unittest();
+sram_unittest("sram_read");
+sram_unittest("sram_write");
+endtask
 
 endmodule
