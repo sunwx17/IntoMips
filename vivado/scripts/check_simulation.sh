@@ -3,8 +3,8 @@
 grep "Fail" intomips.sim/sim_cpu/behav/xsim/simulate.log
 
 if [ $? -eq 1 ]; then
-    echo "CPU simulation succeeded."
+    echo "$1 simulation succeeded."
 else
-    echo "CPU simulation failed. Please check log for more information."
+    echo "$1 simulation failed. Please check log for more information."
     exit 1
 fi

@@ -23,7 +23,10 @@ run_all_testbenches:
   script:
     - export SIMULATION=sim_cpu
     - ${VIVADO_PATH} -mode tcl -source scripts/run_simulation.tcl ${PROJECT_NAME}.xpr
-    - bash scripts/check_simulation.sh
+    - bash scripts/check_simulation.sh CPU
+    - export SIMULATION=sim_peripheral
+    - ${VIVADO_PATH} -mode tcl -source scripts/run_simulation.tcl ${PROJECT_NAME}.xpr
+    - bash scripts/check_simulation.sh Peripheral
   artifacts:
     paths:
       - ${PROJECT_DIR}/${PROJECT_NAME}.sim/*/behav/xsim/simulate.log
