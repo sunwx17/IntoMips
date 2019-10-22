@@ -121,6 +121,7 @@ initial begin
     unittest("auto_lui");
     unittest("auto_mthi");
     unittest("memory");
+    unittest("load");
     $finish;
 end
 

@@ -111,6 +111,11 @@ Reg_addr_t  mem_wreg_addr_o;
 Word_t      mem_wreg_data_o;
 
 
+//memory operations and load conflict
+Oper_t      ex_oper_o;
+
+
+
 //stage id
 id id_instance(
     .rst,
@@ -127,6 +132,7 @@ id id_instance(
     .reg2_o(id_reg2_o),
     .wreg_write_o(id_wreg_write_o),
     .wreg_addr_o(id_wreg_addr_o),
+    .ex_oper_i(ex_oper_o),
     .ex_wreg_write_i(ex_wreg_write_o),
     .ex_wreg_addr_i(ex_wreg_addr_o),
     .ex_wreg_data_i(ex_wreg_data_o),
@@ -210,7 +216,6 @@ hilo hilo_instance(
 );
 
 //memory operations
-Oper_t      ex_oper_o;
 Word_t      ex_mem_oper_addr_o;
 Word_t      ex_mem_oper_data_o;
 

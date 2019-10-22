@@ -20,6 +20,8 @@ module id(
     output  Reg_addr_t  wreg_addr_o,
 
     //below for solve data conflict
+    input   Oper_t      ex_oper_i,
+
     input   Bit_t       ex_wreg_write_i,
     input   Reg_addr_t  ex_wreg_addr_i,
     input   Word_t      ex_wreg_data_i,
@@ -80,7 +82,6 @@ always_comb begin
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
         pc_o <= `PC_RESET_ADDR;
-        stallreq <= `DISABLE;
     end else begin        
         oper_o <= oper;
         wreg_write_o <= wreg_write;
@@ -146,6 +147,17 @@ always_comb begin
     end
 end
 
+always_comb begin
+    if (rst == `ENABLE) begin
+        stallreq <= `DISABLE;
+    end else if (`NEED_LOAD(ex_oper_i) && ((reg1_read_o == `ENABLE && ex_wreg_addr_i == reg1_addr_o) || (reg2_read_o == `ENABLE && ex_wreg_addr_i == reg2_addr_o))) begin
+        stallreq <= `ENABLE;
+    end else begin
+        stallreq <= `DISABLE;
+    end
+
+    
+end
 
 
     

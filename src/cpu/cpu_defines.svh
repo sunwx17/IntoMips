@@ -52,6 +52,7 @@ typedef enum {
 `define NEED_WRITE_HILO(op) (op == OP_MTHI || op == OP_MTLO || op == OP_MULT ||op == OP_MULTU) 
 `define NEED_LINK(op) (op == OP_JAL || op == OP_BLTZAL || op == OP_BGEZAL)
 `define NEED_SAVE(op) (op == OP_SB || op == OP_SH || op == OP_SW)
+`define NEED_LOAD(op) (op == OP_LB || op == OP_LBU || op == OP_LH || op == OP_LHU || op == OP_LW)
 
 
 //opcode
