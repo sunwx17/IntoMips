@@ -32,7 +32,9 @@ module id(
     output  Bit_t       branch_flag_o,
     output  Inst_addr_t branch_target_addr_o,
 
-    output  Inst_addr_t pc_o
+    output  Inst_addr_t pc_o,
+
+    output  Bit_t       stallreq
 );
 
 Oper_t      oper;
@@ -78,6 +80,7 @@ always_comb begin
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
         pc_o <= `PC_RESET_ADDR;
+        stallreq <= `DISABLE;
     end else begin        
         oper_o <= oper;
         wreg_write_o <= wreg_write;

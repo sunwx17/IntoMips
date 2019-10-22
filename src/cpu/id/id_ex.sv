@@ -15,18 +15,20 @@ module id_ex(
     output  Word_t      ex_reg2,
     output  Bit_t       ex_wreg_write,
     output  Reg_addr_t  ex_wreg_addr,
-    output  Inst_addr_t ex_pc
+    output  Inst_addr_t ex_pc,
+
+    input   Stall_t     stall
 );
 
 always @ (posedge clk) begin
-    if (rst == `ENABLE) begin
-        ex_oper <= OP_ORI;
+    if (rst == `ENABLE || (stall[2] == `ENABLE && stall[3] == `DISABLE)) begin
+        ex_oper <= OP_NOP;
         ex_reg1 <= `ZERO_WORD;
         ex_reg2 <= `ZERO_WORD;
         ex_wreg_write <= `DISABLE;
         ex_wreg_addr  <= `REG_ZERO;
         ex_pc <= `PC_RESET_ADDR;
-    end else begin
+    end else if (stall[2] == `DISABLE) begin
         ex_oper <= id_oper;
         ex_reg1 <= id_reg1;
         ex_reg2 <= id_reg2;

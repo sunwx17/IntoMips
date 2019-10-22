@@ -9,7 +9,9 @@ module pc_reg(
 
     //branch
     input   Bit_t       branch_flag_i,
-    input   Inst_addr_t branch_target_addr_i    
+    input   Inst_addr_t branch_target_addr_i,
+
+    input   Stall_t     stall
 );
 
 always @ (posedge clk) begin
@@ -25,7 +27,7 @@ always @ (posedge clk) begin
         pc <= `PC_RESET_ADDR;
     end else if(branch_flag_i == `ENABLE) begin
         pc <= branch_target_addr_i;
-    end else begin
+    end else if(stall[0] != `ENABLE) begin
         pc <= pc + `INST_BYTE_NUM;
     end
 

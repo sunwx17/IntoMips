@@ -21,6 +21,9 @@ typedef logic[`ADDR_IN_INST - 1:0]  Addr_in_inst_t;
 `define MASK_WIDTH                4
 typedef logic[`MASK_WIDTH - 1:0]  Mask_t;
 
+`define STALL_WIDTH                6
+typedef logic[`STALL_WIDTH - 1:0]  Stall_t;
+
 //operator
 typedef enum {
     OP_NOP, OP_SSNOP,
