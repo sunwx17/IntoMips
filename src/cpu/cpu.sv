@@ -49,6 +49,17 @@ registers registers_instance(
     .data_2(reg_data_2)
 );
 
+Bit_t    stallreq_from_id;
+Bit_t    stallreq_from_ex;
+Stall_t  stall;
+
+ctrl ctrl_instance(
+    .stallreq_from_id(stallreq_from_id),
+    .stallreq_from_ex(stallreq_from_ex),
+    .stall(stall) 
+);
+
+
 //branch
 Bit_t branch_flag;
 Inst_addr_t branch_target_addr;
@@ -60,7 +71,8 @@ pc_reg pc_reg_instance(
     .pc(rom_addr_o),
     .ce(rom_ce_o),
     .branch_flag_i(branch_flag),
-    .branch_target_addr_i(branch_target_addr) 
+    .branch_target_addr_i(branch_target_addr),
+    .stall
 );
 
 //connect if_id and id
@@ -74,7 +86,8 @@ if_id if_id_instance(
     .if_pc(rom_addr_o),
     .if_inst(rom_data_i),
     .id_pc(id_pc_i),
-    .id_inst(id_inst_i)
+    .id_inst(id_inst_i),
+    .stall
 );
 
 
@@ -98,6 +111,11 @@ Reg_addr_t  mem_wreg_addr_o;
 Word_t      mem_wreg_data_o;
 
 
+//memory operations and load conflict
+Oper_t      ex_oper_o;
+
+
+
 //stage id
 id id_instance(
     .rst,
@@ -114,6 +132,7 @@ id id_instance(
     .reg2_o(id_reg2_o),
     .wreg_write_o(id_wreg_write_o),
     .wreg_addr_o(id_wreg_addr_o),
+    .ex_oper_i(ex_oper_o),
     .ex_wreg_write_i(ex_wreg_write_o),
     .ex_wreg_addr_i(ex_wreg_addr_o),
     .ex_wreg_data_i(ex_wreg_data_o),
@@ -122,7 +141,8 @@ id id_instance(
     .mem_wreg_data_i(mem_wreg_data_o), 
     .branch_flag_o(branch_flag),
     .branch_target_addr_o(branch_target_addr),
-    .pc_o(id_pc_o) 
+    .pc_o(id_pc_o),
+    .stallreq(stallreq_from_id)
 );
 
 
@@ -150,7 +170,8 @@ id_ex id_ex_instance(
     .ex_reg2(ex_reg2_i),
     .ex_wreg_write(ex_wreg_write_i),
     .ex_wreg_addr(ex_wreg_addr_i),
-    .ex_pc(ex_pc_i)
+    .ex_pc(ex_pc_i),
+    .stall
 );
 
 
@@ -195,7 +216,6 @@ hilo hilo_instance(
 );
 
 //memory operations
-Oper_t      ex_oper_o;
 Word_t      ex_mem_oper_addr_o;
 Word_t      ex_mem_oper_data_o;
 
@@ -225,7 +245,8 @@ ex ex_instance(
     .lo_o(ex_lo_o),
     .oper_o(ex_oper_o),
     .mem_oper_addr(ex_mem_oper_addr_o),
-    .mem_oper_data(ex_mem_oper_data_o) 
+    .mem_oper_data(ex_mem_oper_data_o),
+    .stallreq(stallreq_from_ex)
 );
 
 //connext ex_mem and mem
@@ -259,7 +280,8 @@ ex_mem ex_mem_instance(
     .ex_mem_oper_data(ex_mem_oper_data_o),
     .mem_oper(mem_oper_i),
     .mem_mem_oper_addr(mem_mem_oper_addr_i),
-    .mem_mem_oper_data(mem_mem_oper_data_i) 
+    .mem_mem_oper_data(mem_mem_oper_data_i),
+    .stall
 );
 
 
@@ -305,7 +327,8 @@ mem_wb mem_wb_instance(
     .mem_lo(mem_lo_o),
     .wb_whilo(hilo_we),
     .wb_hi(hi_i),
-    .wb_lo(lo_i) 
+    .wb_lo(lo_i),
+    .stall
 );
 
 

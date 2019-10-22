@@ -27,11 +27,13 @@ module ex_mem(
     
     output  Oper_t      mem_oper,
     output  Word_t      mem_mem_oper_addr,
-    output  Word_t      mem_mem_oper_data 
+    output  Word_t      mem_mem_oper_data,
+
+    input   Stall_t     stall
 );
 
 always @ (posedge clk) begin
-    if (rst == `ENABLE) begin 
+    if (rst == `ENABLE || (stall[3] == `ENABLE && stall[4] == `DISABLE)) begin 
         mem_wreg_write <= `DISABLE;
         mem_wreg_addr  <= `REG_ZERO;
         mem_wreg_data  <= `ZERO_WORD;
@@ -43,7 +45,7 @@ always @ (posedge clk) begin
         mem_oper          <= OP_NOP;
         mem_mem_oper_addr <= `ZERO_WORD;
         mem_mem_oper_data <= `ZERO_WORD;
-    end else begin
+    end else if (stall[3] == `DISABLE) begin
         mem_wreg_write <= ex_wreg_write;
         mem_wreg_addr  <= ex_wreg_addr;
         mem_wreg_data  <= ex_wreg_data;

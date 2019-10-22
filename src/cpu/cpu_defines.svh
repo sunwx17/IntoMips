@@ -21,6 +21,9 @@ typedef logic[`ADDR_IN_INST - 1:0]  Addr_in_inst_t;
 `define MASK_WIDTH                4
 typedef logic[`MASK_WIDTH - 1:0]  Mask_t;
 
+`define STALL_WIDTH                6
+typedef logic[`STALL_WIDTH - 1:0]  Stall_t;
+
 //operator
 typedef enum {
     OP_NOP, OP_SSNOP,
@@ -49,6 +52,7 @@ typedef enum {
 `define NEED_WRITE_HILO(op) (op == OP_MTHI || op == OP_MTLO || op == OP_MULT ||op == OP_MULTU) 
 `define NEED_LINK(op) (op == OP_JAL || op == OP_BLTZAL || op == OP_BGEZAL)
 `define NEED_SAVE(op) (op == OP_SB || op == OP_SH || op == OP_SW)
+`define NEED_LOAD(op) (op == OP_LB || op == OP_LBU || op == OP_LH || op == OP_LHU || op == OP_LW)
 
 
 //opcode

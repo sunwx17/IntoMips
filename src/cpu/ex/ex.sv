@@ -35,7 +35,9 @@ module ex(
     //mempry operations
     output  Oper_t      oper_o,
     output  Word_t      mem_oper_addr,
-    output  Word_t      mem_oper_data 
+    output  Word_t      mem_oper_data,
+
+    output  Bit_t       stallreq
 );
 
 assign oper_o = oper;
@@ -95,6 +97,8 @@ always_comb begin
 
         whilo_o      <= `DISABLE;
         {hi_o, lo_o} <= {`ZERO_WORD, `ZERO_WORD};
+        
+        stallreq <= `DISABLE;
     end else begin
         wreg_write_o <= wreg_write_i;
         wreg_addr_o  <= wreg_addr_i;

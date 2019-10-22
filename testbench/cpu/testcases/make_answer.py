@@ -26,7 +26,7 @@ def main(argv):
         for line in lines:
             if '#' in line:
                 count = count + 1
-                ans = line.split(' ')[-1]
+                ans = line.strip().split(' ')[-1]
                 if ':' in line:
                     temp = ans.split(':')
                     num = int(temp[0])
