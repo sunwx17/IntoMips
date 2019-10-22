@@ -120,6 +120,7 @@ initial begin
     unittest("auto_ori");
     unittest("auto_lui");
     unittest("auto_mthi");
+    unittest("memory");
     $finish;
 end
 

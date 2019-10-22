@@ -89,30 +89,35 @@ always_comb begin
         pc_o <= pc;
     end
 end
+
+Word_t  reg1_o_temp;
+
+assign reg1_o = (`NEED_SAVE(oper_o)) ? (reg1_o_temp + immediate) : reg1_o_temp;
     
 always_comb begin
     if (rst == `ENABLE) begin
-        reg1_o <= `ZERO_WORD;
+        reg1_o_temp <= `ZERO_WORD;
     end else if (reg1_read_o == `ENABLE && ex_wreg_write_i == `ENABLE && ex_wreg_addr_i == reg1_addr_o) begin
         if(ex_wreg_addr_i != `REG_ZERO) begin
-            reg1_o <= ex_wreg_data_i;
+            reg1_o_temp <= ex_wreg_data_i;
         end else begin
-            reg1_o <= `ZERO_WORD;
+            reg1_o_temp <= `ZERO_WORD;
         end
     end else if (reg1_read_o == `ENABLE && mem_wreg_write_i == `ENABLE && mem_wreg_addr_i == reg1_addr_o) begin
         if(mem_wreg_addr_i != `REG_ZERO) begin
-            reg1_o <= mem_wreg_data_i;
+            reg1_o_temp <= mem_wreg_data_i;
         end else begin
-            reg1_o <= `ZERO_WORD;
+            reg1_o_temp <= `ZERO_WORD;
         end
     end else if (reg1_read_o == `ENABLE) begin
-        reg1_o <= reg1_data_i;
+        reg1_o_temp <= reg1_data_i;
     end else if (reg1_read_o == `DISABLE) begin
-        reg1_o <= immediate;
+        reg1_o_temp <= immediate;
     end else begin
-        reg1_o <= `ZERO_WORD;
+        reg1_o_temp <= `ZERO_WORD;
     end
 end
+
 
 always_comb begin
     if (rst == `ENABLE) begin

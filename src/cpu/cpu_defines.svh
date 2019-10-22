@@ -18,6 +18,9 @@ typedef logic[`SA_WIDTH - 1:0]  Sa_t;
 `define ADDR_IN_INST                26
 typedef logic[`ADDR_IN_INST - 1:0]  Addr_in_inst_t;
 
+`define MASK_WIDTH                4
+typedef logic[`MASK_WIDTH - 1:0]  Mask_t;
+
 //operator
 typedef enum {
     OP_NOP, OP_SSNOP,
@@ -31,19 +34,21 @@ typedef enum {
     OP_CLO, OP_CLZ,
     OP_MUL, OP_MULT, OP_MULTU,
     OP_J, OP_JAL, OP_JR, OP_JALR,
-    OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE, OP_BLTZ, OP_BLTZAL, OP_BGEZ, OP_BGEZAL
+    OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE, OP_BLTZ, OP_BLTZAL, OP_BGEZ, OP_BGEZAL,
+    OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW, OP_SB, OP_SH, OP_SW
 } Oper_t;
 
 `define OPER_TYPE_I_U OP_ANDI, OP_ORI, OP_XORI, OP_LUI
-`define OPER_TYPE_I_S OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU
+`define OPER_TYPE_I_S OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU, OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW
 `define OPER_TYPE_I_B OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE, OP_BLTZ, OP_BLTZAL, OP_BGEZ, OP_BGEZAL
+`define OPER_TYPE_I_SS OP_SB, OP_SH, OP_SW
 `define OPER_TYPE_J OP_J, OP_JAL
 `define OPER_TYPE_R_0 OP_AND, OP_OR, OP_XOR, OP_NOR, OP_SLLV, OP_SRAV, OP_SRLV, OP_MOVN, OP_MOVZ, OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO, OP_ADD, OP_ADDU, OP_SUB, OP_SUBU, OP_SLT, OP_SLTU, OP_CLO, OP_CLZ, OP_MUL, OP_MULT, OP_MULTU, OP_JR, OP_JALR
 `define OPER_TYPE_R_1 OP_SLL, OP_SRA, OP_SRL
 
 `define NEED_WRITE_HILO(op) (op == OP_MTHI || op == OP_MTLO || op == OP_MULT ||op == OP_MULTU) 
 `define NEED_LINK(op) (op == OP_JAL || op == OP_BLTZAL || op == OP_BGEZAL)
-
+`define NEED_SAVE(op) (op == OP_SB || op == OP_SH || op == OP_SW)
 
 
 //opcode
@@ -68,6 +73,17 @@ typedef enum {
 `define OPCODE_BGTZ 6'b000111
 `define OPCODE_BLEZ 6'b000110
 `define OPCODE_BNE  6'b000101
+
+`define OPCODE_LB   6'b100000
+`define OPCODE_LBU  6'b100100
+`define OPCODE_LH   6'b100001
+`define OPCODE_LHU  6'b100101
+`define OPCODE_LW   6'b100011
+
+`define OPCODE_SB   6'b101000
+`define OPCODE_SH   6'b101001
+`define OPCODE_SW   6'b101011
+
 
 
 //spec_opcode
