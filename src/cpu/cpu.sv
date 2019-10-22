@@ -4,8 +4,24 @@ module cpu(
     input               clk, rst,
     input   Inst_t      rom_data_i,
     output  Inst_addr_t rom_addr_o,  
-    output  Bit_t       rom_ce_o
+    output  Bit_t       rom_ce_o,
+
+    input   Word_t      ram_data_i,
+    output  Word_t      ram_addr_o,
+    output  Word_t      ram_data_o,
+    output  Bit_t       ram_re_o,
+    output  Bit_t       ram_we_o,
+    output  Mask_t      ram_mask_o 
 );
+
+/*always @ (posedge clk) begin
+    if (ram_we_o == `ENABLE) begin
+        $display("write 0x%x to 0x%0x", ram_data_o, ram_addr_o);
+    end else if(ram_re_o == `ENABLE) begin
+        $display("read 0x%x from 0x%0x", ram_data_i, ram_addr_o);
+    end 
+end*/
+
 
 //wire about regfile
 Bit_t       reg_write_enable;
@@ -178,8 +194,10 @@ hilo hilo_instance(
     .lo_o
 );
 
-
-
+//memory operations
+Oper_t      ex_oper_o;
+Word_t      ex_mem_oper_addr_o;
+Word_t      ex_mem_oper_data_o;
 
 
 //stage ex
@@ -204,13 +222,21 @@ ex ex_instance(
     .wb_lo_i(lo_i),
     .whilo_o(ex_whilo_o),
     .hi_o(ex_hi_o),
-    .lo_o(ex_lo_o) 
+    .lo_o(ex_lo_o),
+    .oper_o(ex_oper_o),
+    .mem_oper_addr(ex_mem_oper_addr_o),
+    .mem_oper_data(ex_mem_oper_data_o) 
 );
 
 //connext ex_mem and mem
 Bit_t       mem_wreg_write_i;
 Reg_addr_t  mem_wreg_addr_i;
 Word_t      mem_wreg_data_i;
+
+Oper_t      mem_oper_i;
+Word_t      mem_mem_oper_addr_i;
+Word_t      mem_mem_oper_data_i;
+
 
 //stage ex_mem
 ex_mem ex_mem_instance(
@@ -227,7 +253,13 @@ ex_mem ex_mem_instance(
     .ex_lo(ex_lo_o),
     .mem_whilo(mem_whilo_i),
     .mem_hi(mem_hi_i),
-    .mem_lo(mem_lo_i) 
+    .mem_lo(mem_lo_i),
+    .ex_oper(ex_oper_o),
+    .ex_mem_oper_addr(ex_mem_oper_addr_o),
+    .ex_mem_oper_data(ex_mem_oper_data_o),
+    .mem_oper(mem_oper_i),
+    .mem_mem_oper_addr(mem_mem_oper_addr_i),
+    .mem_mem_oper_data(mem_mem_oper_data_i) 
 );
 
 
@@ -246,7 +278,16 @@ mem mem_instance(
     .lo_i(mem_lo_i),
     .whilo_o(mem_whilo_o),
     .hi_o(mem_hi_o),
-    .lo_o(mem_lo_o) 
+    .lo_o(mem_lo_o),
+    .oper_i(mem_oper_i),
+    .mem_oper_addr(mem_mem_oper_addr_i),
+    .mem_oper_data(mem_mem_oper_data_i),
+    .mem_data_i(ram_data_i),
+    .mem_addr_o(ram_addr_o),
+    .mem_data_o(ram_data_o),
+    .mem_we_o(ram_we_o),
+    .mem_re_o(ram_re_o),
+    .mem_mask_o(ram_mask_o)
 );
 
 //stage mem_wb

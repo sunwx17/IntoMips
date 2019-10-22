@@ -30,8 +30,15 @@ module ex(
 
     output  Bit_t       whilo_o,
     output  Word_t      hi_o,
-    output  Word_t      lo_o 
+    output  Word_t      lo_o,
+
+    //mempry operations
+    output  Oper_t      oper_o,
+    output  Word_t      mem_oper_addr,
+    output  Word_t      mem_oper_data 
 );
+
+assign oper_o = oper;
 
 Word_t hi, lo;
 
@@ -125,6 +132,8 @@ always_comb begin
             OP_MULT, OP_MULTU : {hi_o, lo_o} <= mul_res;
             OP_JALR : wreg_data_o <= pc + 8;
             OP_JAL, OP_BLTZAL, OP_BGEZAL : begin wreg_write_o <= `ENABLE;  wreg_data_o <= pc + 8; end
+            OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW : mem_oper_addr <= add_u;
+            OP_SB, OP_SH, OP_SW : begin mem_oper_addr <= reg1; mem_oper_data <= reg2; end
             //OP_CLZ  : 
             //OP_CLO  : 
             default: begin

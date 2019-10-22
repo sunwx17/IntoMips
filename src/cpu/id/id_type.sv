@@ -97,6 +97,14 @@ always_comb begin
         `OPCODE_BGTZ : oper <= OP_BGTZ ;
         `OPCODE_BLEZ : oper <= OP_BLEZ ;
         `OPCODE_BNE  : oper <= OP_BNE  ;
+        `OPCODE_LB   : oper <= OP_LB   ;
+        `OPCODE_LBU  : oper <= OP_LBU  ;
+        `OPCODE_LH   : oper <= OP_LH   ;
+        `OPCODE_LHU  : oper <= OP_LHU  ;
+        `OPCODE_LW   : oper <= OP_LW   ;
+        `OPCODE_SB   : oper <= OP_SB   ;
+        `OPCODE_SH   : oper <= OP_SH   ;
+        `OPCODE_SW   : oper <= OP_SW   ;
         default: oper <= OP_NOP;
     endcase
 end
@@ -130,6 +138,15 @@ always_comb begin
             reg2_addr  <= rt;
             immediate  <= {{16{imm[15]}}, imm}; 
         end
+        `OPER_TYPE_I_SS : begin
+            wreg_write <= `DISABLE;
+            wreg_addr  <= `REG_ZERO;
+            reg1_read  <= `ENABLE;
+            reg2_read  <= `ENABLE;
+            reg1_addr  <= rs;
+            reg2_addr  <= rt;
+            immediate  <= {{16{imm[15]}}, imm}; 
+        end        
         `OPER_TYPE_J   : begin
             wreg_write <= `DISABLE;
             wreg_addr  <= 5'b11111;
