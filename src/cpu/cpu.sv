@@ -11,7 +11,10 @@ module cpu(
     output  Word_t      ram_data_o,
     output  Bit_t       ram_re_o,
     output  Bit_t       ram_we_o,
-    output  Mask_t      ram_mask_o 
+    output  Mask_t      ram_mask_o,
+
+    input   logic[6:0]  int_i, //???
+    output  Bit_t       timer_int_o 
 );
 
 /*always @ (posedge clk) begin
@@ -48,6 +51,42 @@ registers registers_instance(
     .data_1(reg_data_1),
     .data_2(reg_data_2)
 );
+
+Bit_t       cp0_we_i;
+Reg_addr_t  cp0_waddr_i;
+Reg_data_t  cp0_wdata_i;
+Reg_addr_t  cp0_raddr_i;
+logic[5:0]  cp0_int_i;
+Reg_data_t  cp0_data_o;
+Reg_data_t  cp0_count_o;
+Reg_data_t  cp0_compare_o;
+Reg_data_t  cp0_status_o;
+Reg_data_t  cp0_cause_o;
+Reg_data_t  cp0_epc_o;
+Reg_data_t  cp0_config_o;
+Reg_data_t  cp0_prid_o;
+Bit_t       cp0_timer_int_o;
+
+
+cp0 cp0_instance(
+    .clk, 
+    .rst,
+    .we_i(cp0_we_i),
+    .waddr_i(cp0_waddr_i),
+    .wdata_i(cp0_wdata_i),
+    .raddr_i(cp0_raddr_i),
+    .int_i(cp0_int_i),
+    .data_o(cp0_data_o),
+    .count_o(cp0_count_o),
+    .compare_o(cp0_compare_o),
+    .status_o(cp0_status_o),
+    .cause_o(cp0_cause_o),
+    .epc_o(cp0_epc_o),
+    .config_o(cp0_config_o),
+    .prid_o(cp0_prid_o),
+    .timer_int_o(cp0_timer_int_o) 
+);
+
 
 Bit_t    stallreq_from_id;
 Bit_t    stallreq_from_ex;
@@ -220,6 +259,21 @@ Word_t      ex_mem_oper_addr_o;
 Word_t      ex_mem_oper_data_o;
 
 
+//cp0
+Bit_t       ex_cp0_reg_we_o;
+Reg_addr_t  ex_cp0_reg_write_addr_o;
+Word_t      ex_cp0_reg_data_o;
+
+Bit_t       mem_cp0_reg_we_i;
+Reg_addr_t  mem_cp0_reg_write_addr_i;
+Word_t      mem_cp0_reg_data_i;
+
+Bit_t       mem_cp0_reg_we_o;
+Reg_addr_t  mem_cp0_reg_write_addr_o;
+Word_t      mem_cp0_reg_data_o;
+
+
+
 //stage ex
 ex ex_instance(
     .rst,
@@ -246,7 +300,18 @@ ex ex_instance(
     .oper_o(ex_oper_o),
     .mem_oper_addr(ex_mem_oper_addr_o),
     .mem_oper_data(ex_mem_oper_data_o),
-    .stallreq(stallreq_from_ex)
+    .stallreq(stallreq_from_ex),
+    .mem_cp0_reg_we(mem_cp0_reg_we_o),
+    .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr_o),
+    .mem_cp0_reg_data(mem_cp0_reg_data_o),
+    .wb_cp0_reg_we(cp0_we_i),
+    .wb_cp0_reg_write_addr(cp0_waddr_i),
+    .wb_cp0_reg_data(cp0_wdata_i),
+    .cp0_reg_data_i(cp0_data_o),
+    .cp0_reg_read_addr_o(cp0_raddr_i),
+    .cp0_reg_we_o(ex_cp0_reg_we_o),
+    .cp0_reg_write_addr_o(ex_cp0_reg_write_addr_o),
+    .cp0_reg_data_o(ex_cp0_reg_data_o) 
 );
 
 //connext ex_mem and mem
@@ -281,7 +346,13 @@ ex_mem ex_mem_instance(
     .mem_oper(mem_oper_i),
     .mem_mem_oper_addr(mem_mem_oper_addr_i),
     .mem_mem_oper_data(mem_mem_oper_data_i),
-    .stall
+    .stall,
+    .ex_cp0_reg_we(ex_cp0_reg_we_o),
+    .ex_cp0_reg_write_addr(ex_cp0_reg_write_addr_o),
+    .ex_cp0_reg_data(ex_cp0_reg_data_o),
+    .mem_cp0_reg_we(mem_cp0_reg_we_i),
+    .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr_i),
+    .mem_cp0_reg_data(mem_cp0_reg_data_i) 
 );
 
 
@@ -309,7 +380,13 @@ mem mem_instance(
     .mem_data_o(ram_data_o),
     .mem_we_o(ram_we_o),
     .mem_re_o(ram_re_o),
-    .mem_mask_o(ram_mask_o)
+    .mem_mask_o(ram_mask_o),
+    .cp0_reg_we_i(mem_cp0_reg_we_i),
+    .cp0_reg_write_addr_i(mem_cp0_reg_write_addr_i),
+    .cp0_reg_data_i(mem_cp0_reg_data_i),
+    .cp0_reg_we_o(mem_cp0_reg_we_o),
+    .cp0_reg_write_addr_o(mem_cp0_reg_write_addr_o),
+    .cp0_reg_data_o(mem_cp0_reg_data_o) 
 );
 
 //stage mem_wb
@@ -328,7 +405,13 @@ mem_wb mem_wb_instance(
     .wb_whilo(hilo_we),
     .wb_hi(hi_i),
     .wb_lo(lo_i),
-    .stall
+    .stall,
+    .mem_cp0_reg_we(mem_cp0_reg_we_o),
+    .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr_o),
+    .mem_cp0_reg_data(mem_cp0_reg_data_o),
+    .wb_cp0_reg_we(cp0_we_i),
+    .wb_cp0_reg_write_addr(cp0_waddr_i),
+    .wb_cp0_reg_data(cp0_wdata_i) 
 );
 
 

@@ -82,6 +82,13 @@ always_comb begin
                 default: oper <= OP_NOP;
             endcase
         end
+        `OPCODE_COP0 : begin
+            case (rs)
+                `COP0_OPCODE_MTC0 : oper <= OP_MTC0;
+                `COP0_OPCODE_MFC0 : oper <= OP_MFC0;
+                default: oper <= OP_NOP;
+            endcase
+        end
         `OPCODE_ANDI : oper <= OP_ANDI ;
         `OPCODE_ORI  : oper <= OP_ORI  ;
         `OPCODE_XORI : oper <= OP_XORI ;
@@ -173,6 +180,24 @@ always_comb begin
             reg1_addr  <= `REG_ZERO;
             reg2_addr  <= rt;
             immediate  <= {27'b0, sa};
+        end
+        OP_MTC0 : begin
+            wreg_write <= `DISABLE;
+            wreg_addr  <= `REG_ZERO;
+            reg1_read  <= `ENABLE;
+            reg2_read  <= `DISABLE;
+            reg1_addr  <= rt;
+            reg2_addr  <= `REG_ZERO;
+            immediate  <= {27'b0, rd};
+        end
+        OP_MFC0 : begin
+            wreg_write <= `ENABLE;
+            wreg_addr  <= rt;
+            reg1_read  <= `DISABLE;
+            reg2_read  <= `DISABLE;
+            reg1_addr  <= `REG_ZERO;
+            reg2_addr  <= `REG_ZERO;
+            immediate  <= {27'b0, rd};
         end
         default : begin end
     endcase

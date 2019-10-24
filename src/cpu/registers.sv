@@ -24,7 +24,7 @@ module registers(
 
 );
 
-Reg_data_t regs[0:`REG_NUM - 1];
+Regs_t regs;
 integer i;
 
 

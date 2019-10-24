@@ -12,6 +12,10 @@ Bit_t       hilo_we;
 Reg_data_t  hi_data;
 Reg_data_t  lo_data;
 
+Bit_t       cp0_we;
+Reg_addr_t  cp0_waddr;
+Reg_data_t  cp0_wdata;
+
 assign reg_write_enable = cpu_test_instance.cpu_instance.reg_write_enable;
 assign reg_write_addr = cpu_test_instance.cpu_instance.reg_write_addr;
 assign reg_write_data = cpu_test_instance.cpu_instance.reg_write_data;
@@ -19,6 +23,10 @@ assign reg_write_data = cpu_test_instance.cpu_instance.reg_write_data;
 assign hilo_we = cpu_test_instance.cpu_instance.hilo_we;
 assign hi_data = cpu_test_instance.cpu_instance.hi_i;
 assign lo_data = cpu_test_instance.cpu_instance.lo_i;
+
+assign cp0_we = cpu_test_instance.cpu_instance.cp0_we_i;
+assign cp0_waddr = cpu_test_instance.cpu_instance.cp0_waddr_i;
+assign cp0_wdata = cpu_test_instance.cpu_instance.cp0_wdata_i;
 
 initial begin
     clock_50 = 1'b0;
@@ -85,6 +93,14 @@ while(!$feof(ans)) begin @ (negedge clock_50)
                 $display("[Fail] Expected: %0s, Got: %0s", line, out);
                 is_ok = 1'b0;
             end
+        end else if (cp0_we == `ENABLE) begin
+            $sformat(out, "%0d:cp0.$%0d=0x%x", true_count, cp0_waddr, cp0_wdata);
+            if (out == line) begin
+                $display("[pass] %0s", out);
+            end else begin
+                $display("[Fail] Expected: %0s, Got: %0s", line, out);
+                is_ok = 1'b0;
+            end
         end else begin
             $sformat(out, "%0d:skip", true_count);
             if (line == out) begin
@@ -122,6 +138,7 @@ initial begin
     unittest("auto_mthi");
     unittest("memory");
     unittest("load");
+    unittest("cp0");
     $finish;
 end
 

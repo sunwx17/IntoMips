@@ -29,7 +29,16 @@ module ex_mem(
     output  Word_t      mem_mem_oper_addr,
     output  Word_t      mem_mem_oper_data,
 
-    input   Stall_t     stall
+    input   Stall_t     stall,
+
+    //cp0
+    input   Bit_t       ex_cp0_reg_we,
+    input   Reg_addr_t  ex_cp0_reg_write_addr,
+    input   Word_t      ex_cp0_reg_data,
+
+    output  Bit_t       mem_cp0_reg_we,
+    output  Reg_addr_t  mem_cp0_reg_write_addr,
+    output  Word_t      mem_cp0_reg_data 
 );
 
 always @ (posedge clk) begin
@@ -45,6 +54,10 @@ always @ (posedge clk) begin
         mem_oper          <= OP_NOP;
         mem_mem_oper_addr <= `ZERO_WORD;
         mem_mem_oper_data <= `ZERO_WORD;
+
+        mem_cp0_reg_we          <= `DISABLE;
+        mem_cp0_reg_write_addr  <= `REG_ZERO;
+        mem_cp0_reg_data        <= `ZERO_WORD;
     end else if (stall[3] == `DISABLE) begin
         mem_wreg_write <= ex_wreg_write;
         mem_wreg_addr  <= ex_wreg_addr;
@@ -57,6 +70,10 @@ always @ (posedge clk) begin
         mem_oper          <= ex_oper;
         mem_mem_oper_addr <= ex_mem_oper_addr;
         mem_mem_oper_data <= ex_mem_oper_data;
+        
+        mem_cp0_reg_we          <= ex_cp0_reg_we;
+        mem_cp0_reg_write_addr  <= ex_cp0_reg_write_addr;
+        mem_cp0_reg_data        <= ex_cp0_reg_data;
     end
 end
     

@@ -16,8 +16,6 @@ module fake_ram(
 Byte_t data_mem[0:`DATA_MEM_NUM * 4 - 1];
 
 
-initial $readmemh ( "ori0.mem", data_mem );
-
 always @ (posedge clk) begin
     if(we == `ENABLE) begin
         if(mask[0] == `ENABLE) data_mem[addr[`DATA_MEM_NUM_LOG2 + 1 : 0]] <= data_i[7:0];
