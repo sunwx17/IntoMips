@@ -81,10 +81,18 @@ always_comb begin
         cp0_reg_read_addr_o <= `REG_ZERO;
     end else begin
         cp0_reg_read_addr_o <= reg2[`REG_ADDR_BUS];
-        if (mem_cp0_reg_we == `ENABLE && mem_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
-            cp0_data <= mem_cp0_reg_data;
-        end else if(wb_cp0_reg_we == `ENABLE && wb_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
-            cp0_data <= wb_cp0_reg_data;
+        if (`CP0_REGS_CAN_WRITE(mem_cp0_reg_write_addr)) begin // has a problem
+            if (mem_cp0_reg_we == `ENABLE && mem_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+                cp0_data <= mem_cp0_reg_data;
+            end else if(wb_cp0_reg_we == `ENABLE && wb_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+                cp0_data <= wb_cp0_reg_data;
+            end
+        end else if(mem_cp0_reg_write_addr == `CP0_CAUSE) begin
+            if (mem_cp0_reg_we == `ENABLE && mem_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+                cp0_data <= mem_cp0_reg_data && `CP0_CAUSE_MASK;
+            end else if(wb_cp0_reg_we == `ENABLE && wb_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+                cp0_data <= wb_cp0_reg_data && `CP0_CAUSE_MASK;
+            end 
         end else begin
             cp0_data <= cp0_reg_data_i;
         end
