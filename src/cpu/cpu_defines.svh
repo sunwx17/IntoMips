@@ -24,6 +24,36 @@ typedef logic[`MASK_WIDTH - 1:0]  Mask_t;
 `define STALL_WIDTH                6
 typedef logic[`STALL_WIDTH - 1:0]  Stall_t;
 
+//cp0
+`define CP0_COUNT   9
+`define CP0_COMPARE 11
+`define CP0_STATUS  12
+`define CP0_CAUSE   13
+`define CP0_EPC     14
+`define CP0_PRID    15
+`define CP0_CONFIG  16
+
+`define CP0_STATUS_INIT 32'b0001_0000_0000_0000_0000_0000_0000_0000
+
+`define CP0_REGS_CAN_WRITE(waddr) (waddr == `CP0_COUNT  || waddr == `CP0_COMPARE || waddr == `CP0_STATUS || waddr == `CP0_EPC)
+`define CP0_REGS_CAN_WRITE_WITH_MASK(waddr) (waddr == `CP0_CAUSE)
+
+`define CP0_CAUSE_MASK  32'b0000_0000_1100_0000_0000_0011_0000_0000
+
+//Cause
+`define CP0_CAUSE_BD    31
+`define CP0_CAUSE_R     30
+`define CP0_CAUSE_CE    29:28
+`define CP0_CAUSE_DC    27
+`define CP0_CAUSE_PCI   26
+`define CP0_CAUSE_IV    23
+`define CP0_CAUSE_WP    22
+`define CP0_CAUSE_IP    15:8
+`define CP0_CAUSE_IP_H  15:10
+`define CP0_CAUSE_IP_S  9:8
+`define CP0_CAUSE_EXCCODE 6:2
+
+
 //operator
 typedef enum {
     OP_NOP, OP_SSNOP,
@@ -38,7 +68,8 @@ typedef enum {
     OP_MUL, OP_MULT, OP_MULTU,
     OP_J, OP_JAL, OP_JR, OP_JALR,
     OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE, OP_BLTZ, OP_BLTZAL, OP_BGEZ, OP_BGEZAL,
-    OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW, OP_SB, OP_SH, OP_SW
+    OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW, OP_SB, OP_SH, OP_SW,
+    OP_MTC0, OP_MFC0
 } Oper_t;
 
 `define OPER_TYPE_I_U OP_ANDI, OP_ORI, OP_XORI, OP_LUI
@@ -48,6 +79,7 @@ typedef enum {
 `define OPER_TYPE_J OP_J, OP_JAL
 `define OPER_TYPE_R_0 OP_AND, OP_OR, OP_XOR, OP_NOR, OP_SLLV, OP_SRAV, OP_SRLV, OP_MOVN, OP_MOVZ, OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO, OP_ADD, OP_ADDU, OP_SUB, OP_SUBU, OP_SLT, OP_SLTU, OP_CLO, OP_CLZ, OP_MUL, OP_MULT, OP_MULTU, OP_JR, OP_JALR
 `define OPER_TYPE_R_1 OP_SLL, OP_SRA, OP_SRL
+`define OPER_TYPE_CP0 OP_MTC0, OP_MFC0
 
 `define NEED_WRITE_HILO(op) (op == OP_MTHI || op == OP_MTLO || op == OP_MULT ||op == OP_MULTU) 
 `define NEED_LINK(op) (op == OP_JAL || op == OP_BLTZAL || op == OP_BGEZAL)
@@ -59,6 +91,7 @@ typedef enum {
 `define OPCODE_SPEC  6'b000000
 `define OPCODE_SPEC2 6'b011100
 `define OPCODE_REGIMM 6'b000001
+`define OPCODE_COP0  6'b010000
 
 `define OPCODE_ANDI 6'b001100
 `define OPCODE_ORI  6'b001101
@@ -135,6 +168,9 @@ typedef enum {
 `define REGIMM_OPCODE_BGEZ   5'b00001
 `define REGIMM_OPCODE_BGEZAL 5'b10001
 
+//cop0
+`define COP0_OPCODE_MTC0    5'b00100
+`define COP0_OPCODE_MFC0    5'b00000
 
 
 `endif

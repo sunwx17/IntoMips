@@ -37,7 +37,23 @@ module ex(
     output  Word_t      mem_oper_addr,
     output  Word_t      mem_oper_data,
 
-    output  Bit_t       stallreq
+    output  Bit_t       stallreq,
+
+    //cp0
+    input   Bit_t       mem_cp0_reg_we,
+    input   Reg_addr_t  mem_cp0_reg_write_addr,
+    input   Word_t      mem_cp0_reg_data,
+  
+    input   Bit_t       wb_cp0_reg_we,
+    input   Reg_addr_t  wb_cp0_reg_write_addr,
+    input   Word_t      wb_cp0_reg_data,
+
+    input   Word_t      cp0_reg_data_i,
+    output  Reg_addr_t  cp0_reg_read_addr_o,
+
+    output  Bit_t       cp0_reg_we_o,
+    output  Reg_addr_t  cp0_reg_write_addr_o,
+    output  Word_t      cp0_reg_data_o 
 );
 
 assign oper_o = oper;
@@ -55,6 +71,27 @@ always_comb begin
         {hi, lo} <= {hi_i, lo_i};
     end
 end
+
+
+Word_t cp0_data;
+
+always_comb begin
+    if(rst == `ENABLE) begin
+        cp0_data <= `ZERO_WORD;
+        cp0_reg_read_addr_o <= `REG_ZERO;
+    end else begin
+        cp0_reg_read_addr_o <= reg2[`REG_ADDR_BUS];
+        if (mem_cp0_reg_we == `ENABLE && mem_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+            cp0_data <= mem_cp0_reg_data;
+        end else if(wb_cp0_reg_we == `ENABLE && wb_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+            cp0_data <= wb_cp0_reg_data;
+        end else begin
+            cp0_data <= cp0_reg_data_i;
+        end
+    end
+end
+
+
 
 //unsigned
 Word_t add_u, sub_u;
@@ -99,6 +136,11 @@ always_comb begin
         {hi_o, lo_o} <= {`ZERO_WORD, `ZERO_WORD};
         
         stallreq <= `DISABLE;
+        
+        cp0_reg_we_o <= `DISABLE;
+        cp0_reg_write_addr_o <= `REG_ZERO;
+        cp0_reg_data_o <= `ZERO_WORD;
+        
     end else begin
         wreg_write_o <= wreg_write_i;
         wreg_addr_o  <= wreg_addr_i;
@@ -112,6 +154,10 @@ always_comb begin
             whilo_o <= `DISABLE;
         end
         {hi_o, lo_o} <= {hi, lo};
+
+        cp0_reg_we_o <= `DISABLE;
+        cp0_reg_write_addr_o <= `REG_ZERO;
+        cp0_reg_data_o <= `ZERO_WORD;
 
         case (oper)
             OP_AND, OP_ANDI : wreg_data_o <= reg1 & reg2;
@@ -138,6 +184,8 @@ always_comb begin
             OP_JAL, OP_BLTZAL, OP_BGEZAL : begin wreg_write_o <= `ENABLE;  wreg_data_o <= pc + 8; end
             OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW : mem_oper_addr <= add_u;
             OP_SB, OP_SH, OP_SW : begin mem_oper_addr <= reg1; mem_oper_data <= reg2; end
+            OP_MTC0 : begin cp0_reg_we_o <= `ENABLE; cp0_reg_write_addr_o <= reg2[`REG_ADDR_BUS]; cp0_reg_data_o <= reg1; end
+            OP_MFC0 : wreg_data_o <= cp0_data;
             //OP_CLZ  : 
             //OP_CLO  : 
             default: begin

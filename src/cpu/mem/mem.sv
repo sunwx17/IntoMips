@@ -28,7 +28,17 @@ module mem(
     output  Word_t      mem_data_o,
     output  Bit_t       mem_we_o,
     output  Bit_t       mem_re_o,
-    output  Mask_t      mem_mask_o 
+    output  Mask_t      mem_mask_o,
+
+    //cp0
+    input   Bit_t       cp0_reg_we_i,
+    input   Reg_addr_t  cp0_reg_write_addr_i,
+    input   Word_t      cp0_reg_data_i,
+
+    output  Bit_t       cp0_reg_we_o,
+    output  Reg_addr_t  cp0_reg_write_addr_o,
+    output  Word_t      cp0_reg_data_o 
+
 );
 
 always_comb begin
@@ -45,6 +55,10 @@ always_comb begin
         mem_we_o     <= `DISABLE;
         mem_re_o     <= `DISABLE;
         mem_mask_o   <= 4'b0;
+
+        cp0_reg_we_o         <= `DISABLE;
+        cp0_reg_write_addr_o <= `REG_ZERO;
+        cp0_reg_data_o       <= `ZERO_WORD;
     end else begin
         wreg_write_o <= wreg_write_i;
         wreg_addr_o  <= wreg_addr_i;
@@ -56,6 +70,10 @@ always_comb begin
 
         mem_addr_o   <= mem_oper_addr;
         mem_data_o   <= mem_oper_data;
+
+        cp0_reg_we_o         <= cp0_reg_we_i;
+        cp0_reg_write_addr_o <= cp0_reg_write_addr_i;
+        cp0_reg_data_o       <= cp0_reg_data_i;
 
         mem_we_o     <= `DISABLE;
         mem_re_o     <= `DISABLE;
