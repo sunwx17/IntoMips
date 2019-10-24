@@ -9,11 +9,13 @@ module if_id(
     output  Inst_addr_t     id_pc,
     output  Inst_t          id_inst,
 
-    input   Stall_t         stall
+    input   Stall_t         stall,
+
+    input   Bit_t           flush
 );
 
 always @ (posedge clk) begin
-    if (rst == `ENABLE || (stall[1] == `ENABLE && stall[2] == `DISABLE)) begin
+    if (rst == `ENABLE || flush == `ENABLE || (stall[1] == `ENABLE && stall[2] == `DISABLE)) begin
         id_pc <= `PC_RESET_ADDR;
         id_inst <= `ZERO_WORD;
     end else if (stall[1] == `DISABLE) begin

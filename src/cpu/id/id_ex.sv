@@ -17,6 +17,12 @@ module id_ex(
     output  Reg_addr_t  ex_wreg_addr,
     output  Inst_addr_t ex_pc,
 
+    input   Bit_t       id_is_in_delayslot,
+    output  Bit_t       ex_is_in_delayslot,
+
+    input   Bit_t       next_is_in_delayslot_i,
+    output  Bit_t       is_in_delayslot_o,
+
     input   Stall_t     stall
 );
 
@@ -28,6 +34,8 @@ always @ (posedge clk) begin
         ex_wreg_write <= `DISABLE;
         ex_wreg_addr  <= `REG_ZERO;
         ex_pc <= `PC_RESET_ADDR;
+        ex_is_in_delayslot <= `DISABLE;
+        is_in_delayslot_o <= `DISABLE;
     end else if (stall[2] == `DISABLE) begin
         ex_oper <= id_oper;
         ex_reg1 <= id_reg1;
@@ -35,6 +43,8 @@ always @ (posedge clk) begin
         ex_wreg_write <= id_wreg_write;
         ex_wreg_addr  <= id_wreg_addr;
         ex_pc <= id_pc;
+        ex_is_in_delayslot <= id_is_in_delayslot;
+        is_in_delayslot_o <= next_is_in_delayslot_i;
     end
 end
 

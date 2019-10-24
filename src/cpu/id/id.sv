@@ -30,6 +30,10 @@ module id(
     input   Reg_addr_t  mem_wreg_addr_i,
     input   Word_t      mem_wreg_data_i, 
 
+    input   Bit_t       is_in_delayslot_i,
+    output  Bit_t       is_in_delayslot_o,
+    output  Bit_t       next_is_in_delayslot_o,
+
     //branch
     output  Bit_t       branch_flag_o,
     output  Inst_addr_t branch_target_addr_o,
@@ -82,6 +86,8 @@ always_comb begin
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
         pc_o <= `PC_RESET_ADDR;
+        next_is_in_delayslot_o <= `DISABLE;
+        is_in_delayslot_o <= `DISABLE;
     end else begin        
         oper_o <= oper;
         wreg_write_o <= wreg_write;
@@ -91,6 +97,8 @@ always_comb begin
         reg1_addr_o <= reg1_addr;
         reg2_addr_o <= reg2_addr;
         pc_o <= pc;
+        next_is_in_delayslot_o <= `NEXT_IN_DELAYSLOT(oper);
+        is_in_delayslot_o <= is_in_delayslot_i;
     end
 end
 

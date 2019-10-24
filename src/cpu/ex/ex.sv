@@ -39,6 +39,8 @@ module ex(
 
     output  Bit_t       stallreq,
 
+    input   Bit_t       is_in_delayslot_i,
+
     //cp0
     input   Bit_t       mem_cp0_reg_we,
     input   Reg_addr_t  mem_cp0_reg_write_addr,

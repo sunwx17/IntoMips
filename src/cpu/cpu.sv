@@ -154,6 +154,13 @@ Word_t      mem_wreg_data_o;
 Oper_t      ex_oper_o;
 
 
+Bit_t       id_is_in_delayslot_i;
+Bit_t       id_is_in_delayslot_o;
+Bit_t       id_next_is_in_delayslot_o;
+
+Bit_t       ex_is_in_delayslot_i;
+
+
 
 //stage id
 id id_instance(
@@ -178,6 +185,9 @@ id id_instance(
     .mem_wreg_write_i(mem_wreg_write_o),
     .mem_wreg_addr_i(mem_wreg_addr_o),
     .mem_wreg_data_i(mem_wreg_data_o), 
+    .is_in_delayslot_i(id_is_in_delayslot_i),
+    .is_in_delayslot_o(id_is_in_delayslot_o),
+    .next_is_in_delayslot_o(id_next_is_in_delayslot_o),
     .branch_flag_o(branch_flag),
     .branch_target_addr_o(branch_target_addr),
     .pc_o(id_pc_o),
@@ -210,6 +220,10 @@ id_ex id_ex_instance(
     .ex_wreg_write(ex_wreg_write_i),
     .ex_wreg_addr(ex_wreg_addr_i),
     .ex_pc(ex_pc_i),
+    .id_is_in_delayslot(id_is_in_delayslot_o),
+    .ex_is_in_delayslot(ex_is_in_delayslot_i),
+    .next_is_in_delayslot_i(id_next_is_in_delayslot_o),
+    .is_in_delayslot_o(id_is_in_delayslot_i),
     .stall
 );
 
@@ -300,6 +314,7 @@ ex ex_instance(
     .oper_o(ex_oper_o),
     .mem_oper_addr(ex_mem_oper_addr_o),
     .mem_oper_data(ex_mem_oper_data_o),
+    .is_in_delayslot_i(ex_is_in_delayslot_i),
     .stallreq(stallreq_from_ex),
     .mem_cp0_reg_we(mem_cp0_reg_we_o),
     .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr_o),

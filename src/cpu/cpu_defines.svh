@@ -85,6 +85,7 @@ typedef enum {
 `define NEED_LINK(op) (op == OP_JAL || op == OP_BLTZAL || op == OP_BGEZAL)
 `define NEED_SAVE(op) (op == OP_SB || op == OP_SH || op == OP_SW)
 `define NEED_LOAD(op) (op == OP_LB || op == OP_LBU || op == OP_LH || op == OP_LHU || op == OP_LW)
+`define NEXT_IN_DELAYSLOT(op) (op == OP_J || op == OP_JAL || op == OP_JR || op == OP_JALR || op == OP_BEQ || op == OP_BGTZ || op == OP_BLEZ || op == OP_BNE || op == OP_BLTZ || op == OP_BLTZAL || op == OP_BGEZ || op == OP_BGEZAL)
 
 
 //opcode
