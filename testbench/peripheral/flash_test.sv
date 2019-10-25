@@ -2,7 +2,8 @@ module flash_test(
     input clk, rst,
     input Flash_addr_t    bus_addr,
     input Bit_t           read_op, 
-    inout Word_t          bus_data
+    output Word_t         bus_data_read,
+    input Word_t          bus_data_write
 );
 
 
@@ -12,7 +13,8 @@ flash_controller flash_ctl_instance(
 
     .bus_addr(bus_addr),    //总线地址
     .read_op(read_op),      //读信号
-    .bus_data(bus_data),    //总线数据(32位)
+    .bus_data_read(bus_data_read),
+    .bus_data_write(bus_data_write),
 
     //Flash存储器信号，参考 JS28F640 芯片手册
     .flash_a(fake_flash_instance.flash_a),      //Flash地址，a0仅在8bit模式有效，16bit模式无意义
