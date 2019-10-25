@@ -4,8 +4,9 @@ module flash_controller(
     input clk, rst,
 
     input Flash_addr_t  bus_addr,       //总线地址
-    input Bit_t         read_op,        //读信号
-    inout Word_t        bus_data,       //总线数据(32位)
+    input Bit_t         read_op,        //读信号 1为读
+    input Word_t        bus_data_write, //总线向flash写入数据(TODO)
+    output Word_t       bus_data_read,  //总线从flash读入数据
 
     output Flash_addr_t flash_a,        //Flash地址，a0仅在8bit模式有效，16bit模式无意义
     inout  Halfword_t   flash_d,        //Flash数据
@@ -26,7 +27,7 @@ module flash_controller(
     assign flash_we_n = 1'b1;
 
     Word_t data_read; //存储读取的data
-    assign bus_data = data_read;
+    assign bus_data_read = data_read;
 
     Flash_addr_t inner_addr; //存储读取的addr
     assign flash_a = inner_addr;

@@ -6,7 +6,7 @@ module flash_test_tb(
 
 Flash_addr_t    bus_addr = 0;
 Bit_t           read_op = 0;
-wire[31:0]      bus_data;
+Word_t          bus_data_read, bus_data_write;
 
 
 
@@ -15,7 +15,8 @@ flash_test flash_test_instance(
     .rst(rst),
     .bus_addr(bus_addr),
     .read_op(read_op),
-    .bus_data(bus_data)
+    .bus_data_read(bus_data_read),
+    .bus_data_write(bus_data_write)
 );
 
 task unittest();
@@ -41,10 +42,10 @@ while(1) begin @(negedge clk_10)
         
         read_flag = 1'b1;
     end else begin
-        if (bus_data == content) begin
+        if (bus_data_read == content) begin
             $display("[Pass] Addr: %d", addr);
         end else begin
-            $display("[Fail] Addr: %d, Expected:%h, Got:%h", addr, content, bus_data);
+            $display("[Fail] Addr: %d, Expected:%h, Got:%h", addr, content, bus_data_read);
             is_ok = 1'b0;
         end
         read_op = 1'b0;

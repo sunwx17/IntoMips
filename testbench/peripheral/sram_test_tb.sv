@@ -8,10 +8,8 @@ module sram_test_tb(
 Ram_addr_t  bus_addr;
 Bit_t       read_op;
 Bit_t       write_op = 0;
-wire[31:0] bus_data;
-Word_t      bus_data_assign = 0;
+Word_t      bus_data_write, bus_data_read;
 
-assign bus_data = write_op? bus_data_assign: `HIGH_WORD;
 
 Bit_t       bus_stall;
 
@@ -21,7 +19,8 @@ sram_test sram_test_instance(
     .bus_addr(bus_addr),
     .read_op(read_op),
     .write_op(write_op),
-    .bus_data(bus_data),
+    .bus_data_write(bus_data_write),
+    .bus_data_read(bus_data_read),
     .bus_stall(bus_stall)
 );
 
@@ -51,7 +50,7 @@ written_content = 0;
 while(1) begin @(negedge clk_10)
     if (flag == 1'b0) begin
         $fscanf(ans, "%s addr:%d=%h\n", op, addr, content);
-        bus_data_assign = content;
+        bus_data_write = content;
         //$display("op = %s, addr = %d, content = %h", op, addr, content);
         bus_addr = addr;
         if (op == "read") begin
@@ -67,10 +66,10 @@ while(1) begin @(negedge clk_10)
         flag = 1'b1;
     end else begin
         if (read_op == 1'b1) begin
-            if (bus_data == content) begin
+            if (bus_data_read == content) begin
                 $display("[Pass] Read Addr: %d", addr);
             end else begin
-                $display("[Fail] Read Addr: %d, Expected:%h, Got:%h", addr, content, bus_data);
+                $display("[Fail] Read Addr: %d, Expected:%h, Got:%h", addr, content, bus_data_read);
                 is_ok = 1'b0;
             end
         end else begin

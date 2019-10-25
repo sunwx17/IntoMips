@@ -2,7 +2,8 @@ module sram_test(
     input clk, rst,
     input Ram_addr_t    bus_addr,
     input Bit_t         read_op, write_op,
-    inout Word_t        bus_data,
+    input Word_t        bus_data_write,
+    output Word_t       bus_data_read,
 
     output Bit_t        bus_stall
 );
@@ -12,7 +13,8 @@ sram_controller sram_controller_instance(
     .rst(rst),
     .read_op(read_op),
     .write_op(write_op),
-    .bus_data(bus_data),
+    .bus_data_write(bus_data_write),
+    .bus_data_read(bus_data_read),
     .bus_addr(bus_addr),
     .byte_mask(4'b1111),
     .bus_stall(bus_stall),

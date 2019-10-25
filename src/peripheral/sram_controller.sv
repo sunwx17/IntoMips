@@ -1,27 +1,27 @@
 `include "defines.svh"
 module sram_controller (
     //时钟信号
-    input Bit_t clk,
-    input Bit_t rst,
+    input Bit_t     clk,
+    input Bit_t     rst,
 
     //总线信号
-    input Bit_t read_op, //是否读
-    input Bit_t write_op, //是否写
-    inout Word_t bus_data, //总线数据
-    //inout wire[31:0] bus_data,
-    input Ram_addr_t bus_addr, //数据地址
-    input logic[3:0] byte_mask,
-    output Bit_t bus_stall, //总线使能
+    input Bit_t         read_op,        //读信号 1为读
+    input Bit_t         write_op,       //写信号 1为写
+    input Word_t        bus_data_write, //总线向sram写入的数据
+    output Word_t       bus_data_read,  //总线从sram读入的数据
+    input Ram_addr_t    bus_addr,       //数据地址
+    input logic[3:0]    byte_mask,
+
+    output Bit_t        bus_stall,      //总线使能
     
     
-    //RAM信号
-    inout Word_t ram_data,
-    //inout wire[31:0] ram_data,
-    output Ram_addr_t ram_addr,
-    output logic[3:0] ram_be_n,
-    output logic ram_ce_n,
-    output logic ram_oe_n,
-    output logic ram_we_n
+    //RAM信号 连接到top模块对应位置
+    inout Word_t        ram_data,
+    output Ram_addr_t   ram_addr,
+    output logic[3:0]   ram_be_n,
+    output logic        ram_ce_n,
+    output logic        ram_oe_n,
+    output logic        ram_we_n
 
 );
     typedef enum {IDLE, PREPARE, HOLD} State_t;
@@ -31,8 +31,12 @@ module sram_controller (
     //assign ram_be_n = 4'b0000;
     
     Word_t data_read, data_write;
-    assign bus_data = read_op ? data_read: `HIGH_WORD;
+    assign bus_data_read = read_op ? data_read: `HIGH_WORD;
     assign ram_data = write_op ? data_write: `HIGH_WORD;
+
+
+    //assign bus_data = read_op ? data_read: `HIGH_WORD;
+    //assign ram_data = write_op ? data_write: `HIGH_WORD;
 
     Ram_addr_t inner_addr;
     assign inner_addr = bus_addr;
@@ -83,7 +87,7 @@ module sram_controller (
             end                
             HOLD: begin            
                 if (read_op) data_read <= ram_data;
-                if (write_op) data_write <= bus_data;
+                if (write_op) data_write <= bus_data_write;
                 //$display("print HOLD read_op/write_op = %b, %b, write_data = %h, bus_data = %h, time = %t", read_op, write_op, data_write, bus_data, $time);
             end
             IDLE: begin
