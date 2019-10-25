@@ -15,6 +15,11 @@ Bit_t       ram_re;
 Bit_t       ram_we;
 Mask_t      ram_mask;
 
+Bit_t[5:0]  cpu_int_i;
+Bit_t       timer_int_o;
+
+assign cpu_int_i = { 5'b0, timer_int_o };
+
 cpu cpu_instance(
     .clk,
     .rst,
@@ -26,7 +31,9 @@ cpu cpu_instance(
     .ram_data_o(ram_data_i),
     .ram_re_o(ram_re),
     .ram_we_o(ram_we),
-    .ram_mask_o(ram_mask) 
+    .ram_mask_o(ram_mask),
+    .int_i(cpu_int_i),
+    .timer_int_o 
 );
 
 fake_rom fake_rom_instance(

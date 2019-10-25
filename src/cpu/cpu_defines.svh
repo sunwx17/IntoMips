@@ -3,7 +3,13 @@
 
 `include "defines.svh"
 
-`define PC_RESET_ADDR 32'b0
+`define PC_RESET_ADDR   32'b0
+
+`define PC_INTERRUPT    32'h00000020
+`define PC_SYSCALL      32'h00000040
+`define PC_INVALID_INST 32'h00000040
+`define PC_OV           32'h00000040
+
 
 
 //instruction
@@ -53,6 +59,31 @@ typedef logic[`STALL_WIDTH - 1:0]  Stall_t;
 `define CP0_CAUSE_IP_S  9:8
 `define CP0_CAUSE_EXCCODE 6:2
 
+//status
+`define CP0_STATUS_CU   31:28
+`define CP0_STATUS_IM   15:8
+`define CP0_STATUS_EXL  1
+`define CP0_STATUS_IE   0
+
+
+
+`define EXCP_TYPE_INTERRUPT     32'h00000001
+`define EXCP_TYPE_SYSCALL       32'h00000008
+`define EXCP_TYPE_INVALID_INST  32'h0000000a
+`define EXCP_TYPE_OV            32'h0000000c
+`define EXCP_TYPE_ERET          32'h0000000e
+
+//`define NEED_CHANGE_BD(excp_code) ((excp_code == `EXCP_TYPE_INTERRUPT) || (((excp_code == `EXCP_TYPE_SYSCALL) || (excp_code == `EXCP_TYPE_INVALID_INST) || (excp_code == `EXCP_TYPE_OV)) && cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] == `DISABLE))
+
+`define ORDINARY_EXCEPTION(excp_code) ((excp_code == `EXCP_TYPE_SYSCALL) || (excp_code == `EXCP_TYPE_INVALID_INST) || (excp_code == `EXCP_TYPE_OV))
+
+`define EXC_CODE_INTERRUPT      5'b00000
+`define EXC_CODE_SYSCALL        5'b01000
+`define EXC_CODE_INVALID_INST   5'b01010
+`define EXC_CODE_OV             5'b01100
+//`define EXC_CODE_ERET           5'b00000
+
+
 
 //operator
 typedef enum {
@@ -69,7 +100,9 @@ typedef enum {
     OP_J, OP_JAL, OP_JR, OP_JALR,
     OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE, OP_BLTZ, OP_BLTZAL, OP_BGEZ, OP_BGEZAL,
     OP_LB, OP_LBU, OP_LH, OP_LHU, OP_LW, OP_SB, OP_SH, OP_SW,
-    OP_MTC0, OP_MFC0
+    OP_MTC0, OP_MFC0,
+    OP_SYSCALL, OP_ERET,
+    OP_INVALID
 } Oper_t;
 
 `define OPER_TYPE_I_U OP_ANDI, OP_ORI, OP_XORI, OP_LUI
@@ -80,6 +113,7 @@ typedef enum {
 `define OPER_TYPE_R_0 OP_AND, OP_OR, OP_XOR, OP_NOR, OP_SLLV, OP_SRAV, OP_SRLV, OP_MOVN, OP_MOVZ, OP_MFHI, OP_MFLO, OP_MTHI, OP_MTLO, OP_ADD, OP_ADDU, OP_SUB, OP_SUBU, OP_SLT, OP_SLTU, OP_CLO, OP_CLZ, OP_MUL, OP_MULT, OP_MULTU, OP_JR, OP_JALR
 `define OPER_TYPE_R_1 OP_SLL, OP_SRA, OP_SRL
 `define OPER_TYPE_CP0 OP_MTC0, OP_MFC0
+`define OPER_TYPE_N OP_SYSCALL, OP_ERET
 
 `define NEED_WRITE_HILO(op) (op == OP_MTHI || op == OP_MTLO || op == OP_MULT ||op == OP_MULTU) 
 `define NEED_LINK(op) (op == OP_JAL || op == OP_BLTZAL || op == OP_BGEZAL)
@@ -124,38 +158,41 @@ typedef enum {
 
 
 
+
 //spec_opcode
-`define SEPC_OPCODE_AND  6'b100100
-`define SEPC_OPCODE_OR   6'b100101
-`define SEPC_OPCODE_XOR  6'b100110
-`define SEPC_OPCODE_NOR  6'b100111
+`define SPEC_OPCODE_AND  6'b100100
+`define SPEC_OPCODE_OR   6'b100101
+`define SPEC_OPCODE_XOR  6'b100110
+`define SPEC_OPCODE_NOR  6'b100111
 
-`define SEPC_OPCODE_SLL  6'b000000
-`define SEPC_OPCODE_SRL  6'b000010
-`define SEPC_OPCODE_SRA  6'b000011
-`define SEPC_OPCODE_SLLV 6'b000100
-`define SEPC_OPCODE_SRLV 6'b000110
-`define SEPC_OPCODE_SRAV 6'b000111
+`define SPEC_OPCODE_SLL  6'b000000
+`define SPEC_OPCODE_SRL  6'b000010
+`define SPEC_OPCODE_SRA  6'b000011
+`define SPEC_OPCODE_SLLV 6'b000100
+`define SPEC_OPCODE_SRLV 6'b000110
+`define SPEC_OPCODE_SRAV 6'b000111
 
-`define SEPC_OPCODE_MOVN 6'b001011
-`define SEPC_OPCODE_MOVZ 6'b001010
-`define SEPC_OPCODE_MFHI 6'b010000
-`define SEPC_OPCODE_MFLO 6'b010010
-`define SEPC_OPCODE_MTHI 6'b010001
-`define SEPC_OPCODE_MTLO 6'b010011
+`define SPEC_OPCODE_MOVN 6'b001011
+`define SPEC_OPCODE_MOVZ 6'b001010
+`define SPEC_OPCODE_MFHI 6'b010000
+`define SPEC_OPCODE_MFLO 6'b010010
+`define SPEC_OPCODE_MTHI 6'b010001
+`define SPEC_OPCODE_MTLO 6'b010011
 
-`define SEPC_OPCODE_ADD  6'b100000
-`define SEPC_OPCODE_ADDU 6'b100001
-`define SEPC_OPCODE_SUB  6'b100010
-`define SEPC_OPCODE_SUBU 6'b100011
-`define SEPC_OPCODE_SLT  6'b101010
-`define SEPC_OPCODE_SLTU 6'b101011
+`define SPEC_OPCODE_ADD  6'b100000
+`define SPEC_OPCODE_ADDU 6'b100001
+`define SPEC_OPCODE_SUB  6'b100010
+`define SPEC_OPCODE_SUBU 6'b100011
+`define SPEC_OPCODE_SLT  6'b101010
+`define SPEC_OPCODE_SLTU 6'b101011
 
-`define SEPC_OPCODE_MULT  6'b011000
-`define SEPC_OPCODE_MULTU 6'b011001
+`define SPEC_OPCODE_MULT  6'b011000
+`define SPEC_OPCODE_MULTU 6'b011001
 
-`define SEPC_OPCODE_JR   6'b001000
-`define SEPC_OPCODE_JALR 6'b001001
+`define SPEC_OPCODE_JR   6'b001000
+`define SPEC_OPCODE_JALR 6'b001001
+
+`define SPEC_OPCODE_SYSCALL 6'b001100
 
 //spec2
 `define SPEC2_OPCODE_CLZ 6'b100000
@@ -172,6 +209,8 @@ typedef enum {
 //cop0
 `define COP0_OPCODE_MTC0    5'b00100
 `define COP0_OPCODE_MFC0    5'b00000
+
+`define COP0_OPCODE_FUNC_ERET   6'b011000
 
 
 `endif

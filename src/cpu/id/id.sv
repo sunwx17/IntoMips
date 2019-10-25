@@ -40,8 +40,11 @@ module id(
 
     output  Inst_addr_t pc_o,
 
-    output  Bit_t       stallreq
+    output  Bit_t       stallreq,
+
+    output  Word_t      exception_type_o
 );
+
 
 Oper_t      oper;
 Bit_t       reg1_read;
@@ -52,6 +55,8 @@ Bit_t       wreg_write;
 Reg_addr_t  wreg_addr;
 Word_t      immediate;
 
+
+assign exception_type_o = {19'b0, (oper == OP_ERET ? 1'b1 : 1'b0), 2'b0, (oper == OP_INVALID ? 1'b1 : 1'b0), (oper == OP_SYSCALL ? 1'b1 : 1'b0), 8'b0};
 
 id_type id_type_instance(
     .inst,

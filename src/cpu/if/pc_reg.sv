@@ -15,7 +15,7 @@ module pc_reg(
 
     //exception
     input   Bit_t       flush,
-    input   Inst_addr_t new_pc
+    input   Inst_addr_t new_pc 
 );
 
 always @ (posedge clk) begin

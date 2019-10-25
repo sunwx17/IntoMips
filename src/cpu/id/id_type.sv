@@ -33,36 +33,38 @@ assign imm    = inst[15:0];
 
 
 always_comb begin
+    oper <= OP_INVALID;
     case (opcode)
         `OPCODE_SPEC : begin
             case (func)
-                `SEPC_OPCODE_AND  : oper <= OP_AND  ;
-                `SEPC_OPCODE_OR   : oper <= OP_OR   ;
-                `SEPC_OPCODE_XOR  : oper <= OP_XOR  ;
-                `SEPC_OPCODE_NOR  : oper <= OP_NOR  ;
-                `SEPC_OPCODE_SLL  : oper <= OP_SLL  ;
-                `SEPC_OPCODE_SRL  : oper <= OP_SRL  ;
-                `SEPC_OPCODE_SRA  : oper <= OP_SRA  ;
-                `SEPC_OPCODE_SLLV : oper <= OP_SLLV ;
-                `SEPC_OPCODE_SRLV : oper <= OP_SRLV ;
-                `SEPC_OPCODE_SRAV : oper <= OP_SRAV ;
-                `SEPC_OPCODE_MOVN : oper <= OP_MOVN ;
-                `SEPC_OPCODE_MOVZ : oper <= OP_MOVZ ;
-                `SEPC_OPCODE_MFHI : oper <= OP_MFHI ;
-                `SEPC_OPCODE_MFLO : oper <= OP_MFLO ;
-                `SEPC_OPCODE_MTHI : oper <= OP_MTHI ;
-                `SEPC_OPCODE_MTLO : oper <= OP_MTLO ;
-                `SEPC_OPCODE_ADD  : oper <= OP_ADD  ;
-                `SEPC_OPCODE_ADDU : oper <= OP_ADDU ;
-                `SEPC_OPCODE_SUB  : oper <= OP_SUB  ;
-                `SEPC_OPCODE_SUBU : oper <= OP_SUBU ;
-                `SEPC_OPCODE_SLT  : oper <= OP_SLT  ;
-                `SEPC_OPCODE_SLTU : oper <= OP_SLTU ;
-                `SEPC_OPCODE_MULT : oper <= OP_MULT ;
-                `SEPC_OPCODE_MULTU: oper <= OP_MULTU;
-                `SEPC_OPCODE_JR   : oper <= OP_JR   ;
-                `SEPC_OPCODE_JALR : oper <= OP_JALR ;
-                default: oper <= OP_NOP;
+                `SPEC_OPCODE_AND  : oper <= OP_AND  ;
+                `SPEC_OPCODE_OR   : oper <= OP_OR   ;
+                `SPEC_OPCODE_XOR  : oper <= OP_XOR  ;
+                `SPEC_OPCODE_NOR  : oper <= OP_NOR  ;
+                `SPEC_OPCODE_SLL  : oper <= OP_SLL  ;
+                `SPEC_OPCODE_SRL  : oper <= OP_SRL  ;
+                `SPEC_OPCODE_SRA  : oper <= OP_SRA  ;
+                `SPEC_OPCODE_SLLV : oper <= OP_SLLV ;
+                `SPEC_OPCODE_SRLV : oper <= OP_SRLV ;
+                `SPEC_OPCODE_SRAV : oper <= OP_SRAV ;
+                `SPEC_OPCODE_MOVN : oper <= OP_MOVN ;
+                `SPEC_OPCODE_MOVZ : oper <= OP_MOVZ ;
+                `SPEC_OPCODE_MFHI : oper <= OP_MFHI ;
+                `SPEC_OPCODE_MFLO : oper <= OP_MFLO ;
+                `SPEC_OPCODE_MTHI : oper <= OP_MTHI ;
+                `SPEC_OPCODE_MTLO : oper <= OP_MTLO ;
+                `SPEC_OPCODE_ADD  : oper <= OP_ADD  ;
+                `SPEC_OPCODE_ADDU : oper <= OP_ADDU ;
+                `SPEC_OPCODE_SUB  : oper <= OP_SUB  ;
+                `SPEC_OPCODE_SUBU : oper <= OP_SUBU ;
+                `SPEC_OPCODE_SLT  : oper <= OP_SLT  ;
+                `SPEC_OPCODE_SLTU : oper <= OP_SLTU ;
+                `SPEC_OPCODE_MULT : oper <= OP_MULT ;
+                `SPEC_OPCODE_MULTU: oper <= OP_MULTU;
+                `SPEC_OPCODE_JR   : oper <= OP_JR   ;
+                `SPEC_OPCODE_JALR : oper <= OP_JALR ;
+                `SPEC_OPCODE_SYSCALL : oper <= OP_SYSCALL;
+                default: oper <= OP_INVALID;
             endcase
         end
         `OPCODE_SPEC2 : begin
@@ -70,7 +72,7 @@ always_comb begin
                 `SPEC2_OPCODE_CLZ : oper <= OP_CLZ;
                 `SPEC2_OPCODE_CLO : oper <= OP_CLO;
                 `SPEC2_OPCODE_MUL : oper <= OP_MUL;
-                default: oper <= OP_NOP;
+                default: oper <= OP_INVALID;
             endcase
         end
         `OPCODE_REGIMM : begin
@@ -79,15 +81,22 @@ always_comb begin
                 `REGIMM_OPCODE_BLTZAL : oper <= OP_BLTZAL;
                 `REGIMM_OPCODE_BGEZ   : oper <= OP_BGEZ  ;
                 `REGIMM_OPCODE_BGEZAL : oper <= OP_BGEZAL;
-                default: oper <= OP_NOP;
+                default: oper <= OP_INVALID;
             endcase
         end
         `OPCODE_COP0 : begin
             case (rs)
                 `COP0_OPCODE_MTC0 : oper <= OP_MTC0;
                 `COP0_OPCODE_MFC0 : oper <= OP_MFC0;
-                default: oper <= OP_NOP;
+                5'b10000 : begin
+                    case(func)
+                        `COP0_OPCODE_FUNC_ERET : oper <= OP_ERET;
+                        default: oper <= OP_INVALID;
+                    endcase
+                end
+                default: oper <= OP_INVALID;
             endcase
+
         end
         `OPCODE_ANDI : oper <= OP_ANDI ;
         `OPCODE_ORI  : oper <= OP_ORI  ;
@@ -112,7 +121,7 @@ always_comb begin
         `OPCODE_SB   : oper <= OP_SB   ;
         `OPCODE_SH   : oper <= OP_SH   ;
         `OPCODE_SW   : oper <= OP_SW   ;
-        default: oper <= OP_NOP;
+        default: oper <= OP_INVALID;
     endcase
 end
 
@@ -198,6 +207,15 @@ always_comb begin
             reg1_addr  <= `REG_ZERO;
             reg2_addr  <= `REG_ZERO;
             immediate  <= {27'b0, rd};
+        end
+        `OPER_TYPE_N : begin 
+            wreg_write <= `DISABLE;
+            wreg_addr  <= `REG_ZERO;
+            reg1_read  <= `DISABLE;
+            reg2_read  <= `DISABLE;
+            reg1_addr  <= `REG_ZERO;
+            reg2_addr  <= `REG_ZERO;
+            immediate  <= `ZERO_WORD;
         end
         default : begin end
     endcase

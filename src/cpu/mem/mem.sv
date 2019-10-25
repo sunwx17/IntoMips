@@ -37,9 +37,77 @@ module mem(
 
     output  Bit_t       cp0_reg_we_o,
     output  Reg_addr_t  cp0_reg_write_addr_o,
-    output  Word_t      cp0_reg_data_o 
+    output  Word_t      cp0_reg_data_o,
 
+    input   Word_t      exception_type_i,
+    input   Inst_addr_t pc_i,
+    input   Bit_t       is_in_delayslot_i,
+    input   Word_t      cp0_status_i,
+    input   Word_t      cp0_cause_i,
+    input   Word_t      cp0_epc_i,
+    input   Bit_t       wb_cp0_reg_we,
+    input   Reg_addr_t  wb_cp0_reg_write_addr,
+    input   Word_t      wb_cp0_reg_data,
+    output  Word_t      exception_type_o,
+    output  Inst_addr_t pc_o,
+    output  Bit_t       is_in_delayslot_o,
+    output  Word_t      cp0_epc_o
 );
+
+assign is_in_delayslot_o = is_in_delayslot_i;
+assign pc_o = pc_i;
+
+Word_t  cp0_epc;
+Word_t  cp0_cause;
+Word_t  cp0_status;
+
+assign cp0_epc_o = cp0_epc;
+
+always_comb begin
+    if(rst == `ENABLE) begin
+        cp0_epc <= `ZERO_WORD;
+        cp0_cause <= `ZERO_WORD;
+        cp0_status <= `ZERO_WORD;
+    end else begin
+        cp0_epc <= cp0_epc_i;
+        cp0_cause <= cp0_cause_i;
+        cp0_status <= cp0_status_i;
+        if(wb_cp0_reg_we == `ENABLE) begin
+            if(wb_cp0_reg_write_addr == `CP0_CAUSE) begin
+                cp0_cause <= wb_cp0_reg_data & `CP0_CAUSE_MASK;
+            end else if(wb_cp0_reg_write_addr == `CP0_EPC) begin
+                cp0_epc <= wb_cp0_reg_data;
+            end else if(wb_cp0_reg_write_addr == `CP0_STATUS) begin
+                cp0_status <= wb_cp0_reg_data;
+            end 
+        end
+    end
+end
+
+always_comb begin
+    if (rst == `ENABLE) begin
+        exception_type_o <= `ZERO_WORD;
+    end else begin
+        exception_type_o <= `ZERO_WORD;
+        if(pc_i != `PC_RESET_ADDR) begin
+            if(((cp0_cause[`CP0_CAUSE_IP] & cp0_status[`CP0_STATUS_IM]) != `ZERO_BYTE) && cp0_status[1] == `DISABLE && cp0_status[0] == `ENABLE) begin
+                exception_type_o <= `EXCP_TYPE_INTERRUPT;
+            end else if (exception_type_i[8] == `ENABLE) begin
+                exception_type_o <= `EXCP_TYPE_SYSCALL;
+            end else if (exception_type_i[9] == `ENABLE) begin
+                exception_type_o <= `EXCP_TYPE_INVALID_INST;
+            end else if (exception_type_i[11] == `ENABLE) begin
+                exception_type_o <= `EXCP_TYPE_OV;
+            end else if (exception_type_i[12] == `ENABLE) begin
+                exception_type_o <= `EXCP_TYPE_ERET;
+            end
+        end
+    end
+end
+
+Bit_t   mem_we;
+
+assign mem_we_o = mem_we & (~(|exception_type_i));
 
 always_comb begin
     if (rst == `ENABLE) begin 
@@ -52,7 +120,7 @@ always_comb begin
         lo_o         <= `ZERO_WORD;
         mem_addr_o   <= `ZERO_WORD;
         mem_data_o   <= `ZERO_WORD;
-        mem_we_o     <= `DISABLE;
+        mem_we     <= `DISABLE;
         mem_re_o     <= `DISABLE;
         mem_mask_o   <= 4'b0;
 
@@ -60,11 +128,11 @@ always_comb begin
         cp0_reg_write_addr_o <= `REG_ZERO;
         cp0_reg_data_o       <= `ZERO_WORD;
     end else begin
-        wreg_write_o <= wreg_write_i;
+        wreg_write_o <= wreg_write_i & (~(|exception_type_i));
         wreg_addr_o  <= wreg_addr_i;
         wreg_data_o  <= wreg_data_i;
 
-        whilo_o      <= whilo_i;
+        whilo_o      <= whilo_i & (~(|exception_type_i));
         hi_o         <= hi_i;
         lo_o         <= lo_i;
 
@@ -75,7 +143,7 @@ always_comb begin
         cp0_reg_write_addr_o <= cp0_reg_write_addr_i;
         cp0_reg_data_o       <= cp0_reg_data_i;
 
-        mem_we_o     <= `DISABLE;
+        mem_we     <= `DISABLE;
         mem_re_o     <= `DISABLE;
         mem_mask_o   <= 4'b0;
 
@@ -106,15 +174,15 @@ always_comb begin
                 wreg_data_o <= mem_data_i;
             end
             OP_SB  : begin
-                mem_we_o    <= `ENABLE;
+                mem_we    <= `ENABLE;
                 mem_mask_o  <= 4'b0001;
             end
             OP_SH  : begin
-                mem_we_o    <= `ENABLE;
+                mem_we    <= `ENABLE;
                 mem_mask_o  <= 4'b0011;
             end
             OP_SW  : begin
-                mem_we_o    <= `ENABLE;
+                mem_we    <= `ENABLE;
                 mem_mask_o  <= 4'b1111;
             end
             default : begin end

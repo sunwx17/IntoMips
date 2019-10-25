@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="530"/>
+    <Option Name="WTXSimLaunchSim" Val="607"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -426,6 +426,22 @@
       </File>
       <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/cp0.ans"/>
       <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/cp0.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/exception.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/exception.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/exception.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/timer_int.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/timer_int.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/timer_int.s"/>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="cpu_test_tb"/>
