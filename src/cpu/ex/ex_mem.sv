@@ -38,11 +38,21 @@ module ex_mem(
 
     output  Bit_t       mem_cp0_reg_we,
     output  Reg_addr_t  mem_cp0_reg_write_addr,
-    output  Word_t      mem_cp0_reg_data 
+    output  Word_t      mem_cp0_reg_data,
+
+    input   Bit_t       flush,
+    input   Word_t      ex_exception_type,
+    input   Bit_t       ex_is_in_delayslot,
+    input   Inst_addr_t ex_pc,
+
+    output  Word_t      mem_exception_type,
+    output  Bit_t       mem_is_in_delayslot,
+    output  Inst_addr_t mem_pc 
+
 );
 
 always @ (posedge clk) begin
-    if (rst == `ENABLE || (stall[3] == `ENABLE && stall[4] == `DISABLE)) begin 
+    if (rst == `ENABLE || flush == `ENABLE || (stall[3] == `ENABLE && stall[4] == `DISABLE)) begin 
         mem_wreg_write <= `DISABLE;
         mem_wreg_addr  <= `REG_ZERO;
         mem_wreg_data  <= `ZERO_WORD;
@@ -58,6 +68,10 @@ always @ (posedge clk) begin
         mem_cp0_reg_we          <= `DISABLE;
         mem_cp0_reg_write_addr  <= `REG_ZERO;
         mem_cp0_reg_data        <= `ZERO_WORD;
+
+        mem_exception_type      <= `ZERO_WORD;
+        mem_is_in_delayslot     <= `DISABLE;
+        mem_pc      <=  `PC_RESET_ADDR;
     end else if (stall[3] == `DISABLE) begin
         mem_wreg_write <= ex_wreg_write;
         mem_wreg_addr  <= ex_wreg_addr;
@@ -74,6 +88,10 @@ always @ (posedge clk) begin
         mem_cp0_reg_we          <= ex_cp0_reg_we;
         mem_cp0_reg_write_addr  <= ex_cp0_reg_write_addr;
         mem_cp0_reg_data        <= ex_cp0_reg_data;
+
+        mem_exception_type      <= ex_exception_type;
+        mem_is_in_delayslot     <= ex_is_in_delayslot;
+        mem_pc      <=  ex_pc;
     end
 end
     

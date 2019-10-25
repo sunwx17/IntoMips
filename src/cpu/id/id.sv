@@ -30,14 +30,21 @@ module id(
     input   Reg_addr_t  mem_wreg_addr_i,
     input   Word_t      mem_wreg_data_i, 
 
+    input   Bit_t       is_in_delayslot_i,
+    output  Bit_t       is_in_delayslot_o,
+    output  Bit_t       next_is_in_delayslot_o,
+
     //branch
     output  Bit_t       branch_flag_o,
     output  Inst_addr_t branch_target_addr_o,
 
     output  Inst_addr_t pc_o,
 
-    output  Bit_t       stallreq
+    output  Bit_t       stallreq,
+
+    output  Word_t      exception_type_o
 );
+
 
 Oper_t      oper;
 Bit_t       reg1_read;
@@ -48,6 +55,8 @@ Bit_t       wreg_write;
 Reg_addr_t  wreg_addr;
 Word_t      immediate;
 
+
+assign exception_type_o = {19'b0, (oper == OP_ERET ? 1'b1 : 1'b0), 2'b0, (oper == OP_INVALID ? 1'b1 : 1'b0), (oper == OP_SYSCALL ? 1'b1 : 1'b0), 8'b0};
 
 id_type id_type_instance(
     .inst,
@@ -82,6 +91,8 @@ always_comb begin
         reg1_addr_o <= `REG_ZERO;
         reg2_addr_o <= `REG_ZERO;
         pc_o <= `PC_RESET_ADDR;
+        next_is_in_delayslot_o <= `DISABLE;
+        is_in_delayslot_o <= `DISABLE;
     end else begin        
         oper_o <= oper;
         wreg_write_o <= wreg_write;
@@ -91,6 +102,8 @@ always_comb begin
         reg1_addr_o <= reg1_addr;
         reg2_addr_o <= reg2_addr;
         pc_o <= pc;
+        next_is_in_delayslot_o <= `NEXT_IN_DELAYSLOT(oper);
+        is_in_delayslot_o <= is_in_delayslot_i;
     end
 end
 

@@ -3,7 +3,7 @@
 module ex(
     input               rst,
     
-    input   Inst_t      pc,
+    input   Inst_addr_t pc,
 
     input   Oper_t      oper,
     input   Word_t      reg1,
@@ -39,6 +39,9 @@ module ex(
 
     output  Bit_t       stallreq,
 
+    input   Bit_t       is_in_delayslot_i,
+    output  Bit_t       is_in_delayslot_o,
+
     //cp0
     input   Bit_t       mem_cp0_reg_we,
     input   Reg_addr_t  mem_cp0_reg_write_addr,
@@ -53,8 +56,19 @@ module ex(
 
     output  Bit_t       cp0_reg_we_o,
     output  Reg_addr_t  cp0_reg_write_addr_o,
-    output  Word_t      cp0_reg_data_o 
+    output  Word_t      cp0_reg_data_o,
+
+    input   Word_t      exception_type_i,
+    output  Word_t      exception_type_o,
+
+    output  Inst_addr_t pc_o 
 );
+
+assign is_in_delayslot_o = is_in_delayslot_i;
+
+assign exception_type_o = exception_type_i;//TODO: 溢出异常
+
+assign pc_o = pc;
 
 assign oper_o = oper;
 
@@ -74,6 +88,7 @@ end
 
 
 Word_t cp0_data;
+
 
 always_comb begin
     if(rst == `ENABLE) begin
@@ -98,6 +113,7 @@ always_comb begin
         end
     end
 end
+
 
 
 

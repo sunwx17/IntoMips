@@ -27,11 +27,13 @@ module mem_wb(
 
     output  Bit_t       wb_cp0_reg_we,
     output  Reg_addr_t  wb_cp0_reg_write_addr,
-    output  Word_t      wb_cp0_reg_data 
+    output  Word_t      wb_cp0_reg_data,
+
+    input   Bit_t       flush
 );
 
 always @ (posedge clk) begin
-    if (rst == `ENABLE || (stall[4] == `ENABLE && stall[5] == `DISABLE)) begin 
+    if (rst == `ENABLE || flush == `ENABLE || (stall[4] == `ENABLE && stall[5] == `DISABLE)) begin 
         wb_wreg_write <= `DISABLE;
         wb_wreg_addr  <= `REG_ZERO;
         wb_wreg_data  <= `ZERO_WORD;

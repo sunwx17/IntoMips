@@ -80,7 +80,7 @@ while(!$feof(ans)) begin @ (negedge clock_50)
         if (reg_write_enable == `ENABLE) begin
             $sformat(out, "%0d:$%0d=0x%x", true_count, reg_write_addr, reg_write_data);
             if (out == line) begin
-                $display("[pass] %0s", out);
+                $display("[Pass] %0s", out);
             end else begin
                 $display("[Fail] Expected: %0s, Got: %0s", line, out);
                 is_ok = 1'b0;
@@ -88,7 +88,7 @@ while(!$feof(ans)) begin @ (negedge clock_50)
         end else if (hilo_we == `ENABLE) begin
             $sformat(out, "%0d:hi=0x%x,lo=0x%x", true_count, hi_data, lo_data);
             if (out == line) begin
-                $display("[pass] %0s", out);
+                $display("[Pass] %0s", out);
             end else begin
                 $display("[Fail] Expected: %0s, Got: %0s", line, out);
                 is_ok = 1'b0;
@@ -96,7 +96,7 @@ while(!$feof(ans)) begin @ (negedge clock_50)
         end else if (cp0_we == `ENABLE) begin
             $sformat(out, "%0d:cp0.$%0d=0x%x", true_count, cp0_waddr, cp0_wdata);
             if (out == line) begin
-                $display("[pass] %0s", out);
+                $display("[Pass] %0s", out);
             end else begin
                 $display("[Fail] Expected: %0s, Got: %0s", line, out);
                 is_ok = 1'b0;
@@ -104,7 +104,7 @@ while(!$feof(ans)) begin @ (negedge clock_50)
         end else begin
             $sformat(out, "%0d:skip", true_count);
             if (line == out) begin
-                $display("[pass] %0s", line);
+                $display("[Pass] %0s", line);
             end else begin
                 $display("[Fail] Expected: %0s, Got: %0d:skip", line, true_count);
                 is_ok = 1'b0;
@@ -139,6 +139,8 @@ initial begin
     unittest("memory");
     unittest("load");
     unittest("cp0");
+    unittest("exception");
+    unittest("timer_int");
     $finish;
 end
 

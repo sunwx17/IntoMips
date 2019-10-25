@@ -13,7 +13,7 @@ module cpu(
     output  Bit_t       ram_we_o,
     output  Mask_t      ram_mask_o,
 
-    input   logic[6:0]  int_i, //???
+    input   Bit_t[5:0]  int_i, //???
     output  Bit_t       timer_int_o 
 );
 
@@ -56,7 +56,6 @@ Bit_t       cp0_we_i;
 Reg_addr_t  cp0_waddr_i;
 Reg_data_t  cp0_wdata_i;
 Reg_addr_t  cp0_raddr_i;
-logic[5:0]  cp0_int_i;
 Reg_data_t  cp0_data_o;
 Reg_data_t  cp0_count_o;
 Reg_data_t  cp0_compare_o;
@@ -65,7 +64,11 @@ Reg_data_t  cp0_cause_o;
 Reg_data_t  cp0_epc_o;
 Reg_data_t  cp0_config_o;
 Reg_data_t  cp0_prid_o;
-Bit_t       cp0_timer_int_o;
+
+Word_t      cp0_exception_type_i;
+Inst_addr_t cp0_pc_i;
+Bit_t       cp0_is_in_delayslot_i;
+
 
 
 cp0 cp0_instance(
@@ -75,7 +78,7 @@ cp0 cp0_instance(
     .waddr_i(cp0_waddr_i),
     .wdata_i(cp0_wdata_i),
     .raddr_i(cp0_raddr_i),
-    .int_i(cp0_int_i),
+    .int_i(int_i),
     .data_o(cp0_data_o),
     .count_o(cp0_count_o),
     .compare_o(cp0_compare_o),
@@ -84,7 +87,10 @@ cp0 cp0_instance(
     .epc_o(cp0_epc_o),
     .config_o(cp0_config_o),
     .prid_o(cp0_prid_o),
-    .timer_int_o(cp0_timer_int_o) 
+    .timer_int_o(timer_int_o),
+    .exception_type_i(cp0_exception_type_i),
+    .pc_i(cp0_pc_i),
+    .is_in_delayslot_i(cp0_is_in_delayslot_i) 
 );
 
 
@@ -92,11 +98,23 @@ Bit_t    stallreq_from_id;
 Bit_t    stallreq_from_ex;
 Stall_t  stall;
 
+
+Word_t      mem_cp0_epc_o;
+Inst_addr_t new_pc;
+Bit_t       flush;
+
+
 ctrl ctrl_instance(
     .stallreq_from_id(stallreq_from_id),
     .stallreq_from_ex(stallreq_from_ex),
-    .stall(stall) 
+    .stall(stall),
+    .cp0_epc_i(mem_cp0_epc_o),
+    .exception_type_i(cp0_exception_type_i),
+    .new_pc(new_pc),
+    .flush(flush) 
 );
+
+
 
 
 //branch
@@ -111,7 +129,9 @@ pc_reg pc_reg_instance(
     .ce(rom_ce_o),
     .branch_flag_i(branch_flag),
     .branch_target_addr_i(branch_target_addr),
-    .stall
+    .stall,
+    .flush,
+    .new_pc 
 );
 
 //connect if_id and id
@@ -126,7 +146,8 @@ if_id if_id_instance(
     .if_inst(rom_data_i),
     .id_pc(id_pc_i),
     .id_inst(id_inst_i),
-    .stall
+    .stall,
+    .flush
 );
 
 
@@ -143,6 +164,7 @@ Inst_addr_t id_pc_o;
 Bit_t       ex_wreg_write_o;
 Reg_addr_t  ex_wreg_addr_o;
 Word_t      ex_wreg_data_o;
+Inst_addr_t ex_pc_o;
 
 //connect mem and mem_wb
 Bit_t       mem_wreg_write_o;
@@ -153,6 +175,18 @@ Word_t      mem_wreg_data_o;
 //memory operations and load conflict
 Oper_t      ex_oper_o;
 
+
+Bit_t       id_is_in_delayslot_i;
+Bit_t       id_is_in_delayslot_o;
+Bit_t       id_next_is_in_delayslot_o;
+
+Bit_t       ex_is_in_delayslot_i;
+Bit_t       ex_is_in_delayslot_o;
+
+
+Word_t      id_exception_type_o;
+Word_t      ex_exception_type_i;
+Word_t      ex_exception_type_o;
 
 
 //stage id
@@ -178,11 +212,17 @@ id id_instance(
     .mem_wreg_write_i(mem_wreg_write_o),
     .mem_wreg_addr_i(mem_wreg_addr_o),
     .mem_wreg_data_i(mem_wreg_data_o), 
+    .is_in_delayslot_i(id_is_in_delayslot_i),
+    .is_in_delayslot_o(id_is_in_delayslot_o),
+    .next_is_in_delayslot_o(id_next_is_in_delayslot_o),
     .branch_flag_o(branch_flag),
     .branch_target_addr_o(branch_target_addr),
     .pc_o(id_pc_o),
-    .stallreq(stallreq_from_id)
+    .stallreq(stallreq_from_id),
+    .exception_type_o(id_exception_type_o)
 );
+
+
 
 
 
@@ -210,7 +250,14 @@ id_ex id_ex_instance(
     .ex_wreg_write(ex_wreg_write_i),
     .ex_wreg_addr(ex_wreg_addr_i),
     .ex_pc(ex_pc_i),
-    .stall
+    .id_is_in_delayslot(id_is_in_delayslot_o),
+    .ex_is_in_delayslot(ex_is_in_delayslot_i),
+    .next_is_in_delayslot_i(id_next_is_in_delayslot_o),
+    .is_in_delayslot_o(id_is_in_delayslot_i),
+    .stall,
+    .flush,
+    .id_exception_type(id_exception_type_o),
+    .ex_exception_type(ex_exception_type_i) 
 );
 
 
@@ -300,6 +347,8 @@ ex ex_instance(
     .oper_o(ex_oper_o),
     .mem_oper_addr(ex_mem_oper_addr_o),
     .mem_oper_data(ex_mem_oper_data_o),
+    .is_in_delayslot_i(ex_is_in_delayslot_i),
+    .is_in_delayslot_o(ex_is_in_delayslot_o),
     .stallreq(stallreq_from_ex),
     .mem_cp0_reg_we(mem_cp0_reg_we_o),
     .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr_o),
@@ -311,7 +360,10 @@ ex ex_instance(
     .cp0_reg_read_addr_o(cp0_raddr_i),
     .cp0_reg_we_o(ex_cp0_reg_we_o),
     .cp0_reg_write_addr_o(ex_cp0_reg_write_addr_o),
-    .cp0_reg_data_o(ex_cp0_reg_data_o) 
+    .cp0_reg_data_o(ex_cp0_reg_data_o),
+    .exception_type_i(ex_exception_type_i),
+    .exception_type_o(ex_exception_type_o),
+    .pc_o(ex_pc_o) 
 );
 
 //connext ex_mem and mem
@@ -323,6 +375,9 @@ Oper_t      mem_oper_i;
 Word_t      mem_mem_oper_addr_i;
 Word_t      mem_mem_oper_data_i;
 
+Word_t      mem_exception_type_i;
+Bit_t       mem_is_in_delayslot_i;
+Inst_addr_t mem_pc_i;
 
 //stage ex_mem
 ex_mem ex_mem_instance(
@@ -352,7 +407,14 @@ ex_mem ex_mem_instance(
     .ex_cp0_reg_data(ex_cp0_reg_data_o),
     .mem_cp0_reg_we(mem_cp0_reg_we_i),
     .mem_cp0_reg_write_addr(mem_cp0_reg_write_addr_i),
-    .mem_cp0_reg_data(mem_cp0_reg_data_i) 
+    .mem_cp0_reg_data(mem_cp0_reg_data_i),
+    .flush,
+    .ex_exception_type(ex_exception_type_o),
+    .ex_is_in_delayslot(ex_is_in_delayslot_o),
+    .ex_pc(ex_pc_o),
+    .mem_exception_type(mem_exception_type_i),
+    .mem_is_in_delayslot(mem_is_in_delayslot_i),
+    .mem_pc(mem_pc_i) 
 );
 
 
@@ -386,7 +448,20 @@ mem mem_instance(
     .cp0_reg_data_i(mem_cp0_reg_data_i),
     .cp0_reg_we_o(mem_cp0_reg_we_o),
     .cp0_reg_write_addr_o(mem_cp0_reg_write_addr_o),
-    .cp0_reg_data_o(mem_cp0_reg_data_o) 
+    .cp0_reg_data_o(mem_cp0_reg_data_o),
+    .exception_type_i(mem_exception_type_i),
+    .pc_i(mem_pc_i),
+    .is_in_delayslot_i(mem_is_in_delayslot_i),
+    .cp0_status_i(cp0_status_o),
+    .cp0_cause_i(cp0_cause_o),
+    .cp0_epc_i(cp0_epc_o),
+    .wb_cp0_reg_we(cp0_we_i),
+    .wb_cp0_reg_write_addr(cp0_waddr_i),
+    .wb_cp0_reg_data(cp0_wdata_i),
+    .exception_type_o(cp0_exception_type_i),
+    .pc_o(cp0_pc_i),
+    .is_in_delayslot_o(cp0_is_in_delayslot_i),
+    .cp0_epc_o(mem_cp0_epc_o) 
 );
 
 //stage mem_wb
@@ -411,10 +486,15 @@ mem_wb mem_wb_instance(
     .mem_cp0_reg_data(mem_cp0_reg_data_o),
     .wb_cp0_reg_we(cp0_we_i),
     .wb_cp0_reg_write_addr(cp0_waddr_i),
-    .wb_cp0_reg_data(cp0_wdata_i) 
+    .wb_cp0_reg_data(cp0_wdata_i),
+    .flush
 );
 
 
+
+/*always @ (posedge clk) begin
+    $display("exception 0x%x", mem_exception_type_i);    
+end*/
 
 
 endmodule
