@@ -13,7 +13,7 @@ endif
 
 TARGETDIR = instructions
 
-COMPILATION = $(wildcard $(TARGETDIR)/*.s)
+COMPILATION = $(wildcard $(TARGETDIR)/auto_*.s)
 MEMORY = $(COMPILATION:.s=.mem)
 ANSWER = $(COMPILATION:.s=.ans)
 

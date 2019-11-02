@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="617"/>
+    <Option Name="WTXSimLaunchSim" Val="653"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -533,14 +533,254 @@
       </File>
       <File Path="$PPRDIR/../testbench/peripheral/testcases/sram_read.ans"/>
       <File Path="$PPRDIR/../testbench/peripheral/testcases/sram_write.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_and.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_and.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_and.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_xor.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_or.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_or.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_xor.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_or.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_xor.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_xori.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_xori.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_andi.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_nor.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_nor.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_xori.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_nor.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_andi.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_andi.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srlv.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sllv.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sllv.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srlv.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srl.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srl.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sll.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sllv.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srav.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sll.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srav.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srl.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srlv.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_srav.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sll.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sra.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sra.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sra.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_movn.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_movz.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mflo.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_movn.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mfhi.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mfhi.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mtlo.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mtlo.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_movn.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_movz.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mflo.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_movz.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mflo.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mfhi.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mtlo.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_add.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_slti.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mul.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addu.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_slt.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sltiu.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sltu.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_subu.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addiu.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_slt.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addi.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mul.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addu.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addiu.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_subu.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mul.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sltu.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addu.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addiu.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_add.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_slt.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_subu.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sltiu.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sub.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addi.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sltiu.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sub.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sltu.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_slti.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_add.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_addi.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_slti.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_sub.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_multu.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_multu.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_multu.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mult.s"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mult.ans"/>
+      <File Path="$PPRDIR/../testbench/cpu/testcases/instructions/auto_mult.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="peripheral_test_tb"/>
+        <Option Name="TopModule" Val="cpu_test_tb"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
         <Option Name="TransportPathDelay" Val="0"/>
         <Option Name="TransportIntDelay" Val="0"/>
         <Option Name="SrcSet" Val="sources_1"/>
-        <Option Name="xsim.simulate.runtime" Val="100000ns"/>
+        <Option Name="xsim.simulate.runtime" Val="500000"/>
       </Config>
     </FileSet>
   </FileSets>
@@ -578,7 +818,7 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/impl_1" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
+    <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="constrs_1" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" SynthRun="synth_1" IncludeInArchive="true" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
@@ -591,7 +831,6 @@
         <Step Id="post_route_phys_opt_design"/>
         <Step Id="write_bitstream"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>

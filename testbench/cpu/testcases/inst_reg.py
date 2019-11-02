@@ -249,7 +249,7 @@ class Movz(Inst):
     params = ['r', 'r', 'r']
     def run(self, param_list):
         if param_list[2].getValue() == 0:
-            return (param_list[0], param_list[1].getValue())
+            return (param_list[0], param_list[1].getValue(), -1, 0)
         else:
             return (-1, param_list[0].getValue(), -1, 0)
     
@@ -350,12 +350,12 @@ class Slti(Inst):
     params = ['r', 'r', 16]
     #sign extend for imm
     def run(self, param_list):
-        lhs = ari_extend_16_to_32(param_list[1].getValue())
-        if lhs >= 0x80000000:
-            lhs = (~lhs) + 1
-        rhs = param_list[2].getValue()
+        rhs = ari_extend_16_to_32(param_list[2].getValue())
         if rhs >= 0x80000000:
             rhs = (~rhs) + 1
+        lhs = param_list[1].getValue()
+        if lhs >= 0x80000000:
+            lhs = (~lhs) + 1
         if lhs < rhs:
             return (param_list[0], 1, -1, 0)
         else:
@@ -404,7 +404,7 @@ class Mult(Inst):
         ans = "{:064b}".format(lhs * rhs)
         lo = int(ans[32:], 2)
         hi = int(ans[:32], 2)
-        return (regs[LO_REG], lo, regs[HI_REG], hi)
+        return (regs[LO_REG], constrain(lo), regs[HI_REG], constrain(hi))
 
 class Multu(Inst):
     name = 'multu'
@@ -413,4 +413,4 @@ class Multu(Inst):
         ans = "{:064b}".format(param_list[0].getValue() * param_list[1].getValue())
         lo = int(ans[32:], 2)
         hi = int(ans[:32], 2)
-        return (regs[LO_REG], lo, regs[HI_REG], hi)
+        return (regs[LO_REG], constrain(lo), regs[HI_REG], constrain(hi))
