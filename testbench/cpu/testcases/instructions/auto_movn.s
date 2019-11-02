@@ -1,0 +1,90 @@
+    .org 0x0
+    .global _start
+    .set noat
+    .set noreorder
+    .set nomacro
+_start:
+    lui  $0, 0x7912			# $0=0x79120000
+    ori  $0, $0, 0x15f7			# $0=0x000015f7
+    lui  $1, 0xf050			# $1=0xf0500000
+    ori  $1, $1, 0x460c			# $1=0xf050460c
+    lui  $2, 0x8adc			# $2=0x8adc0000
+    ori  $2, $2, 0x9cfc			# $2=0x8adc9cfc
+    lui  $3, 0x03ba			# $3=0x03ba0000
+    ori  $3, $3, 0xaca4			# $3=0x03baaca4
+    lui  $4, 0xd65a			# $4=0xd65a0000
+    ori  $4, $4, 0x23b1			# $4=0xd65a23b1
+    lui  $5, 0x651f			# $5=0x651f0000
+    ori  $5, $5, 0xed79			# $5=0x651fed79
+    lui  $6, 0xd77d			# $6=0xd77d0000
+    ori  $6, $6, 0xe959			# $6=0xd77de959
+    lui  $7, 0x2468			# $7=0x24680000
+    ori  $7, $7, 0x9158			# $7=0x24689158
+    lui  $8, 0xb1dc			# $8=0xb1dc0000
+    ori  $8, $8, 0x0b94			# $8=0xb1dc0b94
+    lui  $9, 0x95c3			# $9=0x95c30000
+    ori  $9, $9, 0xa550			# $9=0x95c3a550
+    lui  $10, 0x17b1			# $10=0x17b10000
+    ori  $10, $10, 0x8d8d			# $10=0x17b18d8d
+    lui  $11, 0x0984			# $11=0x09840000
+    ori  $11, $11, 0xcd8a			# $11=0x0984cd8a
+    lui  $12, 0x755f			# $12=0x755f0000
+    ori  $12, $12, 0xa62c			# $12=0x755fa62c
+    lui  $13, 0xfee4			# $13=0xfee40000
+    ori  $13, $13, 0x20c7			# $13=0xfee420c7
+    lui  $14, 0x5a65			# $14=0x5a650000
+    ori  $14, $14, 0xe09d			# $14=0x5a65e09d
+    lui  $15, 0x8377			# $15=0x83770000
+    ori  $15, $15, 0x93bf			# $15=0x837793bf
+    lui  $16, 0xdd44			# $16=0xdd440000
+    ori  $16, $16, 0xa539			# $16=0xdd44a539
+    lui  $17, 0xa9f4			# $17=0xa9f40000
+    ori  $17, $17, 0x5f24			# $17=0xa9f45f24
+    lui  $18, 0xf0b5			# $18=0xf0b50000
+    ori  $18, $18, 0xb24e			# $18=0xf0b5b24e
+    lui  $19, 0xb01e			# $19=0xb01e0000
+    ori  $19, $19, 0x407f			# $19=0xb01e407f
+    lui  $20, 0x5f29			# $20=0x5f290000
+    ori  $20, $20, 0x4dbf			# $20=0x5f294dbf
+    lui  $21, 0x2106			# $21=0x21060000
+    ori  $21, $21, 0xf38e			# $21=0x2106f38e
+    lui  $22, 0x3ca0			# $22=0x3ca00000
+    ori  $22, $22, 0x2f4c			# $22=0x3ca02f4c
+    lui  $23, 0x8585			# $23=0x85850000
+    ori  $23, $23, 0xd86e			# $23=0x8585d86e
+    lui  $24, 0xfa4e			# $24=0xfa4e0000
+    ori  $24, $24, 0xc0f2			# $24=0xfa4ec0f2
+    lui  $25, 0x0ccb			# $25=0x0ccb0000
+    ori  $25, $25, 0xf931			# $25=0x0ccbf931
+    lui  $26, 0x2e20			# $26=0x2e200000
+    ori  $26, $26, 0x0077			# $26=0x2e200077
+    lui  $27, 0xae80			# $27=0xae800000
+    ori  $27, $27, 0x1fce			# $27=0xae801fce
+    lui  $28, 0x0079			# $28=0x00790000
+    ori  $28, $28, 0xfdc8			# $28=0x0079fdc8
+    lui  $29, 0x7cac			# $29=0x7cac0000
+    ori  $29, $29, 0x3e69			# $29=0x7cac3e69
+    lui  $30, 0x185e			# $30=0x185e0000
+    ori  $30, $30, 0x3ec1			# $30=0x185e3ec1
+    lui  $31, 0xa9c0			# $31=0xa9c00000
+    ori  $31, $31, 0x7bfa			# $31=0xa9c07bfa
+    movn  $2, $9, $11			# $2=0x95c3a550
+    movn  $30, $17, $24			# $30=0xa9f45f24
+    movn  $24, $26, $19			# $24=0x2e200077
+    movn  $0, $3, $20			# $0=0x03baaca4
+    movn  $1, $16, $0			# skip
+    movn  $6, $1, $22			# $6=0xf050460c
+    movn  $7, $19, $30			# $7=0xb01e407f
+    movn  $26, $3, $23			# $26=0x03baaca4
+    movn  $23, $30, $14			# $23=0xa9f45f24
+    movn  $22, $22, $4			# $22=0x3ca02f4c
+    movn  $0, $4, $24			# $0=0xd65a23b1
+    movn  $15, $25, $30			# $15=0x0ccbf931
+    movn  $21, $8, $0			# skip
+    movn  $19, $4, $23			# $19=0xd65a23b1
+    movn  $30, $8, $4			# $30=0xb1dc0b94
+    movn  $0, $5, $5			# $0=0x651fed79
+    movn  $10, $26, $17			# $10=0x03baaca4
+    movn  $22, $7, $5			# $22=0xb01e407f
+    movn  $22, $15, $11			# $22=0x0ccbf931
+    movn  $16, $9, $24			# $16=0x95c3a550

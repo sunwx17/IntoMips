@@ -36,8 +36,8 @@ end
 initial begin
     rst = `ENABLE;
     #200 rst = `DISABLE;
-    #100000 rst = `ENABLE;
-    #100200 $stop;
+    #500000 rst = `ENABLE;
+    #500200 $stop;
 end
 
 cpu_test cpu_test_instance(
@@ -133,14 +133,50 @@ initial begin
     unittest("arithmetic_2");
     unittest("jump");
     unittest("branch");
-    unittest("auto_ori");
-    unittest("auto_lui");
-    unittest("auto_mthi");
     unittest("memory");
     unittest("load");
     unittest("cp0");
     unittest("exception");
     unittest("timer_int");
+    
+    //logic and shift
+    unittest("auto_and");
+    unittest("auto_or");
+    unittest("auto_xor");
+    unittest("auto_nor");
+    unittest("auto_andi");
+    unittest("auto_ori");
+    unittest("auto_xori");
+    unittest("auto_lui");
+    unittest("auto_sll");
+    unittest("auto_sra");
+    unittest("auto_srl");
+    unittest("auto_sllv");
+    unittest("auto_srav");
+    unittest("auto_srlv");
+    
+    //move instructions and hi/lo
+    unittest("auto_movn");
+    unittest("auto_movz");
+    unittest("auto_mfhi");
+    unittest("auto_mthi");
+    unittest("auto_mflo");
+    unittest("auto_mtlo");
+    
+    //arithmetic instructions
+    unittest("auto_add");
+    unittest("auto_addi");
+    unittest("auto_addiu");
+    unittest("auto_addu");
+    unittest("auto_sub");
+    unittest("auto_subu");
+    unittest("auto_slt");
+    unittest("auto_slti");
+    unittest("auto_sltiu");
+    unittest("auto_sltu");
+    unittest("auto_mul");
+    unittest("auto_mult");
+    unittest("auto_multu");
     $finish;
 end
 
