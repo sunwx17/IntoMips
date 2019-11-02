@@ -2,7 +2,7 @@ import sys, abc, random, math
 from inst_reg import *
 
 target_path = "instructions/"
-n = 100
+n = 20
 
 class Imm(object):
     def __init__(self, width, value = 0):
