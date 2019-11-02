@@ -8,7 +8,10 @@ class Imm(object):
     def __init__(self, width, value = 0):
         self.width = width
         self.value = value
-        assert width > 0 and width < 32 and value >= 0 and value < 2 ** width 
+        assert width > 0
+        assert width < 32
+        assert value >= 0
+        assert value < 2 ** width 
     
     def getWidth(self):
         return self.width
@@ -20,7 +23,7 @@ class Imm(object):
         return ("0x{:0" + str(math.ceil(self.width / 4)) +  "x}").format(self.value)
     
 
-insts = [Mthi(), And(), Or(), Xor(), Nor(), Andi(), Ori(), Xori(), Lui()]
+insts = [Mthi(), And(), Or(), Xor(), Nor(), Andi(), Ori(), Xori(), Lui(), Sll(), Sra(), Srl(), Sllv(), Srav(), Srlv()]
 
 def init():
     regs.clear()
@@ -42,9 +45,9 @@ def main(argv):
         o = Ori()
         l = Lui()
         for i in range(0, 32):
-            params_lui = [regs[i], Imm(16, random.randint(0, 2 ** 16))]
+            params_lui = [regs[i], Imm(16, random.randint(0, 2 ** 16 - 1))]
             head += l.generate_line(params_lui)
-            params_ori = [regs[i], regs[i], Imm(16, random.randint(0, 2 ** 16))]
+            params_ori = [regs[i], regs[i], Imm(16, random.randint(0, 2 ** 16 - 1))]
             head += o.generate_line(params_ori)
 
         now_string = head
@@ -55,7 +58,7 @@ def main(argv):
                 if (p == 'r'):
                     params.append(regs[random.randint(0, 31)])
                 else:
-                    params.append(Imm(p, random.randint(0, 2 ** p)))
+                    params.append(Imm(p, random.randint(0, 2 ** p - 1)))
             now_string += inst.generate_line(params)
         with open(target_path + "auto_" + inst.name + ".s", 'w') as f:
             f.write(now_string)
