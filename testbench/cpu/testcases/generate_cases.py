@@ -4,26 +4,11 @@ from inst_reg import *
 target_path = "instructions/"
 n = 20
 
-class Imm(object):
-    def __init__(self, width, value = 0):
-        self.width = width
-        self.value = value
-        assert width > 0
-        assert width < 32
-        assert value >= 0
-        assert value < 2 ** width 
-    
-    def getWidth(self):
-        return self.width
-
-    def getValue(self):
-        return self.value
-
-    def to_string(self):
-        return ("0x{:0" + str(math.ceil(self.width / 4)) +  "x}").format(self.value)
-    
-
-insts = [Mthi(), And(), Or(), Xor(), Nor(), Andi(), Ori(), Xori(), Lui(), Sll(), Sra(), Srl(), Sllv(), Srav(), Srlv()]
+insts = [
+    And(), Or(), Xor(), Nor(), Andi(), Ori(), Xori(), Lui(), Sll(), Sra(), Srl(), Sllv(), Srav(), Srlv(),
+    Movn(), Movz(), Mfhi(), Mthi(), Mflo(), Mtlo(),
+    Add(), Addi(), Addiu(), Addu(), Sub(), Subu(), Slt(), Slti(), Sltiu(), Sltu(), Mul(), Mult(), Multu()
+]
 
 def init():
     regs.clear()
@@ -33,17 +18,12 @@ def init():
 
 
 def main(argv):
-    
-
-    head = "    .org 0x0\n    .global _start\n    .set noat\n    .set noreorder\n    .set nomacro\n_start:\n"
-
-
     for inst in insts:
-        regs.clear()
         init()
 
         o = Ori()
         l = Lui()
+        head = "    .org 0x0\n    .global _start\n    .set noat\n    .set noreorder\n    .set nomacro\n_start:\n"
         for i in range(0, 32):
             params_lui = [regs[i], Imm(16, random.randint(0, 2 ** 16 - 1))]
             head += l.generate_line(params_lui)
@@ -58,6 +38,7 @@ def main(argv):
                 if (p == 'r'):
                     params.append(regs[random.randint(0, 31)])
                 else:
+                    assert p > 0
                     params.append(Imm(p, random.randint(0, 2 ** p - 1)))
             now_string += inst.generate_line(params)
         with open(target_path + "auto_" + inst.name + ".s", 'w') as f:
