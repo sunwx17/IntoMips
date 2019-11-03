@@ -1,9 +1,7 @@
 `include "defines.svh"
 module sram_test_tb(
-    input clk_10, clk_40, rst
+    input clk, clk_ram, rst
 );
-
-//Bit_t clk_10 = 0, clk_40, rst;
 
 Ram_addr_t  bus_addr;
 Bit_t       read_op;
@@ -14,7 +12,7 @@ Word_t      bus_data_write, bus_data_read;
 Bit_t       bus_stall;
 
 sram_test sram_test_instance(
-    .clk(clk_40),
+    .clk(clk_ram),
     .rst(rst),
     .bus_addr(bus_addr),
     .read_op(read_op),
@@ -47,7 +45,9 @@ write_op = 1'b0;
 written_content = 0;
 
 
-while(1) begin @(negedge clk_10)
+
+//while(1) begin @(negedge clk)
+while(1) begin @(posedge clk)
     if (flag == 1'b0) begin
         $fscanf(ans, "%s addr:%d=%h\n", op, addr, content);
         bus_data_write = content;
@@ -58,11 +58,12 @@ while(1) begin @(negedge clk_10)
             write_op = 1'b0;
         end else begin
             assert(op == "write");
-            //bus_data_assign = content;
             read_op = 1'b0;
             write_op = 1'b1;
+            //$display("flag = 0, time = %t ready write %h", $time, bus_data_write);
+            //$display("sram_test_instance.bus_data_write = %h", sram_test_instance.bus_data_write);
         end
-        
+
         flag = 1'b1;
     end else begin
         if (read_op == 1'b1) begin
@@ -103,8 +104,8 @@ endtask
 
 
 task unittest();
-sram_unittest("sram_read");
-sram_unittest("sram_write");
+    //sram_unittest("sram_read");
+    sram_unittest("sram_write");
 endtask
 
 endmodule

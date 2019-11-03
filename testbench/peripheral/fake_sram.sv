@@ -1,8 +1,8 @@
-`include "defines.svh"
+`include "cpu_defines.svh"
 module fake_sram(
     inout Word_t       ram_data,       //RAM数据，低8位与CPLD串口控制器共享
     input Ram_addr_t   ram_addr,       //RAM地址
-    input logic[3:0]   ram_be_n,       //RAM字节使能，低有效。如果不使用字节使能，请保持为0
+    input Mask_t       ram_be_n,       //RAM字节使能，低有效。如果不使用字节使能，请保持为0
     input Bit_t        ram_ce_n,       //RAM片选，低有效
     input Bit_t        ram_oe_n,       //RAM读使能，低有效
     input Bit_t        ram_we_n       //RAM写使能，低有效
@@ -11,15 +11,18 @@ module fake_sram(
     Word_t sram_mem[0: 1024*1024];
     Word_t data;
     assign ram_data = data;
-
+    
     always_comb begin
         if (ram_ce_n) begin
             data <= `HIGH_WORD;
         end else begin
             if (ram_oe_n && ~ram_we_n) begin
                 //write
-                sram_mem[ram_addr] <= ram_data;
-                //$display("write %h at %d", ram_data, ram_addr);
+                if (~ram_be_n[0]) sram_mem[ram_addr][7:0]   <= ram_data[7: 0];
+                if (~ram_be_n[1]) sram_mem[ram_addr][15:8]  <= ram_data[15: 8];
+                if (~ram_be_n[2]) sram_mem[ram_addr][23:16] <= ram_data[23: 16];
+                if (~ram_be_n[3]) sram_mem[ram_addr][31:24] <= ram_data[31: 24];
+                //$display("write %h at %d, ram_be_n = %b, time = %t", ram_data, ram_addr, ram_be_n, $time);
             end else if (~ram_oe_n && ram_we_n) begin
                 data <= sram_mem[ram_addr];
             end else begin
@@ -27,4 +30,5 @@ module fake_sram(
             end
         end
     end
+    
 endmodule
