@@ -1,8 +1,7 @@
 `include "defines.svh"
 module flash_test_tb(
-    input clk_10, clk_40, rst
+    input clk, clk_ram, rst
 );
-//Bit_t clk_10, clk_40, rst;
 
 Flash_addr_t    bus_addr = 0;
 Bit_t           read_op = 0;
@@ -11,7 +10,7 @@ Word_t          bus_data_read, bus_data_write;
 
 
 flash_test flash_test_instance(
-    .clk(clk_40),
+    .clk(clk_ram),
     .rst(rst),
     .bus_addr(bus_addr),
     .read_op(read_op),
@@ -33,7 +32,7 @@ $display("---------------unittest: flash_read------------------");
 is_ok = 1'b1;
 read_flag = 1'b0;
 read_op = 1'b0;
-while(1) begin @(negedge clk_10)
+while(1) begin @(negedge clk)
     if (read_flag == 1'b0) begin
         $fscanf(ans, "addr:%d=%h\n", addr, content);
         //$display("addr = %d, content = %h", addr, content);

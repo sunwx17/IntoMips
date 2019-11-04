@@ -12,6 +12,7 @@ module sram_controller_cloud_tb(
     output wire base_ram_we_n,       //BaseRAM写使能，低有效
 
 
+    input wire[3:0] dip_sw,        //拨码开关，用于控制mask
 
     //数码管信号
     output wire[15:0] leds,       //16位LED，输出时1点亮
@@ -23,14 +24,15 @@ wire read_op, write_op;
 assign read_op = 1'b0;
 assign write_op = 1'b1;
 
-wire [31:0] data;
-assign data = 32'hffff;
-assign leds = {data[7:0],8'h0};
+wire [31:0] data_w, data_r;
+assign data_w = 32'hffff;
+assign data_r = 32'h0000;
+assign leds = {data_r[7:0],8'h0};
 
 wire [19:0] addr;
 assign addr = 20'b0;
 wire [3:0] mask;
-assign mask = 4'b1111;
+//assign mask = 4'b1111;
 wire stall;
 
 
@@ -39,9 +41,10 @@ sram_controller ctl(
     .rst(reset_btn),
     .read_op(read_op),
     .write_op(write_op),
-    .bus_data(data),
+    .bus_data_write(data_w),
+    .bus_data_read(data_r),
     .bus_addr(addr),
-    .byte_mask(mask),
+    .byte_mask(dip_sw),
     .bus_stall(stall),
     .ram_data(base_ram_data),
     .ram_addr(base_ram_addr),
