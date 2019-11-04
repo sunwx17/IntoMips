@@ -24,7 +24,7 @@ module sram_controller (
     output logic        ram_we_n
 
 );
-    Bit_t write_op_inner, read_op_inner;
+    Bit_t write_op_inner;
 
 
     typedef enum {IDLE, READ, WRITE} State_t;
@@ -33,9 +33,7 @@ module sram_controller (
     assign ram_be_n = ~byte_mask;
     
     Word_t data_read, data_write;
-    //assign bus_data_read = read_op ? data_read: `HIGH_WORD;
     assign bus_data_read = data_read;
-    //assign ram_data = write_op ? data_write: `HIGH_WORD;
     assign ram_data = write_op_inner ? data_write: `HIGH_WORD;
 
     Ram_addr_t inner_addr;
@@ -50,7 +48,6 @@ module sram_controller (
             ram_we_n <= 1'b1;
 
             write_op_inner <= 1'b0;
-            read_op_inner <= 1'b0;
 
             bus_stall <= 1'b1;
             cur_state <= IDLE;
@@ -58,7 +55,6 @@ module sram_controller (
             case(cur_state)
                 IDLE: begin
                     if (read_op) begin
-                        read_op_inner <= read_op;
                         ram_addr <= inner_addr;
                         ram_ce_n <= 1'b0;
                         ram_oe_n <= 1'b0;
@@ -88,7 +84,6 @@ module sram_controller (
                         cur_state <= IDLE;
 
                         write_op_inner <= 1'b0;
-                        read_op_inner <= 1'b0;
                     end
                 end
                 READ: begin
