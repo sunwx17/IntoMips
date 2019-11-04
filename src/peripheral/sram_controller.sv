@@ -73,7 +73,6 @@ module sram_controller (
                         //$display("controller write %h at %h, time = %t, be = %b", bus_data_write, inner_addr, $time, ram_be_n);
                         cur_state <= WRITE;
 
-                        read_op_inner <= 1'b0;
                     end else begin
                         ram_addr <= `HIGH_WORD;
                         ram_ce_n <= 1'b1;
