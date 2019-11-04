@@ -3,7 +3,7 @@
 //统一所有peripheral下的测试
 module peripheral_test_tb();
 
-Bit_t clk_10, clk_25, clk_50, clk_40, rst;
+Bit_t clk_10, clk_25, clk_50, clk_40, clk_100, rst;
 
 initial begin
     clk_10 = 1'b0;
@@ -26,6 +26,10 @@ initial begin
     forever #10 clk_50 = ~clk_50;
 end
 
+initial begin
+    clk_100 = 1'b0;
+    forever #5 clk_100 = ~clk_100;
+end
 
 initial begin
     rst = 1'b1;
@@ -34,14 +38,14 @@ end
 
 
 flash_test_tb flash_test_instance(
-    .clk(clk_25),
-    .clk_ram(clk_50),
+    .clk(clk_50),
+    .clk_ram(clk_100),
     .rst
 );
 
 sram_test_tb sram_test_instance(
-    .clk(clk_25),
-    .clk_ram(clk_50),
+    .clk(clk_50),
+    .clk_ram(clk_100),
     .rst
 );
 

@@ -104,7 +104,7 @@ endtask
 
 
 task unittest();
-    //sram_unittest("sram_read");
+    sram_unittest("sram_read");
     sram_unittest("sram_write");
 endtask
 
