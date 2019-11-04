@@ -45,9 +45,7 @@ write_op = 1'b0;
 written_content = 0;
 
 
-
-//while(1) begin @(negedge clk)
-while(1) begin @(posedge clk)
+while(1) begin @(negedge clk)
     if (flag == 1'b0) begin
         $fscanf(ans, "%s addr:%d=%h\n", op, addr, content);
         bus_data_write = content;
@@ -60,8 +58,7 @@ while(1) begin @(posedge clk)
             assert(op == "write");
             read_op = 1'b0;
             write_op = 1'b1;
-            //$display("flag = 0, time = %t ready write %h", $time, bus_data_write);
-            //$display("sram_test_instance.bus_data_write = %h", sram_test_instance.bus_data_write);
+            //$display("op = %b, addr = %d, content = %h", write_op, addr, content);
         end
 
         flag = 1'b1;
@@ -75,7 +72,10 @@ while(1) begin @(posedge clk)
             end
         end else begin
             assert(write_op == 1'b1);
-            written_content = sram_test_instance.fake_sram_instance.sram_mem[addr];
+            written_content = {sram_test_instance.fake_sram_instance.sram_mem[addr + 3],
+                                sram_test_instance.fake_sram_instance.sram_mem[addr + 2],
+                                sram_test_instance.fake_sram_instance.sram_mem[addr + 1],
+                                sram_test_instance.fake_sram_instance.sram_mem[addr]};
             if (written_content == content) begin
                 $display("[Pass] Write Addr: %d", addr);
             end else begin

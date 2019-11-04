@@ -1,6 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import sys, getopt, random
+
+def rand_byte():
+    call2 = lambda f, x: f(x) + f(x)
+    return  call2(random.choice, list('0123456789abcdef'))
+
 def rand_half_word():
     call4 = lambda f, x: f(x) + f(x) + f(x) + f(x)
     return  call4(random.choice, list('0123456789abcdef'))
@@ -62,25 +67,51 @@ def sram_write(test_num):
     addr = 0
     with open("testcases/sram_write.mem", "w") as f:
         for _ in range(test_num):
-            origin = rand_half_word() + rand_half_word()
-            f.write(origin + "\n")
-            addr += 1
+            ans = rand_byte()
+            f.write(ans + "\n")
+            ans = rand_byte()
+            f.write(ans + "\n")
+            ans = rand_byte()
+            f.write(ans + "\n")
+            ans = rand_byte()
+            f.write(ans + "\n")
     addr = 0
     with open("testcases/sram_write.ans", "w") as f:
         for _ in range(test_num):
-            ans = rand_half_word() + rand_half_word()
-            f.write("write addr:" + str(addr) + "=" + ans + "\n")
-            addr += 1
+            tmp = []
+            ans = rand_byte()
+            tmp.append(ans)
+            ans = rand_byte()
+            tmp.append(ans)
+            ans = rand_byte()
+            tmp.append(ans)
+            ans = rand_byte()
+            tmp.append(ans)
+            tmp.reverse()
+            f.write("write addr:" + str(addr) + "=" + ''.join(tmp) + "\n")
+            addr += 4
 
 def sram_read(test_num):
     ans_list = []
     addr = 0
     with open("testcases/sram_read.mem", "w") as f:
         for _ in range(test_num):
-            ans = rand_half_word() + rand_half_word()
+            tmp = []
+            ans = rand_byte()
             f.write(ans + "\n")
-            ans_list.append("read addr:" + str(addr) + "=" + ans)
-            addr += 1
+            tmp.append(ans)
+            ans = rand_byte()
+            f.write(ans + "\n")
+            tmp.append(ans)
+            ans = rand_byte()
+            f.write(ans + "\n")
+            tmp.append(ans)
+            ans = rand_byte()
+            f.write(ans + "\n")
+            tmp.append(ans)
+            tmp.reverse()
+            ans_list.append("read addr:" + str(addr) + "=" + ''.join(tmp))
+            addr += 4 
     with open("testcases/sram_read.ans", "w") as f:
         for ans in ans_list:
             f.write(ans + "\n")

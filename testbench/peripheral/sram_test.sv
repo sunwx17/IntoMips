@@ -28,6 +28,7 @@ sram_controller sram_controller_instance(
 
 
 fake_sram fake_sram_instance(
+    .clk(clk),
     .ram_data(sram_controller_instance.ram_data),
     .ram_addr(sram_controller_instance.ram_addr),
     .ram_be_n(sram_controller_instance.ram_be_n),
