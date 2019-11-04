@@ -1,6 +1,6 @@
 `include "defines.svh"
 module sram_test_tb(
-    input clk_10, clk_40, rst
+    input clk, clk_ram, rst
 );
 
 //Bit_t clk_10 = 0, clk_40, rst;
@@ -14,7 +14,7 @@ Word_t      bus_data_write, bus_data_read;
 Bit_t       bus_stall;
 
 sram_test sram_test_instance(
-    .clk(clk_40),
+    .clk(clk_ram),
     .rst(rst),
     .bus_addr(bus_addr),
     .read_op(read_op),
@@ -47,7 +47,7 @@ write_op = 1'b0;
 written_content = 0;
 
 
-while(1) begin @(negedge clk_10)
+while(1) begin @(negedge clk)
     if (flag == 1'b0) begin
         $fscanf(ans, "%s addr:%d=%h\n", op, addr, content);
         bus_data_write = content;
@@ -61,6 +61,7 @@ while(1) begin @(negedge clk_10)
             //bus_data_assign = content;
             read_op = 1'b0;
             write_op = 1'b1;
+            //$display("op = %b, addr = %d, content = %h", write_op, addr, content);
         end
         
         flag = 1'b1;
@@ -74,7 +75,10 @@ while(1) begin @(negedge clk_10)
             end
         end else begin
             assert(write_op == 1'b1);
-            written_content = sram_test_instance.fake_sram_instance.sram_mem[addr];
+            written_content = {sram_test_instance.fake_sram_instance.sram_mem[addr + 3],
+                                sram_test_instance.fake_sram_instance.sram_mem[addr + 2],
+                                sram_test_instance.fake_sram_instance.sram_mem[addr + 1],
+                                sram_test_instance.fake_sram_instance.sram_mem[addr]};
             if (written_content == content) begin
                 $display("[Pass] Write Addr: %d", addr);
             end else begin

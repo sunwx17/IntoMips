@@ -4,7 +4,7 @@
 
 module cpu_test_tb();
 
-Bit_t clock_25, clock_50, clock_100;
+Bit_t clock, clock_25, clock_50, clock_100;
 Bit_t rst;
 
 
@@ -38,8 +38,13 @@ initial begin
 end
 
 initial begin
+    clock = 1'b0;
+    forever #`HALF_CYCLE clock = ~ clock;
+end
+
+initial begin
     clock_50 = 1'b0;
-    forever #`HALF_CYCLE clock_50 = ~ clock_50;
+    forever #10 clock_50 = ~ clock_50;
 end
 
 initial begin
@@ -56,8 +61,8 @@ initial begin
 end
 
 cpu_test cpu_test_instance(
-    .clk(clock_50),
-    .clk_ram(clock_100),
+    .clk(clock),
+    .clk_ram(clock_50),
     .rst
 );
 
@@ -88,7 +93,7 @@ $display("----------------unittest: %0s----------------", name);
 count = 0;
 true_count = 0;
 is_ok = 1'b1;
-while(!$feof(ans)) begin @ (negedge clock_50)
+while(!$feof(ans)) begin @ (negedge clock)
     count = count + 1;
     if (count > 5) begin
         true_count = true_count + 1;
@@ -139,7 +144,6 @@ endtask
 
 initial begin
     wait (rst == `ENABLE);
-    /*
     unittest("ori0");
     unittest("write_to_reg0");
     unittest("logic");
@@ -148,14 +152,9 @@ initial begin
     unittest("arithmetic_0");
     unittest("arithmetic_1");
     unittest("arithmetic_2");
-    unittest("jump");
-    unittest("branch");
-    */
-    
+    unittest("jump");    
     unittest("memory");
     unittest("load");
-    
-    /*
     unittest("cp0");
     unittest("exception");
     unittest("timer_int");
@@ -198,7 +197,7 @@ initial begin
     unittest("auto_mul");
     unittest("auto_mult");
     unittest("auto_multu");
-    */
+    
     $finish;
 end
 

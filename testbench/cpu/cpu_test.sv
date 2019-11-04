@@ -54,6 +54,7 @@ fake_ram fake_ram_instance(
 );
 */
 
+
 sram_controller sram_controller_instance(
     .clk(clk_ram),
     .rst,
@@ -75,6 +76,7 @@ sram_controller sram_controller_instance(
 
 
 fake_sram fake_sram_instance(
+    .clk(clk_ram),
     .ram_data(sram_controller_instance.ram_data),
     .ram_addr(sram_controller_instance.ram_addr),
     .ram_be_n(sram_controller_instance.ram_be_n),
@@ -82,7 +84,6 @@ fake_sram fake_sram_instance(
     .ram_oe_n(sram_controller_instance.ram_oe_n),
     .ram_we_n(sram_controller_instance.ram_we_n)
 );
-
 
 
 
