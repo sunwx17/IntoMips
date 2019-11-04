@@ -1,10 +1,6 @@
 `include "cpu_defines.svh"
 module fake_sram(
-<<<<<<< HEAD
-    input              clk,
-=======
     input clk,
->>>>>>> recover_branch
     inout Word_t       ram_data,       //RAM数据，低8位与CPLD串口控制器共享
     input Ram_addr_t   ram_addr,       //RAM地址
     input Mask_t       ram_be_n,       //RAM字节使能，低有效。如果不使用字节使能，请保持为0

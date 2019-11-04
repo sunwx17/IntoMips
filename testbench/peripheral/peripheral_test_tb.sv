@@ -3,12 +3,8 @@
 //统一所有peripheral下的测试
 module peripheral_test_tb();
 
-<<<<<<< HEAD
-Bit_t clk_10, clk_25, clk_50, clk_40, clk_100, rst;
-=======
 Bit_t clk_10, clk_25, clk_40, clk_50, rst;
 
->>>>>>> recover_branch
 
 initial begin
     clk_10 = 1'b0;
