@@ -85,7 +85,6 @@ assign a = 1'b0;
 //assign leds[7:0] = base_ram_data[7:0];
 
 //云端sram测试模块导入
-/*
 sram_controller_cloud_tb(
     .clock_btn(clock_btn),
     .reset_btn(reset_btn),
@@ -97,9 +96,9 @@ sram_controller_cloud_tb(
     .base_ram_we_n(base_ram_we_n),
     .leds(leds),
     .dpy0(dpy0),
-    .dpy1(dpy1)
+    .dpy1(dpy1),
+    .dip_sw(dip_sw[3:0])
 );
-*/
 /*
 //云端flash测试模块导入
 flash_controller_cloud_tb(

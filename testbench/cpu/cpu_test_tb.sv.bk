@@ -2,10 +2,13 @@
 
 module cpu_test_tb();
 
-Bit_t clock_25, clock_50, clock_100;
+Bit_t clock_10;
+Bit_t clock_25;
+Bit_t clock_40;
+Bit_t clock_50;
+
+
 Bit_t rst;
-
-
 Bit_t       reg_write_enable;
 Reg_addr_t  reg_write_addr;
 Reg_data_t  reg_write_data;
@@ -31,20 +34,24 @@ assign cp0_waddr = cpu_test_instance.cpu_instance.cp0_waddr_i;
 assign cp0_wdata = cpu_test_instance.cpu_instance.cp0_wdata_i;
 
 initial begin
+    clock_10 = 1'b0;
+    forever #50 clock_10 = ~ clock_10;
+end
+
+initial begin
     clock_25 = 1'b0;
     forever #20 clock_25 = ~ clock_25;
+end
+
+initial begin
+    clock_40 = 1'b0;
+    forever #12.5 clock_40 = ~ clock_40;
 end
 
 initial begin
     clock_50 = 1'b0;
     forever #10 clock_50 = ~ clock_50;
 end
-
-initial begin
-    clock_100 = 1'b0;
-    forever #5 clock_100 = ~ clock_100;
-end
-
 
 initial begin
     rst = `ENABLE;
@@ -54,8 +61,9 @@ initial begin
 end
 
 cpu_test cpu_test_instance(
-    .clk(clock_50),
-    .clk_ram(clock_100),
+    //.clk(clock_50),
+    .clk(clock_25),
+    .clk_ram(clock_50),
     .rst
 );
 
@@ -86,7 +94,8 @@ $display("----------------unittest: %0s----------------", name);
 count = 0;
 true_count = 0;
 is_ok = 1'b1;
-while(!$feof(ans)) begin @ (negedge clock_50)
+//while(!$feof(ans)) begin @ (negedge clock_50)
+while(!$feof(ans)) begin @ (negedge clock_10)
     count = count + 1;
     if (count > 5) begin
         true_count = true_count + 1;
@@ -137,7 +146,7 @@ endtask
 
 initial begin
     wait (rst == `ENABLE);
-    /*
+    
     unittest("ori0");
     unittest("write_to_reg0");
     unittest("logic");
@@ -148,11 +157,9 @@ initial begin
     unittest("arithmetic_2");
     unittest("jump");
     unittest("branch");
-    */
     
-    unittest("memory");
-    unittest("load");
-    
+    //unittest("memory");
+    //unittest("load");
     /*
     unittest("cp0");
     unittest("exception");

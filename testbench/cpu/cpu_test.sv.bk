@@ -42,18 +42,6 @@ fake_rom fake_rom_instance(
     .inst(inst)
 );
 
-/*
-fake_ram fake_ram_instance(
-    .clk,
-    .re(ram_re),
-    .we(ram_we),
-    .addr(ram_addr),
-    .data_i(ram_data_i), 
-    .mask(ram_mask),
-    .data_o(ram_data_o) 
-);
-*/
-
 sram_controller sram_controller_instance(
     .clk(clk_ram),
     .rst,
@@ -82,8 +70,6 @@ fake_sram fake_sram_instance(
     .ram_oe_n(sram_controller_instance.ram_oe_n),
     .ram_we_n(sram_controller_instance.ram_we_n)
 );
-
-
 
 
 endmodule
