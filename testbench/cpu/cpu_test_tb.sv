@@ -1,5 +1,7 @@
 `include "cpu_defines.svh"
 
+`define HALF_CYCLE 20
+
 module cpu_test_tb();
 
 Bit_t clock_25, clock_50, clock_100;
@@ -37,7 +39,7 @@ end
 
 initial begin
     clock_50 = 1'b0;
-    forever #10 clock_50 = ~ clock_50;
+    forever #`HALF_CYCLE clock_50 = ~ clock_50;
 end
 
 initial begin
@@ -78,7 +80,7 @@ $readmemh({name, ".mem"}, cpu_test_instance.fake_rom_instance.inst_mem);
 
 begin
     rst = `ENABLE;
-    #100 rst = `DISABLE;
+    #(`HALF_CYCLE*10) rst = `DISABLE;
 end
 
 $display("----------------unittest: %0s----------------", name);
