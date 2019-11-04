@@ -335,11 +335,13 @@ class Slt(Inst):
     def run(self, param_list):
         #compare as signed
         lhs = param_list[1].getValue()
-        if lhs >= 0x80000000:
-            lhs = (~lhs) + 1
         rhs = param_list[2].getValue()
+        if lhs >= 0x80000000:
+            lhs = ((~lhs) & 0xffffffff) + 1
+            lhs = -lhs
         if rhs >= 0x80000000:
-            rhs = (~rhs) + 1
+            rhs = ((~rhs) & 0xffffffff) + 1
+            rhs = -rhs
         if lhs < rhs:
             return (param_list[0], 1, -1, 0)
         else:
@@ -351,11 +353,13 @@ class Slti(Inst):
     #sign extend for imm
     def run(self, param_list):
         rhs = ari_extend_16_to_32(param_list[2].getValue())
-        if rhs >= 0x80000000:
-            rhs = (~rhs) + 1
         lhs = param_list[1].getValue()
         if lhs >= 0x80000000:
-            lhs = (~lhs) + 1
+            lhs = ((~lhs) & 0xffffffff) + 1
+            lhs = -lhs
+        if rhs >= 0x80000000:
+            rhs = ((~rhs) & 0xffffffff) + 1
+            rhs = -rhs
         if lhs < rhs:
             return (param_list[0], 1, -1, 0)
         else:
@@ -396,14 +400,19 @@ class Mult(Inst):
     def run(self, param_list):
         lhs = param_list[0].getValue()
         rhs = param_list[1].getValue()
+
+        sign = False
         if lhs >= 0x80000000:
-            lhs = (~lhs) + 1
+            lhs = ((~lhs) & 0xffffffff) + 1
+            sign = not sign
         if rhs >= 0x80000000:
-            rhs = (~rhs) + 1
-        
-        ans = "{:064b}".format(lhs * rhs)
-        lo = int(ans[32:], 2)
-        hi = int(ans[:32], 2)
+            rhs = ((~rhs) & 0xffffffff) + 1
+            sign = not sign
+        ans = lhs * rhs
+        if sign: ans = -ans
+        ans = ans & 0xffffffffffffffff
+        lo = ans & 0xffffffff
+        hi = (ans >> 32) & 0xffffffff
         return (regs[LO_REG], constrain(lo), regs[HI_REG], constrain(hi))
 
 class Multu(Inst):
