@@ -79,11 +79,78 @@ module intomips_top(
     output wire video_clk,         //像素时钟输出
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
-reg a;
-assign a = 1'b0;
+reg a = 1'b0;
+
+//与主频反相
+reg clk_25M = 1'b1;
+//cpu导入
+always @(posedge clk_50M) begin
+    if (a == 1'b0) begin
+        clk_25M <= ~clk_25M;
+        a <= ~a;
+    end else begin
+        a <= ~a;
+    end
+end
+cpu cpu_instance(
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .rom_data_i(inst_ram_controller.bus_data_read),
+    .rom_addr_o(inst_ram_controller.bus_addr),
+    .rom_ce_o(inst_ram_controller.read_op),
+    .ram_data_i(data_sram_controller.bus_data_read),
+    .ram_addr_o(data_sram_controller.bus_addr),
+    .ram_data_o(data_sram_controller.bus_data_write),
+    .ram_re_o(data_sram_controller.read_op),
+    .ram_we_o(data_sram_controller.write_op),
+    .ram_mask_o(data_sram_controller.byte_mask)
+    //.timer_int_o
+);
+//ext ram store instructions
+sram_controller inst_ram_controller(
+    .clk(clk_50M),
+    .rst(reset_btn),
+    .read_op(cpu_instance.rom_ce_o),
+    .write_op(1'b0),
+    //.bus_data_write(),
+    .bus_data_read(cpu_instance.rom_data_i),
+    .bus_addr(cpu_instance.rom_addr_o),
+    .byte_mask(4'b1111),
+    //.bus_stall
+    .ram_data(ext_ram_data),
+    .ram_addr(ext_ram_addr),
+    .ram_be_n(ext_ram_be_n),
+    .ram_ce_n(ext_ram_ce_n),
+    .ram_oe_n(ext_ram_oe_n),
+    .ram_we_n(ext_ram_we_n)
+);
+
+
+//base ram
+sram_controller data_sram_controller(
+    .clk(clk_50M),
+    .rst(reset_btn),
+    .read_op(cpu_instance.ram_re_o),
+    .write_op(cpu_instance.ram_we_o),
+    .bus_data_write(cpu_instance.ram_data_o),
+    .bus_data_read(cpu_instance.ram_data_i),
+    .bus_addr(cpu_instance.ram_addr_o),
+    .byte_mask(cpu_instance.ram_mask_o),
+    //.bus_stall
+    .ram_data(base_ram_data),
+    .ram_addr(base_ram_addr),
+    .ram_be_n(base_ram_be_n),
+    .ram_ce_n(base_ram_ce_n),
+    .ram_oe_n(base_ram_oe_n),
+    .ram_we_n(base_ram_we_n)
+);
+
+
+
 
 //assign leds[7:0] = base_ram_data[7:0];
 
+/*
 //云端sram测试模块导入
 sram_controller_cloud_tb(
     .clock_btn(clock_btn),
@@ -99,6 +166,7 @@ sram_controller_cloud_tb(
     .dpy1(dpy1),
     .dip_sw(dip_sw[3:0])
 );
+*/
 /*
 //云端flash测试模块导入
 flash_controller_cloud_tb(
