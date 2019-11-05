@@ -85,12 +85,7 @@ reg a = 1'b0;
 reg clk_25M = 1'b1;
 //cpu导入
 always @(posedge clk_50M) begin
-    if (a == 1'b0) begin
-        clk_25M <= ~clk_25M;
-        a <= ~a;
-    end else begin
-        a <= ~a;
-    end
+    clk_25M <= ~clk_25M;
 end
 cpu cpu_instance(
     .clk(clk_25M),

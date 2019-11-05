@@ -37,7 +37,7 @@ module sram_controller (
     assign ram_data = write_op_inner ? data_write: `HIGH_WORD;
 
     Ram_addr_t inner_addr;
-    assign inner_addr = bus_addr;
+    assign inner_addr = bus_addr >> 2;
 
 
     always_ff @ (posedge clk or posedge rst) begin 
