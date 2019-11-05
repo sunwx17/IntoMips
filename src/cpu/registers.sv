@@ -28,18 +28,12 @@ Regs_t regs;
 integer i;
 
 
-
-always_comb begin
+always @ (posedge clk) begin
     if (rst == `ENABLE) begin
         for (i = 0; i < `REG_NUM; i = i + 1) begin
             regs[i] <= `ZERO_WORD;
         end
-    end
-end
-
-
-always @ (posedge clk) begin
-    if (rst == `DISABLE) begin
+    end else begin
         if (write_enable == `ENABLE && write_addr != `REG_ZERO) begin
             regs[write_addr] <= write_data;
         end

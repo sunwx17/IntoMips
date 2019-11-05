@@ -17,7 +17,10 @@ always_comb begin
     if (ce == `DISABLE) begin
         inst <= `ZERO_WORD;
     end else begin
-        inst <= inst_mem[addr[`INST_MEM_NUM_LOG2 + 1:2]];
+        inst <= {inst_mem[addr[`INST_MEM_NUM_LOG2 + 1:2]][7:0],
+                 inst_mem[addr[`INST_MEM_NUM_LOG2 + 1:2]][15:8],
+                 inst_mem[addr[`INST_MEM_NUM_LOG2 + 1:2]][23:16],
+                 inst_mem[addr[`INST_MEM_NUM_LOG2 + 1:2]][31:24]};
     end
 end
 
