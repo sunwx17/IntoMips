@@ -16,10 +16,10 @@ module fake_sram(
 
     always @ (posedge clk) begin
         if (~ram_ce_n && ram_oe_n && ~ram_we_n) begin
-            if (~ram_be_n[0]) sram_mem[ram_addr] <= ram_data[7:0];
-            if (~ram_be_n[1]) sram_mem[ram_addr + 1] <= ram_data[15:8];
-            if (~ram_be_n[2]) sram_mem[ram_addr + 2] <= ram_data[23:16];
-            if (~ram_be_n[3]) sram_mem[ram_addr + 3] <= ram_data[31:24];  
+            if (~ram_be_n[0]) sram_mem[ram_addr << 2] <= ram_data[7:0];
+            if (~ram_be_n[1]) sram_mem[(ram_addr << 2) + 1] <= ram_data[15:8];
+            if (~ram_be_n[2]) sram_mem[(ram_addr << 2) + 2] <= ram_data[23:16];
+            if (~ram_be_n[3]) sram_mem[(ram_addr << 2) + 3] <= ram_data[31:24];  
             //$display("write %h at %d time = %t be = %b", ram_data, ram_addr, $time, ram_be_n);      
         end
     end    
@@ -30,7 +30,7 @@ module fake_sram(
             data <= `HIGH_WORD;
         end else begin
             if (ram_we_n && ~ram_oe_n) begin
-                data <= {sram_mem[ram_addr + 3], sram_mem[ram_addr + 2], sram_mem[ram_addr + 1], sram_mem[ram_addr]};
+                data <= {sram_mem[(ram_addr << 2) + 3], sram_mem[(ram_addr << 2) + 2], sram_mem[(ram_addr << 2) + 1], sram_mem[(ram_addr << 2)]};
                 //$display("read %h at %d time = %t be = %b", ram_data, ram_addr, $time, ram_be_n);      
             end else begin
                 data <= `HIGH_WORD;

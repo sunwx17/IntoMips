@@ -3,7 +3,7 @@ ARCH = mips-mti-elf-
 STDOUT = $(shell ls /dev/stdout)
 MEM_MAKE_1 = $(ARCH)objcopy --dump-section .text=/dev/stdout $< | xxd -c 4 -g 32 | cut -f 2 -d " " > $@	
 MEM_MAKE_2 = 
-ifeq ($(STDOUT), /dev/stdout)
+ifeq ($?, 0)
 	MEM_MAKE_1 = $(ARCH)objcopy --dump-section .text=/dev/stdout $< | xxd -c 4 -g 32 | cut -f 2 -d " " > $@	
 	MEM_MAKE_2 = 
 else
@@ -13,7 +13,7 @@ endif
 
 TARGETDIR = instructions
 
-COMPILATION = $(wildcard $(TARGETDIR)/auto_*.s)
+COMPILATION = $(wildcard $(TARGETDIR)/*.s)
 MEMORY = $(COMPILATION:.s=.mem)
 ANSWER = $(COMPILATION:.s=.ans)
 
@@ -24,7 +24,7 @@ all: $(MEMORY) $(ANSWER)
 	$(MEM_MAKE_2)
 
 %.o : %.s    
-	$(ARCH)as -O0 -mips32 -EB $^ -o $@
+	$(ARCH)as -O0 -mips32 -EL $^ -o $@
 
 %.ans : %.s make_answer.py
 	python make_answer.py -i $< -o $@

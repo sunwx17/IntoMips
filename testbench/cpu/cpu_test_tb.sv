@@ -197,7 +197,6 @@ initial begin
     unittest("auto_mul");
     unittest("auto_mult");
     unittest("auto_multu");
-    
     $finish;
 end
 

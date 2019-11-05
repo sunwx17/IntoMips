@@ -137,7 +137,7 @@ always_comb begin
         lo_o         <= lo_i;
 
         mem_addr_o   <= mem_oper_addr;
-        mem_data_o   <= mem_oper_data;
+        //mem_data_o   <= mem_oper_data;
 
         cp0_reg_we_o         <= cp0_reg_we_i;
         cp0_reg_write_addr_o <= cp0_reg_write_addr_i;
@@ -264,6 +264,7 @@ always_comb begin
             end
             OP_SB  : begin
                 mem_we    <= `ENABLE;
+                mem_data_o   <= {{4{mem_oper_data[7:0]}}};
                 case (mem_oper_addr[1:0])
                     2'b00 : begin
                         mem_mask_o  <= 4'b0001;
@@ -285,6 +286,7 @@ always_comb begin
             end
             OP_SH  : begin
                 mem_we    <= `ENABLE;
+                mem_data_o   <= {{2{mem_oper_data[15:0]}}};
                 case (mem_oper_addr[1:0])
                     2'b00 : begin
                         mem_mask_o  <= 4'b0011;
@@ -306,6 +308,7 @@ always_comb begin
             end
             OP_SW  : begin
                 mem_we    <= `ENABLE;
+                mem_data_o   <= mem_oper_data;
                 mem_mask_o  <= 4'b1111;
             end
             default : begin end

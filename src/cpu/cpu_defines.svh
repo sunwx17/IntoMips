@@ -7,7 +7,7 @@
 
 `define PC_INTERRUPT    32'h00000020
 `define PC_SYSCALL      32'h00000040
-`define PC_INVALID_INST 32'h00000040
+`define PC_INVALID_INST 32'h00000080
 `define PC_OV           32'h00000040
 
 
