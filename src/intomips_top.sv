@@ -79,6 +79,15 @@ module intomips_top(
     output wire video_clk,         //像素时钟输出
     output wire video_de           //行数据有效信号，用于区分消隐区
 );
+
+assign leds[0] = uart_rdn;
+assign leds[1] = uart_wrn;
+assign leds[2] = uart_dataready;
+assign leds[3] = uart_tbre;
+assign leds[4] = uart_tsre;
+assign leds[5] = uart_mode[0];
+assign leds[6] = uart_mode[1];
+
 reg a = 1'b0;
 
 //与主频反相
@@ -87,17 +96,71 @@ reg clk_25M = 1'b1;
 always @(posedge clk_50M) begin
     clk_25M <= ~clk_25M;
 end
+
+Inst_addr_t inst_addr_v;
+Word_t      data_addr_v;
+Inst_addr_t inst_addr;
+Word_t      data_addr;
+Bit_t       sram_read_op;
+Bit_t       sram_write_op;
+Word_t      sram_data_read;
+Word_t      sram_data_write;
+Bit_t       uart_read_op;
+Bit_t       uart_write_op;
+Word_t      uart_data_read;
+Word_t      uart_data_write;
+Serial_mode_t   uart_mode;
+
+
+Bit_t       cpu_read_op;
+Bit_t       cpu_write_op;
+Word_t      cpu_data_read;
+Word_t      cpu_data_write;
+
+
+always_comb begin
+    if (inst_addr_v >= 32'h80000000 && inst_addr_v < 32'h80400000) begin
+        inst_addr <= {10'b0, inst_addr_v[21:0]};
+    end
+    if (data_addr_v >= 32'h80400000 && data_addr_v < 32'h80800000) begin
+        data_addr <= {10'b0, data_addr_v[21:0]};
+        sram_read_op <= cpu_read_op;
+        sram_write_op <= cpu_write_op;
+        sram_data_write <= cpu_data_write;
+        cpu_data_read <= sram_data_read;
+        uart_read_op <= `DISABLE;
+        uart_write_op <= `DISABLE;
+        uart_data_write <= `ZERO_WORD;
+    end else if(data_addr_v == 32'hBFD003F8) begin
+        uart_read_op <= cpu_read_op;
+        uart_write_op <= cpu_write_op;
+        uart_data_write <= cpu_data_write;
+        cpu_data_read <= uart_data_read;
+        sram_read_op <= `DISABLE;
+        sram_write_op <= `DISABLE;
+        sram_data_write <= `ZERO_WORD;
+    end else if (data_addr_v == 32'hBFD003FC) begin
+        cpu_data_read <= {30'b0, uart_mode};
+        sram_read_op <= `DISABLE;
+        sram_write_op <= `DISABLE;
+        sram_data_write <= `ZERO_WORD;
+        uart_read_op <= `DISABLE;
+        uart_write_op <= `DISABLE;
+        uart_data_write <= `ZERO_WORD;
+    end
+end
+
 cpu cpu_instance(
     .clk(clk_25M),
     .rst(reset_btn),
     .rom_data_i(inst_ram_controller.bus_data_read),
-    .rom_addr_o(inst_ram_controller.bus_addr),
+    .rom_addr_o(inst_addr_v),
     .rom_ce_o(inst_ram_controller.read_op),
-    .ram_data_i(data_sram_controller.bus_data_read),
-    .ram_addr_o(data_sram_controller.bus_addr),
-    .ram_data_o(data_sram_controller.bus_data_write),
-    .ram_re_o(data_sram_controller.read_op),
-    .ram_we_o(data_sram_controller.write_op),
+    .ram_data_i(cpu_data_read),
+    .ram_addr_o(data_addr_v),
+    .ram_data_o(cpu_data_write),
+    .ram_re_o(cpu_read_op),
+    .ram_we_o(cpu_write_op),
     .ram_mask_o(data_sram_controller.byte_mask)
     //.timer_int_o
 );
@@ -109,7 +172,7 @@ sram_controller inst_ram_controller(
     .write_op(1'b0),
     //.bus_data_write(),
     .bus_data_read(cpu_instance.rom_data_i),
-    .bus_addr(cpu_instance.rom_addr_o),
+    .bus_addr(inst_addr),
     .byte_mask(4'b1111),
     //.bus_stall
     .ram_data(ext_ram_data),
@@ -125,11 +188,11 @@ sram_controller inst_ram_controller(
 sram_controller data_sram_controller(
     .clk(clk_50M),
     .rst(reset_btn),
-    .read_op(cpu_instance.ram_re_o),
-    .write_op(cpu_instance.ram_we_o),
-    .bus_data_write(cpu_instance.ram_data_o),
-    .bus_data_read(cpu_instance.ram_data_i),
-    .bus_addr(cpu_instance.ram_addr_o),
+    .read_op(sram_read_op),
+    .write_op(sram_write_op),
+    .bus_data_write(sram_data_write),
+    .bus_data_read(sram_data_read),
+    .bus_addr(data_addr),
     .byte_mask(cpu_instance.ram_mask_o),
     //.bus_stall
     .ram_data(base_ram_data),
@@ -140,6 +203,22 @@ sram_controller data_sram_controller(
     .ram_we_n(base_ram_we_n)
 );
 
+serial_controller serial_controller_instance(
+    .clk(clk_50M), 
+    .rst(reset_btn),
+    .read_op(uart_read_op), 
+    .write_op(uart_write_op),
+    .bus_data_write(uart_data_write),
+    .bus_data_read(uart_data_read),
+    .mode(uart_mode),
+
+    .uart_rdn,        
+    .uart_wrn,        
+    .uart_dataready,  
+    .uart_tbre,       
+    .uart_tsre,       
+    .uart_data(base_ram_data[7:0])
+);
 
 
 

@@ -44,7 +44,7 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_VFP     637
 `define VGA_VSP     643
 
-typedef logic[1:0]  Serial_mode_t
+typedef logic[1:0]  Serial_mode_t;
 
 //instruction
 `define INST_WIDTH          32
