@@ -150,23 +150,112 @@ always_comb begin
         case (oper_i)
             OP_LB  : begin
                 mem_re_o    <= `ENABLE;
-                mem_mask_o  <= 4'b0001;
-                wreg_data_o <= { {24{mem_data_i[7]}}, mem_data_i[7:0] };
+                //mem_mask_o  <= 4'b0001;
+                case (mem_oper_addr[1:0])
+                    2'b00 : begin
+                        wreg_data_o <= { {24{mem_data_i[7]}}, mem_data_i[7:0] };
+                        mem_mask_o  <= 4'b0001;
+                    end
+                    2'b01 : begin
+                        wreg_data_o <= { {24{mem_data_i[15]}}, mem_data_i[15:8] };
+                        mem_mask_o  <= 4'b0010;
+                    end
+                    2'b10 : begin
+                        wreg_data_o <= { {24{mem_data_i[23]}}, mem_data_i[23:16] };
+                        mem_mask_o  <= 4'b0100;
+                    end
+                    2'b11 : begin
+                        wreg_data_o <= { {24{mem_data_i[31]}}, mem_data_i[31:24] };
+                        mem_mask_o  <= 4'b1000;
+                    end
+                    default: begin
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                endcase
+                //wreg_data_o <= { {24{mem_data_i[7]}}, mem_data_i[7:0] };
             end
             OP_LBU : begin
                 mem_re_o    <= `ENABLE;
-                mem_mask_o  <= 4'b0001;
-                wreg_data_o <= { 24'b0, mem_data_i[7:0] };
+                case (mem_oper_addr[1:0])
+                    2'b00 : begin
+                        wreg_data_o <= { 24'b0, mem_data_i[7:0] };
+                        mem_mask_o  <= 4'b0001;
+                    end
+                    2'b01 : begin
+                        wreg_data_o <= { 24'b0, mem_data_i[15:8] };
+                        mem_mask_o  <= 4'b0010;
+                    end
+                    2'b10 : begin
+                        wreg_data_o <= { 24'b0, mem_data_i[23:16] };
+                        mem_mask_o  <= 4'b0100;
+                    end
+                    2'b11 : begin
+                        wreg_data_o <= { 24'b0, mem_data_i[31:24] };
+                        mem_mask_o  <= 4'b1000;
+                    end
+                    default: begin
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                endcase
+                
+                //mem_mask_o  <= 4'b0001;
+                //wreg_data_o <= { 24'b0, mem_data_i[7:0] };
             end
             OP_LH  : begin
                 mem_re_o    <= `ENABLE;
-                mem_mask_o  <= 4'b0011;
-                wreg_data_o <= { {16{mem_data_i[15]}}, mem_data_i[15:0] };
+                case (mem_oper_addr[1:0])
+                    2'b00 : begin
+                        wreg_data_o <= { {16{mem_data_i[15]}}, mem_data_i[15:0] };
+                        mem_mask_o  <= 4'b0011;
+                    end
+                    2'b01 : begin//TODO
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                    2'b10 : begin
+                        wreg_data_o <= { {16{mem_data_i[31]}}, mem_data_i[31:16] };
+                        mem_mask_o  <= 4'b1100;
+                    end
+                    2'b11 : begin//TODO
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                    default: begin
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                endcase
+                //mem_mask_o  <= 4'b0011;
+                //wreg_data_o <= { {16{mem_data_i[15]}}, mem_data_i[15:0] };
             end
             OP_LHU : begin
                 mem_re_o    <= `ENABLE;
-                mem_mask_o  <= 4'b0011;
-                wreg_data_o <= { 16'b0, mem_data_i[15:0] };
+                case (mem_oper_addr[1:0])
+                    2'b00 : begin
+                        wreg_data_o <= { 16'b0, mem_data_i[15:0] };
+                        mem_mask_o  <= 4'b0011;
+                    end
+                    2'b01 : begin//TODO
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                    2'b10 : begin
+                        wreg_data_o <= { 16'b0, mem_data_i[31:16] };
+                        mem_mask_o  <= 4'b1100;
+                    end
+                    2'b11 : begin//TODO
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                    default: begin
+                        wreg_data_o <= `ZERO_WORD;
+                        mem_mask_o  <= 4'b0000;
+                    end
+                endcase
+                //mem_mask_o  <= 4'b0011;
+                //wreg_data_o <= { 16'b0, mem_data_i[15:0] };
             end
             OP_LW  : begin
                 mem_re_o    <= `ENABLE;
@@ -175,11 +264,45 @@ always_comb begin
             end
             OP_SB  : begin
                 mem_we    <= `ENABLE;
-                mem_mask_o  <= 4'b0001;
+                case (mem_oper_addr[1:0])
+                    2'b00 : begin
+                        mem_mask_o  <= 4'b0001;
+                    end
+                    2'b01 : begin
+                        mem_mask_o  <= 4'b0010;
+                    end
+                    2'b10 : begin
+                        mem_mask_o  <= 4'b0100;
+                    end
+                    2'b11 : begin
+                        mem_mask_o  <= 4'b1000;
+                    end
+                    default: begin
+                        mem_mask_o  <= 4'b0000;
+                    end
+                endcase
+                //mem_mask_o  <= 4'b0001;
             end
             OP_SH  : begin
                 mem_we    <= `ENABLE;
-                mem_mask_o  <= 4'b0011;
+                case (mem_oper_addr[1:0])
+                    2'b00 : begin
+                        mem_mask_o  <= 4'b0011;
+                    end
+                    2'b01 : begin//TODO
+                        mem_mask_o  <= 4'b0000;
+                    end
+                    2'b10 : begin
+                        mem_mask_o  <= 4'b1100;
+                    end
+                    2'b11 : begin//TODO
+                        mem_mask_o  <= 4'b0000;
+                    end
+                    default: begin
+                        mem_mask_o  <= 4'b0000;
+                    end
+                endcase
+                //mem_mask_o  <= 4'b0011;
             end
             OP_SW  : begin
                 mem_we    <= `ENABLE;
