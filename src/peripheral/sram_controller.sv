@@ -32,8 +32,7 @@ module sram_controller (
 
     assign ram_be_n = ~byte_mask;
     
-    Word_t data_read, data_write;
-    assign bus_data_read = data_read;
+    Word_t data_write;
     assign ram_data = write_op_inner ? data_write: `HIGH_WORD;
 
     Ram_addr_t inner_addr;
@@ -49,7 +48,6 @@ module sram_controller (
 
             write_op_inner <= 1'b0;
 
-            bus_stall <= 1'b1;
             cur_state <= IDLE;
         end else begin 
             case(cur_state)
@@ -79,14 +77,13 @@ module sram_controller (
                         ram_oe_n <= 1'b1;
                         ram_we_n <= 1'b1;
 
-                        bus_stall <= 1'b1;
                         cur_state <= IDLE;
 
                         write_op_inner <= 1'b0;
                     end
                 end
                 READ: begin
-                    data_read <= ram_data;
+                    bus_data_read <= ram_data;
 
                     ram_ce_n <= 1'b1;
                     ram_oe_n <= 1'b1;
@@ -102,7 +99,6 @@ module sram_controller (
 
                     write_op_inner <= 1'b0;
 
-                    bus_stall <= 1'b0;
                     cur_state <= IDLE;
                 end
             endcase

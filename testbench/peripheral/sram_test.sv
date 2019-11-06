@@ -4,8 +4,6 @@ module sram_test(
     input Bit_t         read_op, write_op,
     input Word_t        bus_data_write,
     output Word_t       bus_data_read,
-
-    output Bit_t        bus_stall
 );
 
 sram_controller sram_controller_instance(
@@ -17,7 +15,6 @@ sram_controller sram_controller_instance(
     .bus_data_read(bus_data_read),
     .bus_addr(bus_addr),
     .byte_mask(4'b1111),
-    .bus_stall(bus_stall),
     .ram_data(fake_sram_instance.ram_data),
     .ram_addr(fake_sram_instance.ram_addr),
     .ram_be_n(fake_sram_instance.ram_be_n),

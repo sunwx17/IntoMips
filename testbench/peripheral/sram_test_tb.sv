@@ -9,8 +9,6 @@ Bit_t       write_op = 0;
 Word_t      bus_data_write, bus_data_read;
 
 
-Bit_t       bus_stall;
-
 sram_test sram_test_instance(
     .clk(clk_ram),
     .rst(rst),
@@ -18,8 +16,7 @@ sram_test sram_test_instance(
     .read_op(read_op),
     .write_op(write_op),
     .bus_data_write(bus_data_write),
-    .bus_data_read(bus_data_read),
-    .bus_stall(bus_stall)
+    .bus_data_read(bus_data_read)
 );
 
 task sram_unittest(
