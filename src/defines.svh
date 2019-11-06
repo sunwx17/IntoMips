@@ -38,7 +38,9 @@ typedef logic[18:0] Vga_addr_t;
 
 //vga
 `define VGA_HEIGHT  800
+`define VGA_HMAX    1040
 `define VGA_WIDTH   600
+`define VGA_WMAX    666
 `define VGA_HFP     856
 `define VGA_HSP     976     
 `define VGA_VFP     637
