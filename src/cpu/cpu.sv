@@ -13,6 +13,8 @@ module cpu(
     output  Bit_t       ram_we_o,
     output  Mask_t      ram_mask_o,
 
+    input   Bit_t       stallreq_from_bus,
+
     input   Bit_t[5:0]  int_i, //???
     output  Bit_t       timer_int_o 
 );
@@ -105,6 +107,8 @@ Bit_t       flush;
 
 
 ctrl ctrl_instance(
+    .rst,
+    .stallreq_from_bus(stallreq_from_bus),
     .stallreq_from_id(stallreq_from_id),
     .stallreq_from_ex(stallreq_from_ex),
     .stall(stall),

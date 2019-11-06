@@ -3,7 +3,7 @@
 
 `include "defines.svh"
 
-`define PC_RESET_ADDR   32'h80000000
+`define PC_RESET_ADDR   32'h80400000
 
 `define PC_INTERRUPT    32'h00000020
 `define PC_SYSCALL      32'h00000040
