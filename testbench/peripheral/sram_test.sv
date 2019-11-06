@@ -3,7 +3,7 @@ module sram_test(
     input Ram_addr_t    bus_addr,
     input Bit_t         read_op, write_op,
     input Word_t        bus_data_write,
-    output Word_t       bus_data_read,
+    output Word_t       bus_data_read
 );
 
 sram_controller sram_controller_instance(
