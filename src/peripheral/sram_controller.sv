@@ -12,6 +12,13 @@ module sram_controller (
     input Ram_addr_t    bus_addr,       //数据地址
     input Mask_t        byte_mask,
 
+    input Bit_t         read_op_ex,        //读信号 1为读
+    input Bit_t         write_op_ex,       //写信号 1为写
+    input Word_t        bus_data_write_ex, //总线向sram写入的数据
+    output Word_t       bus_data_read_ex,  //总线从sram读入的数据
+    input Ram_addr_t    bus_addr_ex,       //数据地址
+    input Mask_t        byte_mask_ex,
+
     output Bit_t        bus_stall,      //总线使能 1使能
     
     
@@ -24,6 +31,10 @@ module sram_controller (
     output logic        ram_we_n
 
 );
+
+    Bit_t ex_op = 1'b0;
+    Bit_t stage = 1'b0;
+
     Bit_t write_op_inner;
 
 
@@ -52,38 +63,66 @@ module sram_controller (
         end else begin 
             case(cur_state)
                 IDLE: begin
-                    if (read_op) begin
-                        ram_addr <= inner_addr;
-                        ram_ce_n <= 1'b0;
-                        ram_oe_n <= 1'b0;
-                        ram_we_n <= 1'b1;
-                        ram_addr <= inner_addr;
-                        cur_state <= READ;
-                        $display("controller read %h at %h, time = %t, be = %b", bus_data_write, inner_addr, $time, ram_be_n);
-
-                        write_op_inner <= 1'b0;
-                    end else if (write_op) begin
-                        write_op_inner <= write_op;
-                        ram_addr <= inner_addr;
-                        data_write <= bus_data_write;
-                        ram_ce_n <= 1'b0;
-                        ram_oe_n <= 1'b1;
-                        ram_we_n <= 1'b0;
-                        cur_state <= WRITE;
-
+                    if (ex_op) begin
+                        stage <= 1'b1;
+                        if (read_op_ex) begin
+                            write_op_inner <= 1'b0;
+                            ram_addr <= bus_addr_ex >> 2;
+                            ram_ce_n <= 1'b0;
+                            ram_oe_n <= 1'b0;
+                            ram_we_n <= 1'b1;
+                            cur_state <= READ;
+                        end else begin
+                            //write_op must 1'b1
+                            write_op_inner <= 1'b1;
+                            ram_addr <= bus_addr_ex >> 2;
+                            data_write <= bus_data_write_ex;
+                            ram_ce_n <= 1'b0;
+                            ram_oe_n <= 1'b1;
+                            ram_we_n <= 1'b0;
+                            cur_state <= WRITE;
+                        end
                     end else begin
-                        ram_addr <= `HIGH_WORD;
-                        ram_ce_n <= 1'b1;
-                        ram_oe_n <= 1'b1;
-                        ram_we_n <= 1'b1;
+                        //no ex_op
+                        stage <= 1'b0;
+                        if (read_op_ex | write_op_ex) begin
+                            ex_op <= 1'b1;
+                        end
 
-                        cur_state <= IDLE;
+                        if (read_op) begin
+                            write_op_inner <= 1'b0;
+                            ram_addr <= inner_addr;
+                            ram_ce_n <= 1'b0;
+                            ram_oe_n <= 1'b0;
+                            ram_we_n <= 1'b1;
+                            cur_state <= READ;
+                        end else if (write_op) begin
+                            write_op_inner <= 1'b1;
+                            ram_addr <= inner_addr;
+                            data_write <= bus_data_write;
+                            ram_ce_n <= 1'b0;
+                            ram_oe_n <= 1'b1;
+                            ram_we_n <= 1'b0;
+                            cur_state <= WRITE;
+                        end else begin
+                            write_op_inner <= 1'b0;
+                            ram_addr <= `HIGH_WORD;
+                            ram_ce_n <= 1'b1;
+                            ram_oe_n <= 1'b1;
+                            ram_we_n <= 1'b1;
 
-                        write_op_inner <= 1'b0;
+                            cur_state <= IDLE;
+                        end
                     end
                 end
                 READ: begin
-                    bus_data_read <= ram_data;
+                    //bus_data_read <= ram_data;
+                    if (~stage) begin
+                        //normal
+                        bus_data_read <= ram_data;
+                    else begin
+                        bus_data_read_ex <= ram_data;
+                    end
 
                     ram_ce_n <= 1'b1;
                     ram_oe_n <= 1'b1;
