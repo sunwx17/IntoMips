@@ -126,6 +126,22 @@ Word_t      base_data_read;
 Word_t      base_data_write;
 Mask_t      base_mask;
 
+Bit_t       ext_read_op_ex;
+Bit_t       ext_write_op_ex;
+Inst_addr_t ext_addr_ex;
+Word_t      ext_data_read_ex;
+Word_t      ext_data_write_ex;
+Mask_t      ext_mask_ex;
+
+Bit_t       base_read_op_ex;
+Bit_t       base_write_op_ex;
+Inst_addr_t base_addr_ex;
+Word_t      base_data_read_ex;
+Word_t      base_data_write_ex;
+Mask_t      base_mask_ex;
+
+
+
 Bit_t       uart_read_op;
 Bit_t       uart_write_op;
 Byte_t      uart_data_read;
@@ -142,6 +158,8 @@ Word_t      data_data_read;
 Word_t      data_data_write;
 Mask_t      data_mask;
 
+Bit_t       ext_stallreq;
+Bit_t       base_stallreq;
 Bit_t       stallreq;
 
 
@@ -180,10 +198,6 @@ always_comb begin
     end
 end
 
-typedef enum { FIRST, SECOND, THIRD, FOURTH } State_mem;
-State_mem   state;
-
-
 always_comb begin
     if (data_in_uart_data || data_in_uart_status) begin//assert inst_in_ext = `ENALBE
         ext_read_op <= inst_read_op;
@@ -199,8 +213,20 @@ always_comb begin
         base_data_write <= `ZERO_WORD;
         base_mask <= 4'b0000;
 
+        
+        ext_read_op_ex <= `DISABLE;
+        ext_write_op_ex <= `DISABLE;
+        ext_addr_ex <= `ZERO_WORD;
+        ext_data_write_ex <=  `ZERO_WORD;
+        ext_mask_ex <= 4'b0000;
+
+        base_read_op_ex <= `DISABLE;
+        base_write_op_ex <= `DISABLE;
+        base_addr_ex <= `ZERO_WORD;
+        base_data_write_ex <=  `ZERO_WORD;
+        base_mask_ex <= 4'b0000;
+
         stallreq <= `DISABLE;
-        state <= FIRST;
 
         if (data_in_uart_data) begin
             uart_read_op <= data_read_op;
@@ -216,7 +242,20 @@ always_comb begin
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
+        uart_data_write <= `ZERO_WORD;        
+        
+        ext_read_op_ex <= `DISABLE;
+        ext_write_op_ex <= `DISABLE;
+        ext_addr_ex <= `ZERO_WORD;
+        ext_data_write_ex <=  `ZERO_WORD;
+        ext_mask_ex <= 4'b0000;
+
+        base_read_op_ex <= `DISABLE;
+        base_write_op_ex <= `DISABLE;
+        base_addr_ex <= `ZERO_WORD;
+        base_data_write_ex <=  `ZERO_WORD;
+        base_mask_ex <= 4'b0000;
+
         ext_read_op <= inst_in_ext ? inst_read_op : data_read_op;
         ext_write_op <= inst_in_ext ? `DISABLE : data_write_op;
         ext_addr <= inst_in_ext ? inst_addr : data_addr;
@@ -233,60 +272,56 @@ always_comb begin
         data_data_read <= data_in_ext ? ext_data_read : base_data_read;
         
         stallreq <= `DISABLE;
-        state <= FIRST;
     end else if ((inst_in_ext && data_in_ext) || (inst_in_base && data_in_base)) begin
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
-        if (state == FIRST || state == SECOND) begin
-            ext_read_op <= inst_in_ext ? inst_read_op : `DISABLE;
-            ext_write_op <= inst_in_ext ? `DISABLE : `DISABLE;
-            ext_addr <= inst_in_ext ? inst_addr : `ZERO_WORD;
-            ext_data_write <= inst_in_ext ? `ZERO_WORD : `ZERO_WORD;
-            ext_mask <= inst_in_ext ? 4'b1111 : 4'b0000;
+        ext_read_op <= inst_in_ext ? inst_read_op : `DISABLE;
+        ext_write_op <= inst_in_ext ? `DISABLE : `DISABLE;
+        ext_addr <= inst_in_ext ? inst_addr : `ZERO_WORD;
+        ext_data_write <= inst_in_ext ? `ZERO_WORD : `ZERO_WORD;
+        ext_mask <= inst_in_ext ? 4'b1111 : 4'b0000;
+        
+        
+        ext_read_op_ex <= data_in_ext ? data_read_op : `DISABLE;
+        ext_write_op_ex <= data_in_ext ? data_write_op : `DISABLE;
+        ext_addr_ex <= data_in_ext ? data_addr : `ZERO_WORD;
+        ext_data_write_ex <= data_in_ext ? data_data_write : `ZERO_WORD;
+        ext_mask_ex <= data_in_ext ? data_mask : 4'b0000;
+
+        base_read_op <= inst_in_base ? `DISABLE : inst_read_op;
+        base_write_op <= inst_in_base ? `DISABLE : `DISABLE;
+        base_addr <= inst_in_base ? `ZERO_WORD : inst_addr;
+        base_data_write <= inst_in_base ? `ZERO_WORD : `ZERO_WORD;
+        base_mask <= inst_in_base ? 4'b0000 : 4'b1111;
+
+        
+        base_read_op_ex <= data_in_base ? `DISABLE : data_read_op;
+        base_write_op_ex <= data_in_base ? `DISABLE : data_write_op;
+        base_addr_ex <= data_in_base ? `ZERO_WORD : data_addr;
+        base_data_write_ex <= data_in_base ? `ZERO_WORD : data_data_write;
+        base_mask_ex <= data_in_base ? 4'b0000 : data_mask;
             
-            base_read_op <= inst_in_ext ? `DISABLE : inst_read_op;
-            base_write_op <= inst_in_ext ? `DISABLE : `DISABLE;
-            base_addr <= inst_in_ext ? `ZERO_WORD : inst_addr;
-            base_data_write <= inst_in_ext ? `ZERO_WORD : `ZERO_WORD;
-            base_mask <= inst_in_ext ? 4'b0000 : 4'b1111;
-                
-            inst_data <= inst_in_ext ? ext_data_read : base_data_read;
-            //data_data_read <= data_in_ext ? ext_data_read : base_data_read;
-            
-            stallreq <= `ENABLE;
-            if (state == FIRST) begin
-                state <= SECOND;
-            end else begin
-                state <= THIRD;
-            end
-        end else begin
-            ext_read_op <= data_in_ext ? data_read_op : `DISABLE;
-            ext_write_op <= data_in_ext ? data_write_op : `DISABLE;
-            ext_addr <= data_in_ext ? data_addr : `ZERO_WORD;
-            ext_data_write <= data_in_ext ? data_data_write : `ZERO_WORD;
-            ext_mask <= data_in_ext ? data_mask : 4'b0000;
-            
-            base_read_op <= data_in_ext ? `DISABLE : data_read_op;
-            base_write_op <= data_in_ext ? `DISABLE : data_write_op;
-            base_addr <= data_in_ext ? `ZERO_WORD : data_addr;
-            base_data_write <= data_in_ext ? `ZERO_WORD : data_data_write;
-            base_mask <= data_in_ext ? 4'b0000 : data_mask;
-                
-            //inst_data <= inst_in_ext ? ext_data_read : base_data_read;
-            data_data_read <= data_in_ext ? ext_data_read : base_data_read;
-            
-            stallreq <= `DISABLE;
-            if (state == THIRD) begin
-                state <= FOURTH;
-            end else begin
-                state <= FIRST;
-            end
-        end
+        inst_data <= inst_in_ext ? ext_data_read : base_data_read;
+        data_data_read <= data_in_ext ? ext_data_read_ex : base_data_read_ex;
+
+        stallreq <= inst_in_ext ? ext_stallreq : base_stallreq;
     end else begin
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
+
+        ext_read_op_ex <= `DISABLE;
+        ext_write_op_ex <= `DISABLE;
+        ext_addr_ex <= `ZERO_WORD;
+        ext_data_write_ex <=  `ZERO_WORD;
+        ext_mask_ex <= 4'b0000;
+
+        base_read_op_ex <= `DISABLE;
+        base_write_op_ex <= `DISABLE;
+        base_addr_ex <= `ZERO_WORD;
+        base_data_write_ex <=  `ZERO_WORD;
+        base_mask_ex <= 4'b0000;
         ext_read_op <= inst_in_ext ? inst_read_op : (data_in_ext ? data_read_op : `DISABLE);
         ext_write_op <= inst_in_ext ? `DISABLE : (data_in_ext ? data_write_op : `DISABLE);
         ext_addr <= inst_in_ext ? inst_addr : (data_in_ext ? data_addr : `ZERO_WORD);
@@ -303,7 +338,6 @@ always_comb begin
         data_data_read <= data_in_ext ? ext_data_read : (data_in_base ? base_data_read : `ZERO_WORD);
         
         stallreq <= `DISABLE;
-        state <= FIRST;
     end
 end
 
@@ -360,11 +394,17 @@ sram_controller inst_ram_controller(
     .rst(reset_btn),
     .read_op(ext_read_op),
     .write_op(ext_write_op),
-    //.bus_data_write(),
     .bus_data_write(ext_data_write),
     .bus_data_read(ext_data_read),
     .bus_addr(ext_addr),
     .byte_mask(ext_mask),
+    .read_op_ex(ext_read_op_ex),
+    .write_op_ex(ext_write_op_ex),
+    .bus_data_write_ex(ext_data_write_ex),
+    .bus_data_read_ex(ext_data_read_ex),
+    .bus_addr_ex(ext_addr_ex),
+    .byte_mask_ex(ext_mask_ex),
+    .bus_stall(ext_stallreq),
     //.bus_stall
     .ram_data(ext_ram_data),
     .ram_addr(ext_ram_addr),
@@ -385,6 +425,13 @@ sram_controller data_sram_controller(
     .bus_data_read(base_data_read),
     .bus_addr(base_addr),
     .byte_mask(base_mask),
+    .read_op_ex(base_read_op_ex),
+    .write_op_ex(base_write_op_ex),
+    .bus_data_write_ex(base_data_write_ex),
+    .bus_data_read_ex(base_data_read_ex),
+    .bus_addr_ex(base_addr_ex),
+    .byte_mask_ex(base_mask_ex),
+    .bus_stall(base_stallreq),
     //.bus_stall
     .ram_data(base_ram_data),
     .ram_addr(base_ram_addr),
