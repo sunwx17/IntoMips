@@ -6,6 +6,10 @@ module ext_serial_controller(
     input Byte_t    bus_data_write,
     output Byte_t   bus_data_read,
 
+
+    output Bit_t    txd,
+    input Bit_t     rxd
+
 );
 
 Byte_t ext_uart_rx;
