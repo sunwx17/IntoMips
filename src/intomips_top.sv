@@ -210,6 +210,7 @@ always_comb begin
         data_in_uart_data <= `DISABLE;
         data_in_uart_status <= `DISABLE;
         data_in_vga <= `ENABLE;
+    end
 end
 
 always_comb begin
@@ -287,7 +288,7 @@ always_comb begin
         stallreq <= `DISABLE;
         //vga
         vga_write_op <= 1'b1;
-        vga_data_write <= cpu_data_write;
+        vga_data_write <= data_data_write;
         //vga_data_write <= 32'h00000007;
         vga_addr <= data_addr_v & 32'h000fffff;
 
