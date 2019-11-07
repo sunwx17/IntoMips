@@ -1,5 +1,5 @@
 `include "cpu_defines.svh"
-module fake_sram(
+module fake_sram0(
     input clk,
     inout Word_t       ram_data,       //RAM数据，低8位与CPLD串口控制器共享
     input Ram_addr_t   ram_addr,       //RAM地址

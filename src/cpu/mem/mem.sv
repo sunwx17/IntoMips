@@ -1,3 +1,5 @@
+`include "cpu_defines.svh"
+
 module mem(
     input               rst,
 

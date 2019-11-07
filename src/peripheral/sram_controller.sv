@@ -59,6 +59,7 @@ module sram_controller (
                         ram_we_n <= 1'b1;
                         ram_addr <= inner_addr;
                         cur_state <= READ;
+                        $display("controller read %h at %h, time = %t, be = %b", bus_data_write, inner_addr, $time, ram_be_n);
 
                         write_op_inner <= 1'b0;
                     end else if (write_op) begin
@@ -68,7 +69,6 @@ module sram_controller (
                         ram_ce_n <= 1'b0;
                         ram_oe_n <= 1'b1;
                         ram_we_n <= 1'b0;
-                        //$display("controller write %h at %h, time = %t, be = %b", bus_data_write, inner_addr, $time, ram_be_n);
                         cur_state <= WRITE;
 
                     end else begin
@@ -90,6 +90,7 @@ module sram_controller (
                     ram_we_n <= 1'b1;
 
                     cur_state <= IDLE;
+                        $display("controller read read %h at %h, time = %t, be = %b", bus_data_write, inner_addr, $time, ram_be_n);
                 end
                 WRITE: begin
 
@@ -100,6 +101,7 @@ module sram_controller (
                     write_op_inner <= 1'b0;
 
                     cur_state <= IDLE;
+                        $display("controller read write %h at %h, time = %t, be = %b", bus_data_write, inner_addr, $time, ram_be_n);
                 end
             endcase
         end
