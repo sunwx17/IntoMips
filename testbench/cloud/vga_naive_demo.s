@@ -6,18 +6,24 @@
 _start:
     lui     $1, 0xba00
 
-    lui     $2, 0xba07
+    lui     $2, 0x0007
     ori     $2, $2, 0x5300
 
-    ori     $3, $0, 0x0007
+    ori     $3, $0, 0x0007 #red
 
-    lui     $4, 0x8040
-    ori     $4, $4, 0x0
+    ori     $4, $0, 0x0
+    ori     $6, $0, 0xffff
 _render:
-    sb      $3, 0x0($1)
-    sb      $3, 0x0($4)
-    addiu   $1, $1, 0x1 
-    bne     $1, $2, _render
+    addu    $5, $4, $1
+
+    subu    $7, $4, $6
+    bgtz    $7, _update
+    nop
+
+    sb      $3, 0x0($5)
+_update:
+    addiu   $4, $4, 0x1 
+    bne     $4, $2, _render
     nop
     nop
 _exit:

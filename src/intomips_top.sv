@@ -136,7 +136,7 @@ always_comb begin
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
         vga_write_op <= `DISABLE;
-        vga_data_write <= 32'h00000007;
+        vga_data_write <= `HIGH_BYTE;
     end else if(data_addr_v == 32'hBFD003F8) begin
         uart_read_op <= cpu_read_op;
         uart_write_op <= cpu_write_op;
@@ -146,7 +146,7 @@ always_comb begin
         sram_write_op <= `DISABLE;
         sram_data_write <= `ZERO_WORD;
         vga_write_op <= `DISABLE;
-        vga_data_write <= 32'h00000007;
+        vga_data_write <= `HIGH_BYTE;
     end else if (data_addr_v == 32'hBFD003FC) begin
         cpu_data_read <= {30'b0, uart_mode};
         sram_read_op <= `DISABLE;
@@ -156,12 +156,12 @@ always_comb begin
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
         vga_write_op <= `DISABLE;
-        vga_data_write <= 32'h00000007;
+        vga_data_write <= `HIGH_BYTE;
     end else if (data_addr_v >= 32'hBA000000 && data_addr_v < 32'hBA075300) begin
         //vga
         vga_write_op <= 1'b1;
-        //vga_data_write <= cpu_data_write;
-        vga_data_write <= 32'h00000007;
+        vga_data_write <= cpu_data_write;
+        //vga_data_write <= 32'h00000007;
         vga_addr <= data_addr_v & 32'h000fffff;
 
         sram_read_op <= `DISABLE;
