@@ -36,6 +36,9 @@ typedef logic[18:0] Vga_addr_t;
 `define HIGH_WORD   32'bZ
 `define HIGH_BYTE   8'bZ
 
+//mmu
+`define USE_MMU     1
+
 //vga
 `define VGA_HEIGHT  800
 `define VGA_WIDTH   600

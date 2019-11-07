@@ -212,5 +212,12 @@ typedef enum {
 
 `define COP0_OPCODE_FUNC_ERET   6'b011000
 
+// mmu
+`define TLB_ENTRY_NUM       16
+`define TLB_ENTRY_NUM_LOG2        4
+typedef logic[`TLB_ENTRY_NUM_LOG2 - 1:0]    TLB_index_t;
+// (vpn[31:13], asid[7:0]) entry_hi, (pfn[31:6], c[5:3], d[2], v[1], g[0]) entry_lo1,2 
+`define TLB_ENTRY_WIDTH 96
+typedef logic[`TLB_ENTRY_NUM * `TLB_ENTRY_WIDTH - 1:0] TLB_entries_t;
 
 `endif
