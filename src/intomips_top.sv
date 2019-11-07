@@ -109,6 +109,7 @@ Bit_t       inst_in_base;
 Bit_t       data_in_base;
 Bit_t       data_in_uart_data;
 Bit_t       data_in_uart_status;
+Bit_t       data_in_vga;
 Inst_addr_t inst_addr;
 Inst_addr_t data_addr;
 
@@ -148,6 +149,10 @@ Byte_t      uart_data_read;
 Byte_t      uart_data_write;
 Serial_mode_t   uart_mode;
 
+Bit_t       vga_write_op;
+Word_t      vga_data_write;
+Word_t      vga_addr;
+
 
 Bit_t       inst_read_op;
 Word_t      inst_data;
@@ -180,22 +185,31 @@ always_comb begin
         data_in_base <= `DISABLE;
         data_in_uart_data <= `DISABLE;
         data_in_uart_status <= `DISABLE;
+        data_in_vga <= `DISABLE;
     end else if (data_addr_v >= 32'h80400000 && data_addr_v < 32'h80800000) begin
         data_in_ext <= `DISABLE;
         data_in_base <= `ENABLE;
         data_in_uart_data <= `DISABLE;
         data_in_uart_status <= `DISABLE;
+        data_in_vga <= `DISABLE;
     end else if (data_addr_v == 32'hBFD003F8)begin
         data_in_ext <= `DISABLE;
         data_in_base <= `DISABLE;
         data_in_uart_data <= `ENABLE;
         data_in_uart_status <= `DISABLE;
+        data_in_vga <= `DISABLE;
     end else if (data_addr_v == 32'hBFD003FC) begin
         data_in_ext <= `DISABLE;
         data_in_base <= `DISABLE;
         data_in_uart_data <= `DISABLE;
         data_in_uart_status <= `ENABLE;
-    end
+        data_in_vga <= `DISABLE;
+    end else if (data_addr_v >= 32'hBA000000 && data_addr_v < 32'hBA075300) begin
+        data_in_ext <= `DISABLE;
+        data_in_base <= `DISABLE;
+        data_in_uart_data <= `DISABLE;
+        data_in_uart_status <= `DISABLE;
+        data_in_vga <= `ENABLE;
 end
 
 always_comb begin
@@ -227,6 +241,8 @@ always_comb begin
         base_mask_ex <= 4'b0000;
 
         stallreq <= `DISABLE;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
 
         if (data_in_uart_data) begin
             uart_read_op <= data_read_op;
@@ -239,6 +255,42 @@ always_comb begin
             uart_data_write <= `ZERO_WORD;
             data_data_read <= {30'b0, uart_mode};
         end
+    end else if (data_in_vga) begin
+        uart_read_op <= `DISABLE;
+        uart_write_op <= `DISABLE;
+        uart_data_write <= `ZERO_WORD;
+
+        ext_read_op <= `DISABLE;
+        ext_write_op <= `DISABLE;
+        ext_addr <= `ZERO_WORD;
+        ext_data_write <= `ZERO_WORD;
+        ext_mask <= 4'b0000;
+
+        base_read_op <= `DISABLE;
+        base_write_op <= `DISABLE;
+        base_addr <= `ZERO_WORD;
+        base_data_write <= `ZERO_WORD;
+        base_mask <= 4'b0000;
+
+        ext_read_op_ex <= `DISABLE;
+        ext_write_op_ex <= `DISABLE;
+        ext_addr_ex <= `ZERO_WORD;
+        ext_data_write_ex <=  `ZERO_WORD;
+        ext_mask_ex <= 4'b0000;
+
+        base_read_op_ex <= `DISABLE;
+        base_write_op_ex <= `DISABLE;
+        base_addr_ex <= `ZERO_WORD;
+        base_data_write_ex <=  `ZERO_WORD;
+        base_mask_ex <= 4'b0000;
+
+        stallreq <= `DISABLE;
+        //vga
+        vga_write_op <= 1'b1;
+        vga_data_write <= cpu_data_write;
+        //vga_data_write <= 32'h00000007;
+        vga_addr <= data_addr_v & 32'h000fffff;
+
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
@@ -272,6 +324,8 @@ always_comb begin
         data_data_read <= data_in_ext ? ext_data_read : base_data_read;
         
         stallreq <= `DISABLE;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
     end else if ((inst_in_ext && data_in_ext) || (inst_in_base && data_in_base)) begin
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
@@ -306,6 +360,8 @@ always_comb begin
         data_data_read <= data_in_ext ? ext_data_read_ex : base_data_read_ex;
 
         stallreq <= inst_in_ext ? ext_stallreq : base_stallreq;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
     end else begin
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
@@ -338,6 +394,8 @@ always_comb begin
         data_data_read <= data_in_ext ? ext_data_read : (data_in_base ? base_data_read : `ZERO_WORD);
         
         stallreq <= `DISABLE;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
     end
 end
 
@@ -354,6 +412,8 @@ end
         uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
     end else if(data_addr_v == 32'hBFD003F8) begin
         uart_read_op <= cpu_read_op;
         uart_write_op <= cpu_write_op;
@@ -362,8 +422,25 @@ end
         sram_read_op <= `DISABLE;
         sram_write_op <= `DISABLE;
         sram_data_write <= `ZERO_WORD;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
     end else if (data_addr_v == 32'hBFD003FC) begin
         cpu_data_read <= {30'b0, uart_mode};
+        sram_read_op <= `DISABLE;
+        sram_write_op <= `DISABLE;
+        sram_data_write <= `ZERO_WORD;
+        uart_read_op <= `DISABLE;
+        uart_write_op <= `DISABLE;
+        uart_data_write <= `ZERO_WORD;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;
+    end else if (data_addr_v >= 32'hBA000000 && data_addr_v < 32'hBA075300) begin
+        //vga
+        vga_write_op <= 1'b1;
+        vga_data_write <= cpu_data_write;
+        //vga_data_write <= 32'h00000007;
+        vga_addr <= data_addr_v & 32'h000fffff;
+
         sram_read_op <= `DISABLE;
         sram_write_op <= `DISABLE;
         sram_data_write <= `ZERO_WORD;
@@ -456,6 +533,22 @@ serial_controller serial_controller_instance(
     .uart_tbre,       
     .uart_tsre,       
     .uart_data(base_ram_data[7:0])
+);
+
+vga_controller vga_controller_instance(
+    .clk_25M,
+    .clk_50M,
+    .rst(reset_btn),
+    .write_op(vga_write_op),
+    .bus_addr(vga_addr),
+    .bus_data(vga_data_write),
+    .video_red,
+    .video_green,
+    .video_blue,
+    .video_hsync,
+    .video_vsync,
+    .video_clk,
+    .video_de
 );
 
 

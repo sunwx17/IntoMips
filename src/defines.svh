@@ -40,10 +40,12 @@ typedef logic[18:0] Vga_addr_t;
 `define USE_MMU     1
 
 //vga
-`define VGA_HEIGHT  800
-`define VGA_WIDTH   600
+`define VGA_HSIZE   800
+`define VGA_HMAX    1040
+`define VGA_VSIZE   600
+`define VGA_VMAX    666
 `define VGA_HFP     856
-`define VGA_HSP     976     
+`define VGA_HSP     976 
 `define VGA_VFP     637
 `define VGA_VSP     643
 
