@@ -5,3 +5,4 @@ vivado/*.sim
 vivado/*.cache
 vivado/*.hw
 vivado/*.ip_user_files
+testbench/cpu/testcases/__pycache__
