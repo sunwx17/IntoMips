@@ -80,13 +80,13 @@ module intomips_top(
     output wire video_de           //行数据有效信号，用于区分消隐�?
 );
 
-assign leds[0] = uart_rdn;
+/*assign leds[0] = uart_rdn;
 assign leds[1] = uart_wrn;
 assign leds[2] = uart_dataready;
 assign leds[3] = uart_tbre;
 assign leds[4] = uart_tsre;
 assign leds[5] = uart_mode[0];
-assign leds[6] = uart_mode[1];
+assign leds[6] = uart_mode[1];*/
 
 //reg a = 1'b0;
 

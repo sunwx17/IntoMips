@@ -46,8 +46,10 @@ module sram_controller (
     Word_t data_write;
     assign ram_data = write_op_inner ? data_write: `HIGH_WORD;
 
-    Ram_addr_t inner_addr;
-    assign inner_addr = bus_addr >> 2;
+    Ram_addr_t inner_addr, inner_addr_ex;
+   
+    assign inner_addr = (bus_addr >> 2);
+    assign inner_addr_ex = (bus_addr_ex >> 2);
 
 
     always_ff @ (posedge clk or posedge rst) begin 
@@ -103,7 +105,7 @@ module sram_controller (
 
                     if (read_op_ex) begin
                         write_op_inner <= 1'b0;
-                        ram_addr <= bus_addr_ex >> 2;
+                        ram_addr <= inner_addr_ex;
                         ram_ce_n <= 1'b0;
                         ram_oe_n <= 1'b0;
                         ram_we_n <= 1'b1;
@@ -112,7 +114,7 @@ module sram_controller (
                         bus_stall <= 1'b1;
                     end else if (write_op_ex) begin
                         write_op_inner <= 1'b1;
-                        ram_addr <= bus_addr_ex >> 2;
+                        ram_addr <= inner_addr_ex;
                         data_write <= bus_data_write_ex;
                         ram_ce_n <= 1'b0;
                         ram_oe_n <= 1'b1;
@@ -135,7 +137,7 @@ module sram_controller (
 
                     if (read_op_ex) begin
                         write_op_inner <= 1'b0;
-                        ram_addr <= bus_addr_ex >> 2;
+                        ram_addr <= inner_addr_ex;
                         ram_ce_n <= 1'b0;
                         ram_oe_n <= 1'b0;
                         ram_we_n <= 1'b1;
@@ -144,7 +146,7 @@ module sram_controller (
                         bus_stall <= 1'b1;
                     end else if (write_op_ex) begin
                         write_op_inner <= 1'b1;
-                        ram_addr <= bus_addr_ex >> 2;
+                        ram_addr <= inner_addr_ex;
                         data_write <= bus_data_write_ex;
                         ram_ce_n <= 1'b0;
                         ram_oe_n <= 1'b1;
