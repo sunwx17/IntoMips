@@ -17,7 +17,7 @@ end
 
 initial begin
     rst = 1'b1;
-    $readmemh({"memory_byte", ".mem"}, ext_sram.sram_mem);
+    $readmemh({"branch_cloud", ".mem"}, ext_sram.sram_mem);
     $readmemh({"memory_byte", ".mem"}, base_sram.sram_mem);
     #200 rst = 1'b0;
     #500000 rst = 1'b1;
