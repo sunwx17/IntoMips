@@ -44,9 +44,9 @@ always_comb begin
     data_1 <= `ZERO_WORD;
     if (rst == `DISABLE) begin
         if (read_enable_1 == `ENABLE && read_addr_1 != `REG_ZERO) begin
-            if (read_addr_1 != write_addr) begin
+            if ((read_addr_1 != write_addr) || ~write_enable) begin
                 data_1 <= regs[read_addr_1];
-            end else if (write_enable) begin
+            end else begin
                 data_1 <= write_data;
             end
         end
@@ -57,9 +57,9 @@ always_comb begin
     data_2 <= `ZERO_WORD;
     if (rst == `DISABLE) begin
         if (read_enable_2 == `ENABLE && read_addr_2 != `REG_ZERO) begin
-            if (read_addr_2 != write_addr) begin
+            if ((read_addr_2 != write_addr) || ~write_enable) begin
                 data_2 <= regs[read_addr_2];
-            end else if (write_enable) begin
+            end else begin
                 data_2 <= write_data;
             end
         end
