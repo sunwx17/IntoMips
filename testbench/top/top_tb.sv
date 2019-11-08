@@ -24,19 +24,6 @@ initial begin
     #500200 $stop;
 end
 
-Word_t       base_ram_data;
-Ram_addr_t   base_ram_addr;
-Mask_t       base_ram_be_n;
-Bit_t        base_ram_ce_n;
-Bit_t        base_ram_oe_n;
-Bit_t        base_ram_we_n;
-
-Word_t       ext_ram_data;
-Ram_addr_t   ext_ram_addr;
-Mask_t       ext_ram_be_n;
-Bit_t        ext_ram_ce_n;
-Bit_t        ext_ram_oe_n;
-Bit_t        ext_ram_we_n;
 
 intomips_top intomips_top_instance(
     .clk_50M(clock_50),           //50MHz 时钟输入

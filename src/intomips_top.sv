@@ -80,13 +80,13 @@ module intomips_top(
     output wire video_de           //行数据有效信号，用于区分消隐�?
 );
 
-/*assign leds[0] = uart_rdn;
+assign leds[0] = uart_rdn;
 assign leds[1] = uart_wrn;
 assign leds[2] = uart_dataready;
 assign leds[3] = uart_tbre;
 assign leds[4] = uart_tsre;
 assign leds[5] = uart_mode[0];
-assign leds[6] = uart_mode[1];*/
+assign leds[6] = uart_mode[1];
 
 //reg a = 1'b0;
 
@@ -172,7 +172,15 @@ assign inst_addr = {10'b0, inst_addr_v[21:0]};
 assign data_addr = {10'b0, data_addr_v[21:0]};
 
 always_comb begin
-    if (inst_addr_v >= 32'h80000000 && inst_addr_v < 32'h80400000) begin
+    inst_in_ext <= `INST_IN_EXT(inst_addr_v);
+    inst_in_base <= `INST_IN_BASE(inst_addr_v);
+    data_in_ext <= `DATA_IN_EXT(data_addr_v);
+    data_in_base <= `DATA_IN_BASE(data_addr_v);
+    data_in_uart_data <= `DATA_IN_UART_DATA(data_addr_v);
+    data_in_uart_status <= `DATA_IN_UART_STATUS(data_addr_v);
+    data_in_vga <= `DATA_IN_VGA(data_addr_v);
+
+    /*if (inst_addr_v >= 32'h80000000 && inst_addr_v < 32'h80400000) begin
         inst_in_ext <= `ENABLE;
         inst_in_base <= `DISABLE;
     end else if (inst_addr_v >= 32'h80400000 && inst_addr_v < 32'h80800000) begin
@@ -210,10 +218,43 @@ always_comb begin
         data_in_uart_data <= `DISABLE;
         data_in_uart_status <= `DISABLE;
         data_in_vga <= `ENABLE;
-    end
+    end*/
 end
 
 always_comb begin
+    uart_read_op <= `DISABLE;
+    uart_write_op <= `DISABLE;
+    uart_data_write <= `ZERO_WORD;
+
+    ext_read_op <= `DISABLE;
+    ext_write_op <= `DISABLE;
+    ext_addr <= `ZERO_WORD;
+    ext_data_write <= `ZERO_WORD;
+    ext_mask <= 4'b0000;
+
+    base_read_op <= `DISABLE;
+    base_write_op <= `DISABLE;
+    base_addr <= `ZERO_WORD;
+    base_data_write <= `ZERO_WORD;
+    base_mask <= 4'b0000;
+
+    ext_read_op_ex <= `DISABLE;
+    ext_write_op_ex <= `DISABLE;
+    ext_addr_ex <= `ZERO_WORD;
+    ext_data_write_ex <=  `ZERO_WORD;
+    ext_mask_ex <= 4'b0000;
+
+    base_read_op_ex <= `DISABLE;
+    base_write_op_ex <= `DISABLE;
+    base_addr_ex <= `ZERO_WORD;
+    base_data_write_ex <=  `ZERO_WORD;
+    base_mask_ex <= 4'b0000;
+
+    stallreq <= `DISABLE;
+
+    vga_write_op <= `DISABLE;
+    vga_data_write <= `HIGH_BYTE;
+    
     if (data_in_uart_data || data_in_uart_status) begin//assert inst_in_ext = `ENALBE
         ext_read_op <= inst_read_op;
         ext_write_op <= `DISABLE;
@@ -222,7 +263,7 @@ always_comb begin
         ext_mask <= 4'b1111;
         inst_data <= ext_data_read;
 
-        base_read_op <= `DISABLE;
+        /*base_read_op <= `DISABLE;
         base_write_op <= `DISABLE;
         base_addr <= `ZERO_WORD;
         base_data_write <= `ZERO_WORD;
@@ -243,7 +284,7 @@ always_comb begin
 
         stallreq <= `DISABLE;
         vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
+        vga_data_write <= `HIGH_BYTE;*/
 
         if (data_in_uart_data) begin
             uart_read_op <= data_read_op;
@@ -257,7 +298,7 @@ always_comb begin
             data_data_read <= {30'b0, uart_mode};
         end
     end else if (data_in_vga) begin
-        uart_read_op <= `DISABLE;
+        /*uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
 
@@ -285,7 +326,7 @@ always_comb begin
         base_data_write_ex <=  `ZERO_WORD;
         base_mask_ex <= 4'b0000;
 
-        stallreq <= `DISABLE;
+        stallreq <= `DISABLE;*/
         //vga
         vga_write_op <= 1'b1;
         vga_data_write <= data_data_write;
@@ -293,7 +334,7 @@ always_comb begin
         vga_addr <= data_addr_v & 32'h000fffff;
 
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
-        uart_read_op <= `DISABLE;
+        /*uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;        
         
@@ -307,7 +348,7 @@ always_comb begin
         base_write_op_ex <= `DISABLE;
         base_addr_ex <= `ZERO_WORD;
         base_data_write_ex <=  `ZERO_WORD;
-        base_mask_ex <= 4'b0000;
+        base_mask_ex <= 4'b0000;*/
 
         ext_read_op <= inst_in_ext ? inst_read_op : data_read_op;
         ext_write_op <= inst_in_ext ? `DISABLE : data_write_op;
@@ -324,13 +365,15 @@ always_comb begin
         inst_data <= inst_in_ext ? ext_data_read : base_data_read;
         data_data_read <= data_in_ext ? ext_data_read : base_data_read;
         
-        stallreq <= `DISABLE;
+        /*stallreq <= `DISABLE;
         vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
+        vga_data_write <= `HIGH_BYTE;*/
     end else if ((inst_in_ext && data_in_ext) || (inst_in_base && data_in_base)) begin
-        uart_read_op <= `DISABLE;
+        /*uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
+        vga_write_op <= `DISABLE;
+        vga_data_write <= `HIGH_BYTE;*/
         ext_read_op <= inst_in_ext ? inst_read_op : `DISABLE;
         ext_write_op <= inst_in_ext ? `DISABLE : `DISABLE;
         ext_addr <= inst_in_ext ? inst_addr : `ZERO_WORD;
@@ -361,10 +404,8 @@ always_comb begin
         data_data_read <= data_in_ext ? ext_data_read_ex : base_data_read_ex;
 
         stallreq <= inst_in_ext ? ext_stallreq : base_stallreq;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
     end else begin
-        uart_read_op <= `DISABLE;
+        /*uart_read_op <= `DISABLE;
         uart_write_op <= `DISABLE;
         uart_data_write <= `ZERO_WORD;
 
@@ -378,7 +419,8 @@ always_comb begin
         base_write_op_ex <= `DISABLE;
         base_addr_ex <= `ZERO_WORD;
         base_data_write_ex <=  `ZERO_WORD;
-        base_mask_ex <= 4'b0000;
+        base_mask_ex <= 4'b0000;*/
+
         ext_read_op <= inst_in_ext ? inst_read_op : (data_in_ext ? data_read_op : `DISABLE);
         ext_write_op <= inst_in_ext ? `DISABLE : (data_in_ext ? data_write_op : `DISABLE);
         ext_addr <= inst_in_ext ? inst_addr : (data_in_ext ? data_addr : `ZERO_WORD);
@@ -394,9 +436,9 @@ always_comb begin
         inst_data <= inst_in_ext ? ext_data_read : (inst_in_base ? base_data_read : `ZERO_WORD);
         data_data_read <= data_in_ext ? ext_data_read : (data_in_base ? base_data_read : `ZERO_WORD);
         
-        stallreq <= `DISABLE;
+        /*stallreq <= `DISABLE;
         vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
+        vga_data_write <= `HIGH_BYTE;*/
     end
 end
 
@@ -535,6 +577,20 @@ serial_controller serial_controller_instance(
     .uart_tsre,       
     .uart_data(base_ram_data[7:0])
 );
+
+/*ext_serial_controller serial_controller_instance(
+    .clk(clk_50M), 
+    .read_op(uart_read_op), 
+    .write_op(uart_write_op),
+    .bus_data_write(uart_data_write),
+    .bus_data_read(uart_data_read),
+    .mode(uart_mode),
+
+    .txd,
+    .rxd
+);*/
+
+
 
 vga_controller vga_controller_instance(
     .clk_25M,

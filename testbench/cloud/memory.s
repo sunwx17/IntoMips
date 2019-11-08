@@ -5,7 +5,7 @@
     .set nomacro
 _start:
 
-    lui  $10, 0x8001
+    lui  $10, 0x8060
 
     ori  $3, $0, 0xeeff         # $3=0x0000eeff
     sb	 $3, 0x3($10)		    # skip

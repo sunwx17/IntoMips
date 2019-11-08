@@ -9,14 +9,14 @@ module sram_controller (
     input Bit_t         write_op,       //写信号 1为写
     input Word_t        bus_data_write, //总线向sram写入的数据
     output Word_t       bus_data_read,  //总线从sram读入的数据
-    input Ram_addr_t    bus_addr,       //数据地址
+    input Word_t        bus_addr,       //数据地址
     input Mask_t        byte_mask,
 
     input Bit_t         read_op_ex,        //读信号 1为读
     input Bit_t         write_op_ex,       //写信号 1为写
     input Word_t        bus_data_write_ex, //总线向sram写入的数据
     output Word_t       bus_data_read_ex,  //总线从sram读入的数据
-    input Ram_addr_t    bus_addr_ex,       //数据地址
+    input Word_t        bus_addr_ex,       //数据地址
     input Mask_t        byte_mask_ex,
 
     output Bit_t        bus_stall,      //总线使能 1使能

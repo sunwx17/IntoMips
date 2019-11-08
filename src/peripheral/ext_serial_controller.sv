@@ -1,3 +1,5 @@
+`include "defines.svh"
+
 module ext_serial_controller(
     input Bit_t     clk,
     input Bit_t     write_op,
