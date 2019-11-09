@@ -104,10 +104,10 @@ always @ (posedge clk) begin
         if (exception_type_i == `EXCP_TYPE_INTERRUPT || (`ORDINARY_EXCEPTION(exception_type_i) && cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] == `DISABLE)) begin
             if (is_in_delayslot_i == `ENABLE) begin
                 cp0_regs[`CP0_EPC] <= pc_i - 4;
-                cp0_regs[`CP0_CAUSE] <= `ENABLE;
+                cp0_regs[`CP0_CAUSE][`CP0_CAUSE_BD] <= `ENABLE;
             end else begin
                 cp0_regs[`CP0_EPC] <= pc_i;
-                cp0_regs[`CP0_CAUSE] <= `DISABLE;
+                cp0_regs[`CP0_CAUSE][`CP0_CAUSE_BD] <= `DISABLE;
             end
             cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] <= `ENABLE;
         end

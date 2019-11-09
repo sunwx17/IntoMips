@@ -17,7 +17,7 @@ end
 
 initial begin
     rst = 1'b1;
-    $readmemh({"branch_cloud", ".mem"}, ext_sram.sram_mem);
+    $readmemh({"kernel", ".mem"}, ext_sram.sram_mem);
     $readmemh({"memory_byte", ".mem"}, base_sram.sram_mem);
     #200 rst = 1'b0;
     #500000 rst = 1'b1;
@@ -51,7 +51,9 @@ intomips_top intomips_top_instance(
     .ext_ram_be_n(ext_sram.ram_be_n),
     .ext_ram_ce_n(ext_sram.ram_ce_n),
     .ext_ram_oe_n(ext_sram.ram_oe_n),
-    .ext_ram_we_n(ext_sram.ram_we_n)
+    .ext_ram_we_n(ext_sram.ram_we_n),
+
+    .uart_dataready(1'b0)
 
 );
 
