@@ -505,7 +505,8 @@ cpu cpu_instance(
     .ram_re_o(data_read_op),
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
-    .stallreq_from_bus(stallreq)
+    .stallreq_from_bus(stallreq),
+    .int_i({3'b0, uart_dataready, 2'b0})
     //.timer_int_o
 );
 //ext ram store instructions

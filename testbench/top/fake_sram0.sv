@@ -10,7 +10,7 @@ module fake_sram0(
 );
     
     //按字编址
-    Byte_t sram_mem[0: 512*1024*4];
+    Byte_t sram_mem[0: 1024*1024*4];
     Word_t data;
     assign ram_data = data;
 

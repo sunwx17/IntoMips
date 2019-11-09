@@ -14,9 +14,8 @@ all: $(BIN) $(MEM)
 %.o: %.s
 	$(ARCH)as -O0 -mips32 -EL $^ -o $@
 	
-%.mem: %.o
-	$(ARCH)objcopy -O binary -j .text $<  $@
-	cat $@ | xxd -c 4 -g 1 | cut -d " " -f 2,3,4,5 > $@
+%.mem: %.bin
+	cat $< | xxd -c 4 -g 1 | cut -d " " -f 2,3,4,5 > $@
 
 .PHONY: clean
 clean:
