@@ -4,7 +4,7 @@
     .set noreorder
     .set nomacro
 _start:
-
+    ori $1, $0, 1
     ori $4, $0, 1
     ori $5, $0, 10
 

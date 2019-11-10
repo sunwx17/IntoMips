@@ -156,8 +156,8 @@ initial begin
     unittest("memory");
     unittest("load");
     unittest("cp0");
-    unittest("exception");
-    unittest("timer_int");
+    //unittest("exception");
+    //unittest("timer_int");
     
     //logic and shift
     unittest("auto_and");

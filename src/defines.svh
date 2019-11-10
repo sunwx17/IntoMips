@@ -40,10 +40,12 @@ typedef logic[18:0] Vga_addr_t;
 `define USE_MMU     1
 
 //vga
-`define VGA_HEIGHT  800
-`define VGA_WIDTH   600
+`define VGA_HSIZE   800
+`define VGA_HMAX    1040
+`define VGA_VSIZE   600
+`define VGA_VMAX    666
 `define VGA_HFP     856
-`define VGA_HSP     976     
+`define VGA_HSP     976 
 `define VGA_VFP     637
 `define VGA_VSP     643
 
@@ -73,6 +75,16 @@ typedef logic[`REG_ADDR_BUS]    Reg_addr_t;
 typedef logic[`REG_DATA_BUS]    Reg_data_t;
 
 typedef Reg_data_t[`REG_NUM - 1:0]  Regs_t;
+
+
+`define INST_IN_EXT(addr)           (addr >= 32'h80000000 && addr < 32'h80400000)
+`define INST_IN_BASE(addr)          (addr >= 32'h80400000 && addr < 32'h80800000)
+`define DATA_IN_EXT(addr)           (addr >= 32'h80000000 && addr < 32'h80400000)
+`define DATA_IN_BASE(addr)          (addr >= 32'h80400000 && addr < 32'h80800000)
+`define DATA_IN_UART_DATA(addr)     (addr == 32'hBFD003F8)
+`define DATA_IN_UART_STATUS(addr)   (addr >= 32'hBFD003FC)
+`define DATA_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA075300)
+
 
 
 `endif

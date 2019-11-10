@@ -31,6 +31,8 @@ module serial_controller(
     //assign bus_data = data_read;
     //assign data_write = bus_data;
 
+    assign mode[1] = uart_dataready;
+
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
             cur_state <= IDLE;
@@ -38,7 +40,6 @@ module serial_controller(
             uart_wrn <= 1'b1;
 
             mode[0] <= 1'b1;
-            mode[1] <= 1'b1;
         end else begin
             case(cur_state)
                 IDLE: begin
@@ -46,30 +47,25 @@ module serial_controller(
                     uart_rdn <= ~read_op;
                     uart_wrn <= ~write_op;
                     mode[0] <= 1'b1;
-                    mode[1] <= 1'b1;
                 end
                 WRITE_0: begin
                     cur_state <= WRITE_1;
                     uart_wrn <= 1'b0;
                     mode[0] <= 1'b0;
-                    mode[1] <= 1'b0;
                 end
                 WRITE_1: begin
                     cur_state <= WRITE_2;
                     uart_wrn <= 1'b1;
                     
                     mode[0] <= 1'b0;
-                    mode[1] <= 1'b0;
                 end
                 WRITE_2: begin
                     cur_state <= uart_tbre? WRITE_3: WRITE_2;
                     mode[0] <= 1'b0;
-                    mode[1] <= 1'b0;
                 end
                 WRITE_3: begin
                     cur_state <= uart_tsre? IDLE: WRITE_3;
                     mode[0] <= 1'b0;
-                    mode[1] <= 1'b0;
                 end
                 READ_0: begin
                     if (uart_dataready) begin
@@ -79,12 +75,10 @@ module serial_controller(
                         cur_state <= IDLE;
                     end
                     mode[0] <= 1'b0;
-                    mode[1] <= 1'b0;
                 end
                 READ_1: begin
                     cur_state <= IDLE;
                     mode[0] <= 1'b0;
-                    mode[1] <= 1'b0;
                 end
             endcase
         end
