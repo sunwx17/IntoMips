@@ -47,9 +47,9 @@ TLB_entries_t entries;
 `define TLB_GET_ENTRY_I(i) \
     entries[i * `TLB_ENTRY_WIDTH +: `TLB_ENTRY_WIDTH]
 
-assign entry_hi_o = TLB_GET_ENTRY_HI(tlb_rw_index);
-assign entry_lo1_o = TLB_GET_ENTRY_LO1(tlb_rw_index);
-assign entry_lo2_o = TLB_GET_ENTRY_LO2(tlb_rw_index);
+assign entry_hi_o = `TLB_GET_ENTRY_HI(tlb_rw_index);
+assign entry_lo1_o = `TLB_GET_ENTRY_LO1(tlb_rw_index);
+assign entry_lo2_o = `TLB_GET_ENTRY_LO2(tlb_rw_index);
 
 genvar i;
 generate
@@ -68,9 +68,10 @@ generate
     end
 endgenerate
 
-TLB_index_t temp_which, tlbp_which;
+TLB_index_t inst_temp_which, data_temp_which,  tlbp_which;
 Word_t tlbp_paddr;
-Bit_t tlbp_miss, tlbp_d, tlbp_v, tlbp_c;
+Bit_t tlbp_miss, tlbp_d, tlbp_v;
+Triblebit_t tlbp_c;
 
 tlb_lookup inst_lookup(
     .entries_i(entries),
@@ -82,7 +83,7 @@ tlb_lookup inst_lookup(
     .d(d1),
     .v(v1),
     .c(c1),
-    .which_o(temp_which)
+    .which_o(inst_temp_which)
 );
 
 tlb_lookup data_lookup(
@@ -95,7 +96,7 @@ tlb_lookup data_lookup(
     .d(d2),
     .v(v2),
     .c(c2),
-    .which_o(temp_which)
+    .which_o(data_temp_which)
 );
 
 tlb_lookup tlbp_lookup(
