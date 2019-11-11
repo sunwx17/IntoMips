@@ -1,23 +1,22 @@
 `include "defines.svh"
 
 module ext_serial_controller(
-    input Bit_t     clk,
-    input Bit_t     write_op,
-    input Bit_t     read_op,
-    output Serial_mode_t mode,
-    input Byte_t    bus_data_write,
-    output Byte_t   bus_data_read,
+    input Bit_t             clk,
+    input Bit_t             write_op,
+    input Bit_t             read_op,
+    output Serial_mode_t    mode,
+    input Byte_t            bus_data_write,
+    output Byte_t           bus_data_read,
 
 
-    output Bit_t    txd,
-    input Bit_t     rxd
-
+    output Bit_t            txd,
+    input Bit_t             rxd
 );
 
 Byte_t ext_uart_rx;
 Byte_t ext_uart_buffer, ext_uart_tx;
 Bit_t ext_uart_ready, ext_uart_clear, ext_uart_busy;
-Bit_t ext_uart_start, ext_uart_avai;
+Bit_t ext_uart_start;
 
 assign bus_data_read = ext_uart_buffer;
 assign mode[0] = ~ext_uart_busy;
@@ -32,21 +31,21 @@ async_receiver #(.ClkFrequency(50000000),.Baud(9600)) //接收模块，9600无�
         .RxD_data(ext_uart_rx)             //接收到的一字节数据
     );
 
-assign ext_uart_clear = ext_uart_ready; //收到数据的同时，清除标志，因为数据已取到ext_uart_buffer中
-always @(posedge clk) begin //接收到缓冲区ext_uart_buffer
+//assign ext_uart_clear = ext_uart_ready; 
+always @(posedge clk) begin
     if(ext_uart_ready && read_op)begin
         ext_uart_buffer <= ext_uart_rx;
-        ext_uart_avai <= 1;
-    end else if(!ext_uart_busy && ext_uart_avai)begin 
-        ext_uart_avai <= 0;
+        ext_uart_clear <= 1'b1;
+    end else begin
+        ext_uart_clear <= 1'b0;
     end
 end
-always @(posedge clk) begin //将缓冲区ext_uart_buffer发送出去
+always @(posedge clk) begin 
     if(!ext_uart_busy && write_op)begin 
         ext_uart_tx <= bus_data_write;
-        ext_uart_start <= 1;
+        ext_uart_start <= 1'b1;
     end else begin 
-        ext_uart_start <= 0;
+        ext_uart_start <= 1'b0;
     end
 end
 
