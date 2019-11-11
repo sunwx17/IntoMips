@@ -8,7 +8,9 @@ module mmu(
     input   Word_t  data_vaddr,
 
     output  Inst_addr_t inst_paddr,
+    // miss, dirty, valid, illegal
     output  Bit_t   miss1, d1, v1, illegal1,
+    // cache_mode
     output  Triblebit_t c1,
 
     output  Word_t  data_paddr,

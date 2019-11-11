@@ -26,44 +26,44 @@ logic [`TLB_ENTRY_NUM - 1:0] matched;
     entries_i[i * `TLB_ENTRY_WIDTH +: `TLB_ENTRY_WIDTH]
 
 `define TLB_GET_VPN(i) \
-    entries_i[i * TLB_ENTRY_WIDTH +: 19]
+    entries_i[i * `TLB_ENTRY_WIDTH +: 19]
 
 `define TLB_GET_ASID(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 24 +: 8]
+    entries_i[i * `TLB_ENTRY_WIDTH + 24 +: 8]
 
 `define TLB_GET_G(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 63]
+    entries_i[i * `TLB_ENTRY_WIDTH + 63]
 
 `define TLB_GET_D1(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 61]
+    entries_i[i * `TLB_ENTRY_WIDTH + 61]
 
 `define TLB_GET_D2(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 93]
+    entries_i[i * `TLB_ENTRY_WIDTH + 93]
 
 `define TLB_GET_V1(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 62]
+    entries_i[i * `TLB_ENTRY_WIDTH + 62]
 
 `define TLB_GET_V2(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 94]
+    entries_i[i * `TLB_ENTRY_WIDTH + 94]
 
 `define TLB_GET_C1(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 58 +: 3]
+    entries_i[i * `TLB_ENTRY_WIDTH + 58 +: 3]
 
 `define TLB_GET_C2(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 90 +: 3]
+    entries_i[i * `TLB_ENTRY_WIDTH + 90 +: 3]
 
 `define TLB_GET_PFN1(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 32 +: 20]
+    entries_i[i * `TLB_ENTRY_WIDTH + 32 +: 20]
 
 `define TLB_GET_PFN2(i) \
-    entries_i[i * TLB_ENTRY_WIDTH + 64 +: 20]
+    entries_i[i * `TLB_ENTRY_WIDTH + 64 +: 20]
 
 
 Word_t match_entry_hi, match_entry_lo1, match_entry_lo2;
 
-assign match_entry_hi = TLB_GET_ENTRY_HI(matched_index);
-assign match_entry_lo1 = TLB_GET_ENTRY_LO1(matched_index);
-assign match_entry_lo2 = TLB_GET_ENTRY_LO2(matched_index);
+assign match_entry_hi = `TLB_GET_ENTRY_HI(matched_index);
+assign match_entry_lo1 = `TLB_GET_ENTRY_LO1(matched_index);
+assign match_entry_lo2 = `TLB_GET_ENTRY_LO2(matched_index);
 
 assign miss = (matched == 0);
 assign which_o = matched_index;
@@ -71,22 +71,22 @@ assign paddr[11:0] = vaddr[11:0];
 
 genvar i;
 generate for(i = 0; i < `TLB_ENTRY_NUM; i = i + 1) begin: gen_for_tlb_match
-        assign matched[i] = (TLB_GET_VPN(i) == vaddr[31:13]) 
-                        && (TLB_GET_ASID(i) == asid || TLB_GET_G(i));
+        assign matched[i] = (`TLB_GET_VPN(i) == vaddr[31:13]) 
+                        && (`TLB_GET_ASID(i) == asid || `TLB_GET_G(i));
     end
 endgenerate
 
 always_comb begin
     if(vaddr[12]) begin 
-        d = TLB_GET_D1(matched_index);
-        v = TLB_GET_V1(matched_index);
-        c = TLB_GET_C1(matched_index);
-        paddr[31:12] = TLB_GET_PFN1(matched_index);
+        d = `TLB_GET_D1(matched_index);
+        v = `TLB_GET_V1(matched_index);
+        c = `TLB_GET_C1(matched_index);
+        paddr[31:12] = `TLB_GET_PFN1(matched_index);
     end else begin 
-        d = TLB_GET_D2(matched_index);
-        v = TLB_GET_V2(matched_index);
-        c = TLB_GET_C2(matched_index);
-        paddr[31:12] = TLB_GET_PFN2(matched_index);
+        d = `TLB_GET_D2(matched_index);
+        v = `TLB_GET_V2(matched_index);
+        c = `TLB_GET_C2(matched_index);
+        paddr[31:12] = `TLB_GET_PFN2(matched_index);
     end
 end
 

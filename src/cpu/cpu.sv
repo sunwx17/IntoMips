@@ -494,6 +494,53 @@ mem_wb mem_wb_instance(
     .flush
 );
 
+Byte_t cp0_asid;
+Bit_t is_user_mode;
+Inst_addr_t inst_vir_addr, inst_phy_addr;
+Word_t  data_vir_addr, data_phy_addr;
+Bit_t mmu_miss1, mmu_d1, mmu_v1, mmu_illegal1, mmu_miss2, mmu_d2, mmu_v2, mmu_illegal2;
+Triblebit_t mmu_c1, mmu_c2;
+TLB_index_t tlb_rw_index;
+Bit_t tlb_rw_we;
+Word_t entry_hi_i, entry_lo1_i, entry_lo2_i, entry_hi_o, entry_lo1_o, entry_lo2_o, tlb_p_index;
+
+// mmu just test now
+mmu mmu_instance(
+    .clk,
+    .rst,
+    .asid(cp0_asid),
+    .is_user(is_user_mode),
+    .inst_vaddr(inst_vir_addr),
+    .data_vaddr(data_vir_addr),
+
+    .inst_paddr(inst_phy_addr),
+    .miss1(mmu_miss1),
+    .d1(mmu_d1),
+    .v1(mmu_v1),
+    .illegal1(mmu_illegal1),
+    .c1(mmu_c1),
+
+    .data_paddr(data_phy_addr),
+    .miss2(mmu_miss2),
+    .d2(mmu_d2),
+    .v2(mmu_v2),
+    .illegal2(mmu_illegal2),
+    .c2(mmu_c2),
+
+    .tlb_rw_index,
+    .tlb_rw_we,
+    
+    .entry_hi_i,
+    .entry_lo1_i,
+    .entry_lo2_i,
+
+    .entry_hi_o,
+    .entry_lo1_o,
+    .entry_lo2_o,
+
+    .tlb_p_index
+);
+
 
 
 /*always @ (posedge clk) begin

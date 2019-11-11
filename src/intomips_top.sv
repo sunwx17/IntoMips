@@ -562,6 +562,7 @@ sram_controller data_sram_controller(
     .ram_we_n(base_ram_we_n)
 );
 
+/*
 serial_controller serial_controller_instance(
     .clk(clk_50M), 
     .rst(reset_btn),
@@ -578,8 +579,12 @@ serial_controller serial_controller_instance(
     .uart_tsre,       
     .uart_data(base_ram_data[7:0])
 );
+*/
 
-/*ext_serial_controller serial_controller_instance(
+assign leds[0] = uart_mode[0];
+assign leds[1] = uart_mode[1];
+
+ext_serial_controller serial_controller_instance(
     .clk(clk_50M), 
     .read_op(uart_read_op), 
     .write_op(uart_write_op),
@@ -589,7 +594,7 @@ serial_controller serial_controller_instance(
 
     .txd,
     .rxd
-);*/
+);
 
 
 
