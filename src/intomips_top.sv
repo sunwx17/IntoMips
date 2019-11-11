@@ -255,13 +255,22 @@ always_comb begin
     vga_write_op <= `DISABLE;
     vga_data_write <= `HIGH_BYTE;
     
-    if (data_in_uart_data || data_in_uart_status) begin//assert inst_in_ext = `ENALBE
-        ext_read_op <= inst_read_op;
-        ext_write_op <= `DISABLE;
-        ext_addr <= inst_addr;
-        ext_data_write <= `ZERO_WORD;
-        ext_mask <= 4'b1111;
-        inst_data <= ext_data_read;
+    if (data_in_uart_data || data_in_uart_status) begin
+        if (inst_in_ext) begin
+            ext_read_op <= inst_read_op;
+            ext_write_op <= `DISABLE;
+            ext_addr <= inst_addr;
+            ext_data_write <= `ZERO_WORD;
+            ext_mask <= 4'b1111;
+            inst_data <= ext_data_read;
+        end else if (inst_in_base) begin
+            base_read_op <= inst_read_op;
+            base_write_op <= `DISABLE;
+            base_addr <= inst_addr;
+            base_data_write <= `ZERO_WORD;
+            base_mask <= 4'b1111;
+            inst_data <= base_data_read;
+        end
 
         /*base_read_op <= `DISABLE;
         base_write_op <= `DISABLE;
@@ -506,7 +515,7 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({3'b0, uart_dataready, 2'b0})
+    .int_i({3'b0, uart_mode[0], 2'b0})
     //.timer_int_o
 );
 //ext ram store instructions
