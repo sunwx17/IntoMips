@@ -3,12 +3,7 @@
 module top_tb(
 );
 
-Bit_t clock_25 ,clock_50, rst;    
-
-initial begin
-    clock_25 = 1'b0;
-    forever #20 clock_25 = ~ clock_25;
-end
+Bit_t clock_50, rst;    
 
 initial begin
     clock_50 = 1'b0;

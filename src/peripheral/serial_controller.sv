@@ -21,66 +21,66 @@ module serial_controller(
     //数据线 与BaseRam共享
     inout Byte_t            uart_data
 );
-    typedef enum{IDLE, WRITE_0, WRITE_1, WRITE_2, WRITE_3, READ_0, READ_1, READ_2} state_t;
-    state_t cur_state;
-    //Byte_t data_write, data_read;
-    assign uart_data = write_op? bus_data_write: `HIGH_BYTE;
-    assign bus_data_read = read_op? uart_data: `HIGH_BYTE;
+typedef enum{IDLE, WRITE_0, WRITE_1, WRITE_2, WRITE_3, READ_0, READ_1, READ_2} state_t;
+state_t cur_state;
+//Byte_t data_write, data_read;
+assign uart_data = write_op? bus_data_write: `HIGH_BYTE;
+assign bus_data_read = read_op? uart_data: `HIGH_BYTE;
 
 
-    //assign bus_data = data_read;
-    //assign data_write = bus_data;
+//assign bus_data = data_read;
+//assign data_write = bus_data;
 
-    assign mode[1] = uart_dataready;
+assign mode[1] = uart_dataready;
 
-    always_ff @(posedge clk or posedge rst) begin
-        if (rst) begin
-            cur_state <= IDLE;
-            uart_rdn <= 1'b1;
-            uart_wrn <= 1'b1;
+always_ff @(posedge clk or posedge rst) begin
+    if (rst) begin
+        cur_state <= IDLE;
+        uart_rdn <= 1'b1;
+        uart_wrn <= 1'b1;
 
-            mode[0] <= 1'b1;
-        end else begin
-            case(cur_state)
-                IDLE: begin
-                    cur_state <= write_op? WRITE_0: (read_op? READ_0: IDLE);
-                    uart_rdn <= ~read_op;
-                    uart_wrn <= ~write_op;
-                    mode[0] <= 1'b1;
-                end
-                WRITE_0: begin
-                    cur_state <= WRITE_1;
-                    uart_wrn <= 1'b0;
-                    mode[0] <= 1'b0;
-                end
-                WRITE_1: begin
-                    cur_state <= WRITE_2;
-                    uart_wrn <= 1'b1;
-                    
-                    mode[0] <= 1'b0;
-                end
-                WRITE_2: begin
-                    cur_state <= uart_tbre? WRITE_3: WRITE_2;
-                    mode[0] <= 1'b0;
-                end
-                WRITE_3: begin
-                    cur_state <= uart_tsre? IDLE: WRITE_3;
-                    mode[0] <= 1'b0;
-                end
-                READ_0: begin
-                    if (uart_dataready) begin
-                        uart_rdn <= 1'b0;
-                        cur_state <= READ_1;
-                    end else begin
-                        cur_state <= IDLE;
-                    end
-                    mode[0] <= 1'b0;
-                end
-                READ_1: begin
+        mode[0] <= 1'b1;
+    end else begin
+        case(cur_state)
+            IDLE: begin
+                cur_state <= write_op? WRITE_0: (read_op? READ_0: IDLE);
+                uart_rdn <= ~read_op;
+                uart_wrn <= ~write_op;
+                mode[0] <= 1'b1;
+            end
+            WRITE_0: begin
+                cur_state <= WRITE_1;
+                uart_wrn <= 1'b0;
+                mode[0] <= 1'b0;
+            end
+            WRITE_1: begin
+                cur_state <= WRITE_2;
+                uart_wrn <= 1'b1;
+                
+                mode[0] <= 1'b0;
+            end
+            WRITE_2: begin
+                cur_state <= uart_tbre? WRITE_3: WRITE_2;
+                mode[0] <= 1'b0;
+            end
+            WRITE_3: begin
+                cur_state <= uart_tsre? IDLE: WRITE_3;
+                mode[0] <= 1'b0;
+            end
+            READ_0: begin
+                if (uart_dataready) begin
+                    uart_rdn <= 1'b0;
+                    cur_state <= READ_1;
+                end else begin
                     cur_state <= IDLE;
-                    mode[0] <= 1'b0;
                 end
-            endcase
-        end
+                mode[0] <= 1'b0;
+            end
+            READ_1: begin
+                cur_state <= IDLE;
+                mode[0] <= 1'b0;
+            end
+        endcase
     end
+end
 endmodule
