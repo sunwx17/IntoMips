@@ -22,10 +22,10 @@ State_t cur_state, cur_state_ex;
 blk_mem_bootrom rom_instance(
     .clka(clk),
     .addra(bus_addr >> 2),
-    .dout(rom_data_out),
+    .douta(rom_data_out),
     .clkb(clk),
     .addrb(bus_addr_ex >> 2),
-    .dout(rom_data_out_ex)
+    .doutb(rom_data_out_ex)
 );
 
 always_ff @(posedge clk or posedge rst) begin

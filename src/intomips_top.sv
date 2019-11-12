@@ -105,11 +105,17 @@ Inst_addr_t inst_addr_v;
 Inst_addr_t data_addr_v;
 Bit_t       inst_in_ext;
 Bit_t       data_in_ext;
+
 Bit_t       inst_in_base;
 Bit_t       data_in_base;
+
+Bit_t       inst_in_bootrom;
+Bit_t       data_in_bootrom;
+
 Bit_t       data_in_uart_data;
 Bit_t       data_in_uart_status;
 Bit_t       data_in_vga;
+
 Inst_addr_t inst_addr;
 Inst_addr_t data_addr;
 
@@ -168,57 +174,32 @@ Bit_t       base_stallreq;
 Bit_t       stallreq;
 
 
+
+
+Bit_t   bootrom_read_op;
+Word_t  bootrom_addr;
+Word_t  bootrom_data_read;
+
+Bit_t   bootrom_read_op_ex;
+Word_t  bootrom_addr_ex;
+Word_t  bootrom_data_read_ex;
+
+
+
 assign inst_addr = {10'b0, inst_addr_v[21:0]};
 assign data_addr = {10'b0, data_addr_v[21:0]};
 
 always_comb begin
-    inst_in_ext <= `INST_IN_EXT(inst_addr_v);
-    inst_in_base <= `INST_IN_BASE(inst_addr_v);
-    data_in_ext <= `DATA_IN_EXT(data_addr_v);
-    data_in_base <= `DATA_IN_BASE(data_addr_v);
-    data_in_uart_data <= `DATA_IN_UART_DATA(data_addr_v);
-    data_in_uart_status <= `DATA_IN_UART_STATUS(data_addr_v);
-    data_in_vga <= `DATA_IN_VGA(data_addr_v);
-
-    /*if (inst_addr_v >= 32'h80000000 && inst_addr_v < 32'h80400000) begin
-        inst_in_ext <= `ENABLE;
-        inst_in_base <= `DISABLE;
-    end else if (inst_addr_v >= 32'h80400000 && inst_addr_v < 32'h80800000) begin
-        inst_in_ext <= `DISABLE;
-        inst_in_base <= `ENABLE;
-    end
-
-    if (data_addr_v >= 32'h80000000 && data_addr_v < 32'h80400000) begin
-        data_in_ext <= `ENABLE;
-        data_in_base <= `DISABLE;
-        data_in_uart_data <= `DISABLE;
-        data_in_uart_status <= `DISABLE;
-        data_in_vga <= `DISABLE;
-    end else if (data_addr_v >= 32'h80400000 && data_addr_v < 32'h80800000) begin
-        data_in_ext <= `DISABLE;
-        data_in_base <= `ENABLE;
-        data_in_uart_data <= `DISABLE;
-        data_in_uart_status <= `DISABLE;
-        data_in_vga <= `DISABLE;
-    end else if (data_addr_v == 32'hBFD003F8)begin
-        data_in_ext <= `DISABLE;
-        data_in_base <= `DISABLE;
-        data_in_uart_data <= `ENABLE;
-        data_in_uart_status <= `DISABLE;
-        data_in_vga <= `DISABLE;
-    end else if (data_addr_v == 32'hBFD003FC) begin
-        data_in_ext <= `DISABLE;
-        data_in_base <= `DISABLE;
-        data_in_uart_data <= `DISABLE;
-        data_in_uart_status <= `ENABLE;
-        data_in_vga <= `DISABLE;
-    end else if (data_addr_v >= 32'hBA000000 && data_addr_v < 32'hBA075300) begin
-        data_in_ext <= `DISABLE;
-        data_in_base <= `DISABLE;
-        data_in_uart_data <= `DISABLE;
-        data_in_uart_status <= `DISABLE;
-        data_in_vga <= `ENABLE;
-    end*/
+    inst_in_ext <= `ADDR_IN_EXT(inst_addr_v);
+    inst_in_base <= `ADDR_IN_BASE(inst_addr_v);
+    inst_in_bootrom <= `ADDR_IN_BOOTROM(inst_addr_v);
+    data_in_ext <= `ADDR_IN_EXT(data_addr_v);
+    data_in_base <= `ADDR_IN_BASE(data_addr_v);
+    data_in_uart_data <= `ADDR_IN_UART_DATA(data_addr_v);
+    data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v);
+    data_in_vga <= `ADDR_IN_VGA(data_addr_v);
+    data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v);
+    
 end
 
 always_comb begin
@@ -254,6 +235,7 @@ always_comb begin
 
     vga_write_op <= `DISABLE;
     vga_data_write <= `HIGH_BYTE;
+
     
     if (data_in_uart_data || data_in_uart_status) begin
         if (inst_in_ext) begin
@@ -272,28 +254,6 @@ always_comb begin
             inst_data <= base_data_read;
         end
 
-        /*base_read_op <= `DISABLE;
-        base_write_op <= `DISABLE;
-        base_addr <= `ZERO_WORD;
-        base_data_write <= `ZERO_WORD;
-        base_mask <= 4'b0000;
-
-        
-        ext_read_op_ex <= `DISABLE;
-        ext_write_op_ex <= `DISABLE;
-        ext_addr_ex <= `ZERO_WORD;
-        ext_data_write_ex <=  `ZERO_WORD;
-        ext_mask_ex <= 4'b0000;
-
-        base_read_op_ex <= `DISABLE;
-        base_write_op_ex <= `DISABLE;
-        base_addr_ex <= `ZERO_WORD;
-        base_data_write_ex <=  `ZERO_WORD;
-        base_mask_ex <= 4'b0000;
-
-        stallreq <= `DISABLE;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;*/
 
         if (data_in_uart_data) begin
             uart_read_op <= data_read_op;
@@ -307,35 +267,6 @@ always_comb begin
             data_data_read <= {30'b0, uart_mode};
         end
     end else if (data_in_vga) begin
-        /*uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
-
-        ext_read_op <= `DISABLE;
-        ext_write_op <= `DISABLE;
-        ext_addr <= `ZERO_WORD;
-        ext_data_write <= `ZERO_WORD;
-        ext_mask <= 4'b0000;
-
-        base_read_op <= `DISABLE;
-        base_write_op <= `DISABLE;
-        base_addr <= `ZERO_WORD;
-        base_data_write <= `ZERO_WORD;
-        base_mask <= 4'b0000;
-
-        ext_read_op_ex <= `DISABLE;
-        ext_write_op_ex <= `DISABLE;
-        ext_addr_ex <= `ZERO_WORD;
-        ext_data_write_ex <=  `ZERO_WORD;
-        ext_mask_ex <= 4'b0000;
-
-        base_read_op_ex <= `DISABLE;
-        base_write_op_ex <= `DISABLE;
-        base_addr_ex <= `ZERO_WORD;
-        base_data_write_ex <=  `ZERO_WORD;
-        base_mask_ex <= 4'b0000;
-
-        stallreq <= `DISABLE;*/
         //vga
         vga_write_op <= 1'b1;
         vga_data_write <= data_data_write;
@@ -343,21 +274,6 @@ always_comb begin
         vga_addr <= data_addr_v & 32'h000fffff;
 
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
-        /*uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;        
-        
-        ext_read_op_ex <= `DISABLE;
-        ext_write_op_ex <= `DISABLE;
-        ext_addr_ex <= `ZERO_WORD;
-        ext_data_write_ex <=  `ZERO_WORD;
-        ext_mask_ex <= 4'b0000;
-
-        base_read_op_ex <= `DISABLE;
-        base_write_op_ex <= `DISABLE;
-        base_addr_ex <= `ZERO_WORD;
-        base_data_write_ex <=  `ZERO_WORD;
-        base_mask_ex <= 4'b0000;*/
 
         ext_read_op <= inst_in_ext ? inst_read_op : data_read_op;
         ext_write_op <= inst_in_ext ? `DISABLE : data_write_op;
@@ -374,15 +290,7 @@ always_comb begin
         inst_data <= inst_in_ext ? ext_data_read : base_data_read;
         data_data_read <= data_in_ext ? ext_data_read : base_data_read;
         
-        /*stallreq <= `DISABLE;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;*/
     end else if ((inst_in_ext && data_in_ext) || (inst_in_base && data_in_base)) begin
-        /*uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;*/
         ext_read_op <= inst_in_ext ? inst_read_op : `DISABLE;
         ext_write_op <= inst_in_ext ? `DISABLE : `DISABLE;
         ext_addr <= inst_in_ext ? inst_addr : `ZERO_WORD;
@@ -414,21 +322,6 @@ always_comb begin
 
         stallreq <= inst_in_ext ? ext_stallreq : base_stallreq;
     end else begin
-        /*uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
-
-        ext_read_op_ex <= `DISABLE;
-        ext_write_op_ex <= `DISABLE;
-        ext_addr_ex <= `ZERO_WORD;
-        ext_data_write_ex <=  `ZERO_WORD;
-        ext_mask_ex <= 4'b0000;
-
-        base_read_op_ex <= `DISABLE;
-        base_write_op_ex <= `DISABLE;
-        base_addr_ex <= `ZERO_WORD;
-        base_data_write_ex <=  `ZERO_WORD;
-        base_mask_ex <= 4'b0000;*/
 
         ext_read_op <= inst_in_ext ? inst_read_op : (data_in_ext ? data_read_op : `DISABLE);
         ext_write_op <= inst_in_ext ? `DISABLE : (data_in_ext ? data_write_op : `DISABLE);
@@ -445,62 +338,23 @@ always_comb begin
         inst_data <= inst_in_ext ? ext_data_read : (inst_in_base ? base_data_read : `ZERO_WORD);
         data_data_read <= data_in_ext ? ext_data_read : (data_in_base ? base_data_read : `ZERO_WORD);
         
-        /*stallreq <= `DISABLE;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;*/
     end
+
+
+    if (inst_in_bootrom) begin
+        bootrom_read_op <= inst_read_op;
+        bootrom_addr <= { 4'b0001, inst_addr_v[27:0] };
+        inst_data <= bootrom_data_read;
+    end
+
+    if (data_in_bootrom) begin
+        bootrom_read_op_ex <= data_read_op;
+        bootrom_addr_ex <= { 4'b0001, data_addr_v[27:0] };
+        data_data_read <= bootrom_data_read_ex;
+    end
+
 end
 
-/*always_comb begin
-    if (inst_addr_v >= 32'h80000000 && inst_addr_v < 32'h80400000) begin
-        inst_addr <= {10'b0, inst_addr_v[21:0]};
-    end
-    if (data_addr_v >= 32'h80400000 && data_addr_v < 32'h80800000) begin
-        data_addr <= {10'b0, data_addr_v[21:0]};
-        sram_read_op <= cpu_read_op;
-        sram_write_op <= cpu_write_op;
-        sram_data_write <= cpu_data_write;
-        cpu_data_read <= sram_data_read;
-        uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
-    end else if(data_addr_v == 32'hBFD003F8) begin
-        uart_read_op <= cpu_read_op;
-        uart_write_op <= cpu_write_op;
-        uart_data_write <= cpu_data_write;
-        cpu_data_read <= uart_data_read;
-        sram_read_op <= `DISABLE;
-        sram_write_op <= `DISABLE;
-        sram_data_write <= `ZERO_WORD;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
-    end else if (data_addr_v == 32'hBFD003FC) begin
-        cpu_data_read <= {30'b0, uart_mode};
-        sram_read_op <= `DISABLE;
-        sram_write_op <= `DISABLE;
-        sram_data_write <= `ZERO_WORD;
-        uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
-        vga_write_op <= `DISABLE;
-        vga_data_write <= `HIGH_BYTE;
-    end else if (data_addr_v >= 32'hBA000000 && data_addr_v < 32'hBA075300) begin
-        //vga
-        vga_write_op <= 1'b1;
-        vga_data_write <= cpu_data_write;
-        //vga_data_write <= 32'h00000007;
-        vga_addr <= data_addr_v & 32'h000fffff;
-
-        sram_read_op <= `DISABLE;
-        sram_write_op <= `DISABLE;
-        sram_data_write <= `ZERO_WORD;
-        uart_read_op <= `DISABLE;
-        uart_write_op <= `DISABLE;
-        uart_data_write <= `ZERO_WORD;
-    end
-end*/
 
 cpu cpu_instance(
     .clk(clk_25M),
@@ -518,6 +372,28 @@ cpu cpu_instance(
     .int_i({3'b0, uart_mode[0], 2'b0})
     //.timer_int_o
 );
+
+
+bootrom_controller bootrom_controller_instance (
+    .clk(clk_50M),
+    .rst(reset_btn),
+
+    .read_op(bootrom_read_op),
+    .bus_addr(bootrom_addr),
+    .bus_data_read(bootrom_data_read),
+
+    .read_op_ex(bootrom_read_op_ex),
+    .bus_addr_ex(bootrom_addr_ex),
+    .bus_data_read_ex(bootrom_data_read_ex) 
+);
+
+
+
+
+
+
+
+
 //ext ram store instructions
 sram_controller inst_ram_controller(
     .clk(clk_50M),
