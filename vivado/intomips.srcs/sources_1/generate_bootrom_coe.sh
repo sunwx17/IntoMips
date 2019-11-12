@@ -1,5 +1,5 @@
 INIT_RADIX="16"
-INIT_TEXT="memory_initialization_radix = "$INIT_RADIX"\nmemory_initialization_vector =" 
+INIT_TEXT="memory_initialization_radix = "$INIT_RADIX";\nmemory_initialization_vector =" 
 BOOTROM="bootrom"
 
 echo $INIT_TEXT > ${BOOTROM}.coe
