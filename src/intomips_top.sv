@@ -303,7 +303,20 @@ always_comb begin
         ext_data_write_ex <= data_in_ext ? data_data_write : `ZERO_WORD;
         ext_mask_ex <= data_in_ext ? data_mask : 4'b0000;
 
-        base_read_op <= inst_in_base ? `DISABLE : inst_read_op;
+        base_read_op <= inst_in_base ? inst_read_op : `DISABLE;
+        base_write_op <= inst_in_base ? `DISABLE : `DISABLE;
+        base_addr <= inst_in_base ? inst_addr : `ZERO_WORD;
+        base_data_write <= inst_in_base ? `ZERO_WORD : `ZERO_WORD;
+        base_mask <= inst_in_base ? 4'b1111 : 4'b0000;
+        
+        
+        base_read_op_ex <= data_in_base ? data_read_op : `DISABLE;
+        base_write_op_ex <= data_in_base ? data_write_op : `DISABLE;
+        base_addr_ex <= data_in_base ? data_addr : `ZERO_WORD;
+        base_data_write_ex <= data_in_base ? data_data_write : `ZERO_WORD;
+        base_mask_ex <= data_in_base ? data_mask : 4'b0000;
+
+        /*base_read_op <= inst_in_base ? `DISABLE : inst_read_op;
         base_write_op <= inst_in_base ? `DISABLE : `DISABLE;
         base_addr <= inst_in_base ? `ZERO_WORD : inst_addr;
         base_data_write <= inst_in_base ? `ZERO_WORD : `ZERO_WORD;
@@ -314,7 +327,7 @@ always_comb begin
         base_write_op_ex <= data_in_base ? `DISABLE : data_write_op;
         base_addr_ex <= data_in_base ? `ZERO_WORD : data_addr;
         base_data_write_ex <= data_in_base ? `ZERO_WORD : data_data_write;
-        base_mask_ex <= data_in_base ? 4'b0000 : data_mask;
+        base_mask_ex <= data_in_base ? 4'b0000 : data_mask;*/
             
         inst_data <= inst_in_ext ? ext_data_read : base_data_read;
         data_data_read <= data_in_ext ? ext_data_read_ex : base_data_read_ex;
@@ -368,7 +381,7 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({3'b0, uart_mode[0], 2'b0})
+    .int_i({3'b0, uart_mode[1], 2'b0})
     //.timer_int_o
 );
 
