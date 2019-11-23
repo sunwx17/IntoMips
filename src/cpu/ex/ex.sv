@@ -156,6 +156,8 @@ always_comb begin
         wreg_addr_o  <= `REG_ZERO;
         wreg_data_o  <= `ZERO_WORD;
 
+        mem_oper_addr <= `ZERO_WORD;
+
         whilo_o      <= `DISABLE;
         {hi_o, lo_o} <= {`ZERO_WORD, `ZERO_WORD};
         
@@ -170,6 +172,8 @@ always_comb begin
         wreg_addr_o  <= wreg_addr_i;
         wreg_data_o  <= `ZERO_WORD;
         
+        mem_oper_addr <= `ZERO_WORD;
+
         if (`NEED_WRITE_HILO(oper)) begin
             whilo_o <= `ENABLE;
             wreg_write_o <= `DISABLE;
