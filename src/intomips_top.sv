@@ -392,10 +392,36 @@ bootrom_controller bootrom_controller_instance (
 
 
 
+//base ram
+sram_controller base_sram_controller(
+    .clk(clk_50M),
+    .rst(reset_btn),
+    .read_op(base_read_op),
+    .write_op(base_write_op),
+    .bus_data_write(base_data_write),
+    .bus_data_read(base_data_read),
+    .bus_addr(base_addr),
+    .byte_mask(base_mask),
+    .read_op_ex(base_read_op_ex),
+    .write_op_ex(base_write_op_ex),
+    .bus_data_write_ex(base_data_write_ex),
+    .bus_data_read_ex(base_data_read_ex),
+    .bus_addr_ex(base_addr_ex),
+    .byte_mask_ex(base_mask_ex),
+    .bus_stall(base_stallreq),
+    //.bus_stall
+    .ram_data(base_ram_data),
+    .ram_addr(base_ram_addr),
+    .ram_be_n(base_ram_be_n),
+    .ram_ce_n(base_ram_ce_n),
+    .ram_oe_n(base_ram_oe_n),
+    .ram_we_n(base_ram_we_n)
+);
+
 
 
 //ext ram store instructions
-sram_controller inst_ram_controller(
+sram_controller ext_ram_controller(
     .clk(clk_50M),
     .rst(reset_btn),
     .read_op(ext_read_op),
@@ -420,32 +446,6 @@ sram_controller inst_ram_controller(
     .ram_we_n(ext_ram_we_n)
 );
 
-
-//base ram
-sram_controller data_sram_controller(
-    .clk(clk_50M),
-    .rst(reset_btn),
-    .read_op(base_read_op),
-    .write_op(base_write_op),
-    .bus_data_write(base_data_write),
-    .bus_data_read(base_data_read),
-    .bus_addr(base_addr),
-    .byte_mask(base_mask),
-    .read_op_ex(base_read_op_ex),
-    .write_op_ex(base_write_op_ex),
-    .bus_data_write_ex(base_data_write_ex),
-    .bus_data_read_ex(base_data_read_ex),
-    .bus_addr_ex(base_addr_ex),
-    .byte_mask_ex(base_mask_ex),
-    .bus_stall(base_stallreq),
-    //.bus_stall
-    .ram_data(base_ram_data),
-    .ram_addr(base_ram_addr),
-    .ram_be_n(base_ram_be_n),
-    .ram_ce_n(base_ram_ce_n),
-    .ram_oe_n(base_ram_oe_n),
-    .ram_we_n(base_ram_we_n)
-);
 
 /*
 serial_controller serial_controller_instance(
