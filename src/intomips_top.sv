@@ -235,9 +235,10 @@ always_comb begin
 
     vga_write_op <= `DISABLE;
     vga_data_write <= `HIGH_BYTE;
+    vga_addr <= `ZERO_WORD;
 
     
-    if (data_in_uart_data || data_in_uart_status) begin
+    if (data_in_uart_data || data_in_uart_status || data_in_vga) begin
         if (inst_in_ext) begin
             ext_read_op <= inst_read_op;
             ext_write_op <= `DISABLE;
@@ -260,19 +261,17 @@ always_comb begin
             uart_write_op <= data_write_op;
             uart_data_write <= data_data_write;
             data_data_read <= uart_data_read;
-        end else begin
+        end else if (data_in_uart_status) begin
             uart_read_op <= `DISABLE;
             uart_write_op <= `DISABLE;
             uart_data_write <= `ZERO_WORD;
             data_data_read <= {30'b0, uart_mode};
+        end else begin
+            //vga
+            vga_write_op <= data_write_op;
+            vga_data_write <= data_data_write;
+            vga_addr <= data_addr_v & 32'h000fffff;
         end
-    end else if (data_in_vga) begin
-        //vga
-        vga_write_op <= 1'b1;
-        vga_data_write <= data_data_write;
-        //vga_data_write <= 32'h00000007;
-        vga_addr <= data_addr_v & 32'h000fffff;
-
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
 
         ext_read_op <= inst_in_ext ? inst_read_op : data_read_op;

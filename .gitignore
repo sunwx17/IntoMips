@@ -17,3 +17,4 @@ ucore/*.d
 ucore/tools/mksfs
 ucore/.gdb_history
 ucore/.config_*
+.vscode

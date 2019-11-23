@@ -48,6 +48,17 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_HSP     976 
 `define VGA_VFP     637
 `define VGA_VSP     643
+`define VGA_NORMAL_HSIZE        800
+`define VGA_NORMAL_VSIZE        592
+`define VGA_BLOCK_HSIZE         8
+`define VGA_BLOCK_VSIZE         16
+`define VGA_BLOCK_HNUM          100
+`define VGA_BLOCK_VNUM          37
+
+//typedef logic[127:0] Ascii_data_t;
+typedef logic[0:127] Ascii_data_t;
+typedef logic[11:0] Graphics_block_addr_t;
+typedef logic[9:0] Block_bit_addr_t;
 
 typedef logic[1:0]  Serial_mode_t;
 
@@ -81,7 +92,7 @@ typedef Reg_data_t[`REG_NUM - 1:0]  Regs_t;
 `define ADDR_IN_EXT(addr)           (addr >= 32'h80400000 && addr < 32'h80800000)
 `define ADDR_IN_UART_DATA(addr)     (addr == 32'hBFD003F8)
 `define ADDR_IN_UART_STATUS(addr)   (addr == 32'hBFD003FC)
-`define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA075300)
+`define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA000e74)
 `define ADDR_IN_BOOTROM(addr)       (addr >= 32'h8fc00000 && addr < 32'h8fc04000)
 
 
