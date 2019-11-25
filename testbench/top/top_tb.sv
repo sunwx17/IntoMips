@@ -16,8 +16,8 @@ initial begin
     //$readmemh({"vga_ascii_demo", ".mem"}, ext_sram.sram_mem);
     $readmemh({"kernel", ".mem"}, base_sram.sram_mem);
     #200 rst = 1'b0;
-    #500000 rst = 1'b1;
-    #500200 $stop;
+    #5000000 rst = 1'b1;
+    #5002000 $stop;
 end
 
 

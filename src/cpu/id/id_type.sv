@@ -90,7 +90,11 @@ always_comb begin
                 `COP0_OPCODE_MFC0 : oper <= OP_MFC0;
                 5'b10000 : begin
                     case(func)
-                        `COP0_OPCODE_FUNC_ERET : oper <= OP_ERET;
+                        `COP0_OPCODE_FUNC_ERET : oper <= OP_ERET ;
+                        `COP0_OPCODE_FUNC_TLBP : oper <= OP_TLBP ;
+                        `COP0_OPCODE_FUNC_TLBR : oper <= OP_TLBR ;
+                        `COP0_OPCODE_FUNC_TLBWI: oper <= OP_TLBWI;
+                        `COP0_OPCODE_FUNC_TLBWR: oper <= OP_TLBWR;
                         default: oper <= OP_INVALID;
                     endcase
                 end
@@ -102,7 +106,6 @@ always_comb begin
         `OPCODE_ORI  : oper <= OP_ORI  ;
         `OPCODE_XORI : oper <= OP_XORI ;
         `OPCODE_LUI  : oper <= OP_LUI  ;
-        `OPCODE_ANDI : oper <= OP_ANDI ;
         `OPCODE_ADDI : oper <= OP_ADDI ;  
         `OPCODE_ADDIU: oper <= OP_ADDIU;  
         `OPCODE_SLTI : oper <= OP_SLTI ;  

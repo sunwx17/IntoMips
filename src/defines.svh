@@ -12,9 +12,6 @@
 
 //data format
 typedef logic       Bit_t;
-typedef logic[1:0]  Doublebit_t;
-typedef logic[2:0]  Triblebit_t;
-typedef logic[3:0]  Fourbit_t;
 typedef logic[7:0]  Byte_t;
 typedef logic[15:0] Halfword_t;
 typedef logic[31:0] Word_t;

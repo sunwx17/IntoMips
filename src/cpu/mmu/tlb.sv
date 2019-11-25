@@ -33,7 +33,9 @@ module tlb(
 
 TLB_entries_t entries;
 
+typedef logic[0:95] En;
 
+En[0:15] entries_debug;
 
 `define TLB_GET_ENTRY_LO1(i) \
     entries[i * `TLB_ENTRY_WIDTH + 32 +: 32]
@@ -54,6 +56,7 @@ assign entry_lo2_o = `TLB_GET_ENTRY_LO2(tlb_rw_index);
 genvar i;
 generate
     for (i = 0; i < `TLB_ENTRY_NUM; i++) begin: gen_for_tlb
+        assign entries_debug[i] = `TLB_GET_ENTRY_I(i);
         always @ (posedge clk)  begin
             if(rst) begin 
                 `TLB_GET_ENTRY_I(i) <= 96'b0;
@@ -68,10 +71,10 @@ generate
     end
 endgenerate
 
-TLB_index_t inst_temp_which, data_temp_which,  tlbp_which;
-Word_t tlbp_paddr;
-Bit_t tlbp_miss, tlbp_d, tlbp_v;
-Triblebit_t tlbp_c;
+TLB_index_t /*inst_temp_which, data_temp_which,  */tlbp_which;
+//Word_t tlbp_paddr;
+Bit_t tlbp_miss;//, tlbp_d, tlbp_v;
+//Triblebit_t tlbp_c;
 
 tlb_lookup inst_lookup(
     .entries_i(entries),
@@ -82,8 +85,8 @@ tlb_lookup inst_lookup(
     .miss(miss1),
     .d(d1),
     .v(v1),
-    .c(c1),
-    .which_o(inst_temp_which)
+    .c(c1)
+    //.which_o(inst_temp_which)
 );
 
 tlb_lookup data_lookup(
@@ -95,8 +98,8 @@ tlb_lookup data_lookup(
     .miss(miss2),
     .d(d2),
     .v(v2),
-    .c(c2),
-    .which_o(data_temp_which)
+    .c(c2)
+    //.which_o(data_temp_which)
 );
 
 tlb_lookup tlbp_lookup(
@@ -104,11 +107,11 @@ tlb_lookup tlbp_lookup(
     .vaddr(entry_hi_i),
     .asid(entry_hi_i[7:0]),
 
-    .paddr(tlbp_paddr),
+    //.paddr(tlbp_paddr),
     .miss(tlbp_miss),
-    .d(tlbp_d),
-    .v(tlbp_v),
-    .c(tlbp_c),
+    //.d(tlbp_d),
+    //.v(tlbp_v),
+    //.c(tlbp_c),
     .which_o(tlbp_which)
 
 );

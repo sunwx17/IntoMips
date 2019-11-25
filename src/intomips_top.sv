@@ -92,9 +92,14 @@ assign leds[6] = uart_mode[1];*/
 
 //与主频反�?
 reg clk_25M = 1'b0;
+
+reg clk_125 = 1'b0;
 //cpu导入
 always @(negedge clk_50M) begin
     clk_25M <= ~clk_25M;
+end
+always @(posedge clk_25M) begin
+    clk_125 <= ~clk_125;
 end
 
 Bit_t       need_inst;
@@ -369,7 +374,7 @@ end
 
 
 cpu cpu_instance(
-    .clk(clk_25M),
+    .clk(clk_125),
     .rst(reset_btn),
     .rom_data_i(inst_data),
     .rom_addr_o(inst_addr_v),
@@ -477,6 +482,8 @@ serial_controller serial_controller_instance(
     .uart_data(base_ram_data[7:0])
 );
 */
+
+//assign uart_mode = 2'b01;
 
 assign leds[0] = uart_mode[0];
 assign leds[1] = uart_mode[1];

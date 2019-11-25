@@ -1,10 +1,10 @@
 // Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
-// Tool Version: Vivado v.2018.3 (lin64) Build 2405991 Thu Dec  6 23:36:41 MST 2018
-// Date        : Sat Nov 23 01:01:27 2019
-// Host        : monell-ubuntu running 64-bit Ubuntu 18.04.3 LTS
-// Command     : write_verilog -force -mode funcsim
-//               /home/monell/code/IntoMips/vivado/intomips.srcs/sources_1/ip/blk_mem_bootrom/blk_mem_bootrom_sim_netlist.v
+// Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+// Date        : Tue Nov 12 12:32:26 2019
+// Host        : DESKTOP-SWX running 64-bit major release  (build 9200)
+// Command     : write_verilog -force -mode funcsim -rename_top blk_mem_bootrom -prefix
+//               blk_mem_bootrom_ blk_mem_bootrom_sim_netlist.v
 // Design      : blk_mem_bootrom
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -196,7 +196,6 @@ module blk_mem_bootrom
         .web(1'b0));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_generic_cstr" *) 
 module blk_mem_bootrom_blk_mem_gen_generic_cstr
    (douta,
     doutb,
@@ -248,7 +247,6 @@ module blk_mem_bootrom_blk_mem_gen_generic_cstr
         .doutb(doutb[31:27]));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_prim_width" *) 
 module blk_mem_bootrom_blk_mem_gen_prim_width
    (douta,
     doutb,
@@ -372,7 +370,6 @@ module blk_mem_bootrom_blk_mem_gen_prim_width__parameterized2
         .doutb(doutb));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_prim_wrapper_init" *) 
 module blk_mem_bootrom_blk_mem_gen_prim_wrapper_init
    (douta,
     doutb,
@@ -1356,7 +1353,6 @@ module blk_mem_bootrom_blk_mem_gen_prim_wrapper_init__parameterized2
         .WEBWE({1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0}));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_top" *) 
 module blk_mem_bootrom_blk_mem_gen_top
    (douta,
     doutb,
@@ -1412,7 +1408,7 @@ endmodule
 (* C_WEA_WIDTH = "1" *) (* C_WEB_WIDTH = "1" *) (* C_WRITE_DEPTH_A = "4096" *) 
 (* C_WRITE_DEPTH_B = "4096" *) (* C_WRITE_MODE_A = "WRITE_FIRST" *) (* C_WRITE_MODE_B = "WRITE_FIRST" *) 
 (* C_WRITE_WIDTH_A = "32" *) (* C_WRITE_WIDTH_B = "32" *) (* C_XDEVICEFAMILY = "artix7" *) 
-(* ORIG_REF_NAME = "blk_mem_gen_v8_4_2" *) (* downgradeipidentifiedwarnings = "yes" *) 
+(* downgradeipidentifiedwarnings = "yes" *) 
 module blk_mem_bootrom_blk_mem_gen_v8_4_2
    (clka,
     rsta,
@@ -1640,7 +1636,6 @@ module blk_mem_bootrom_blk_mem_gen_v8_4_2
         .doutb(doutb));
 endmodule
 
-(* ORIG_REF_NAME = "blk_mem_gen_v8_4_2_synth" *) 
 module blk_mem_bootrom_blk_mem_gen_v8_4_2_synth
    (douta,
     doutb,

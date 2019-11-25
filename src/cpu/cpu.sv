@@ -27,6 +27,23 @@ module cpu(
     end 
 end*/
 
+//mmu
+Word_t  inst_addr_v;
+Word_t  data_addr_v;
+Word_t  inst_addr_p;
+Word_t  data_addr_p;
+
+assign rom_addr_o = inst_addr_p;
+assign ram_addr_o = data_addr_p;
+
+Bit_t   inst_miss;
+Bit_t   inst_valid;
+Bit_t   data_miss;
+Bit_t   data_valid;
+
+Word_t  bad_addr_v;
+
+
 
 //wire about regfile
 Bit_t       reg_write_enable;
@@ -59,18 +76,54 @@ Reg_addr_t  cp0_waddr_i;
 Reg_data_t  cp0_wdata_i;
 Reg_addr_t  cp0_raddr_i;
 Reg_data_t  cp0_data_o;
+
+
+Reg_data_t  cp0_index_o;
+Reg_data_t  cp0_random_o;
+Reg_data_t  cp0_entrylo0_o;
+Reg_data_t  cp0_entrylo1_o;
+Reg_data_t  cp0_context_o;
+Reg_data_t  cp0_pagemask_o;
+Reg_data_t  cp0_wired_o;
+Reg_data_t  cp0_entryhi_o;
+
+
 Reg_data_t  cp0_count_o;
 Reg_data_t  cp0_compare_o;
 Reg_data_t  cp0_status_o;
 Reg_data_t  cp0_cause_o;
 Reg_data_t  cp0_epc_o;
 Reg_data_t  cp0_config_o;
-Reg_data_t  cp0_prid_o;
+//Reg_data_t  cp0_prid_o;
+Reg_data_t  cp0_ebase_o;
 
-Word_t      cp0_exception_type_i;
+Excp_t      cp0_exception_type_i;
 Inst_addr_t cp0_pc_i;
 Bit_t       cp0_is_in_delayslot_i;
 
+Bit_t       cp0_tlbr_op;
+Reg_data_t  cp0_entryhi_i;
+Reg_data_t  cp0_entrylo0_i;
+Reg_data_t  cp0_entrylo1_i;
+
+Bit_t       cp0_tlbp_op;
+Reg_data_t  cp0_index_i;
+
+Bit_t[7:0]  asid;
+Bit_t       user_mode;
+
+
+Bit_t   tlb_p;
+Bit_t   tlb_r;
+Bit_t   tlb_wi;
+Bit_t   tlb_wr;
+
+
+assign asid = cp0_entryhi_o[`CP0_ENTRYHI_ASID];
+assign user_mode = cp0_status_o[`CP0_STATUS_UM] & (~cp0_status_o[`CP0_STATUS_ERL]) & (cp0_status_o[`CP0_STATUS_EXL]);
+assign cp0_tlbr_op = tlb_r;
+
+assign cp0_tlbp_op = tlb_p;
 
 
 cp0 cp0_instance(
@@ -82,13 +135,36 @@ cp0 cp0_instance(
     .raddr_i(cp0_raddr_i),
     .int_i(int_i),
     .data_o(cp0_data_o),
+
+    .index_o(cp0_index_o),
+    .random_o(cp0_random_o),
+    .entrylo0_o(cp0_entrylo0_o),
+    .entrylo1_o(cp0_entrylo1_o),
+    .context_o(cp0_context_o),
+    .pagemask_o(cp0_pagemask_o),
+    .wired_o(cp0_wired_o),
+    .entryhi_o(cp0_entryhi_o),
+
+
     .count_o(cp0_count_o),
     .compare_o(cp0_compare_o),
     .status_o(cp0_status_o),
     .cause_o(cp0_cause_o),
     .epc_o(cp0_epc_o),
     .config_o(cp0_config_o),
-    .prid_o(cp0_prid_o),
+    //.prid_o(cp0_prid_o),
+    .ebase_o(cp0_ebase_o),
+
+    .tlbr_op(cp0_tlbr_op),
+    .entryhi_i(cp0_entryhi_i),
+    .entrylo0_i(cp0_entrylo0_i),
+    .entrylo1_i(cp0_entrylo1_i),
+
+    .tlbp_op(cp0_tlbp_op),
+    .index_i(cp0_index_i),
+
+    .bad_addr_v,
+
     .timer_int_o(timer_int_o),
     .exception_type_i(cp0_exception_type_i),
     .pc_i(cp0_pc_i),
@@ -129,7 +205,8 @@ Inst_addr_t branch_target_addr;
 pc_reg pc_reg_instance(
     .clk,
     .rst,
-    .pc(rom_addr_o),
+    //.pc(rom_addr_o),
+    .pc(inst_addr_v),
     .ce(rom_ce_o),
     .branch_flag_i(branch_flag),
     .branch_target_addr_i(branch_target_addr),
@@ -141,6 +218,14 @@ pc_reg pc_reg_instance(
 //connect if_id and id
 Inst_addr_t id_pc_i;
 Inst_t      id_inst_i;
+Excp_set_t  id_exception_type_i;
+
+
+Inst_addr_t id_inst_addr_v_i;
+Inst_addr_t id_inst_addr_v_o;
+Inst_addr_t ex_inst_addr_v_i;
+Inst_addr_t ex_inst_addr_v_o;
+Inst_addr_t mem_inst_addr_v_i;
 
 //stage if_id
 if_id if_id_instance(
@@ -148,8 +233,13 @@ if_id if_id_instance(
     .rst,
     .if_pc(rom_addr_o),
     .if_inst(rom_data_i),
+    .if_miss(inst_miss),
+    .if_valid(inst_valid),
     .id_pc(id_pc_i),
     .id_inst(id_inst_i),
+    .id_exception_type(id_exception_type_i),
+    .if_inst_addr_v(inst_addr_v),
+    .id_inst_addr_v(id_inst_addr_v_i),
     .stall,
     .flush
 );
@@ -188,9 +278,9 @@ Bit_t       ex_is_in_delayslot_i;
 Bit_t       ex_is_in_delayslot_o;
 
 
-Word_t      id_exception_type_o;
-Word_t      ex_exception_type_i;
-Word_t      ex_exception_type_o;
+Excp_set_t  id_exception_type_o;
+Excp_set_t  ex_exception_type_i;
+Excp_set_t  ex_exception_type_o;
 
 
 //stage id
@@ -223,6 +313,9 @@ id id_instance(
     .branch_target_addr_o(branch_target_addr),
     .pc_o(id_pc_o),
     .stallreq(stallreq_from_id),
+    .inst_addr_v_i(id_inst_addr_v_i),
+    .inst_addr_v_o(id_inst_addr_v_o),
+    .exception_type_i(id_exception_type_i),
     .exception_type_o(id_exception_type_o)
 );
 
@@ -261,7 +354,9 @@ id_ex id_ex_instance(
     .stall,
     .flush,
     .id_exception_type(id_exception_type_o),
-    .ex_exception_type(ex_exception_type_i) 
+    .ex_exception_type(ex_exception_type_i),
+    .id_inst_addr_v(id_inst_addr_v_o),
+    .ex_inst_addr_v(ex_inst_addr_v_i) 
 );
 
 
@@ -367,6 +462,8 @@ ex ex_instance(
     .cp0_reg_data_o(ex_cp0_reg_data_o),
     .exception_type_i(ex_exception_type_i),
     .exception_type_o(ex_exception_type_o),
+    .inst_addr_v_i(ex_inst_addr_v_i),
+    .inst_addr_v_o(ex_inst_addr_v_o),
     .pc_o(ex_pc_o) 
 );
 
@@ -379,7 +476,7 @@ Oper_t      mem_oper_i;
 Word_t      mem_mem_oper_addr_i;
 Word_t      mem_mem_oper_data_i;
 
-Word_t      mem_exception_type_i;
+Excp_set_t  mem_exception_type_i;
 Bit_t       mem_is_in_delayslot_i;
 Inst_addr_t mem_pc_i;
 
@@ -418,8 +515,17 @@ ex_mem ex_mem_instance(
     .ex_pc(ex_pc_o),
     .mem_exception_type(mem_exception_type_i),
     .mem_is_in_delayslot(mem_is_in_delayslot_i),
-    .mem_pc(mem_pc_i) 
+    .mem_pc(mem_pc_i),
+    .ex_inst_addr_v(ex_inst_addr_v_o),
+    .mem_inst_addr_v(mem_inst_addr_v_i) 
 );
+
+
+Bit_t   mem_tlb_p_o;
+Bit_t   mem_tlb_r_o;
+Bit_t   mem_tlb_wi_o;
+Bit_t   mem_tlb_wr_o;
+
 
 
 
@@ -442,7 +548,8 @@ mem mem_instance(
     .mem_oper_addr(mem_mem_oper_addr_i),
     .mem_oper_data(mem_mem_oper_data_i),
     .mem_data_i(ram_data_i),
-    .mem_addr_o(ram_addr_o),
+    .mem_addr_o(data_addr_v),
+    //.mem_addr_o(ram_addr_o),
     .mem_data_o(ram_data_o),
     .mem_we_o(ram_we_o),
     .mem_re_o(ram_re_o),
@@ -465,7 +572,15 @@ mem mem_instance(
     .exception_type_o(cp0_exception_type_i),
     .pc_o(cp0_pc_i),
     .is_in_delayslot_o(cp0_is_in_delayslot_i),
-    .cp0_epc_o(mem_cp0_epc_o) 
+    .cp0_epc_o(mem_cp0_epc_o),
+    .data_miss,
+    .data_valid,
+    .inst_addr_v(mem_inst_addr_v_i),
+    .bad_addr_v,
+    .tlb_p(mem_tlb_p_o),
+    .tlb_r(mem_tlb_r_o),
+    .tlb_wi(mem_tlb_wi_o),
+    .tlb_wr(mem_tlb_wr_o)
 );
 
 //stage mem_wb
@@ -491,54 +606,69 @@ mem_wb mem_wb_instance(
     .wb_cp0_reg_we(cp0_we_i),
     .wb_cp0_reg_write_addr(cp0_waddr_i),
     .wb_cp0_reg_data(cp0_wdata_i),
+    .mem_tlb_p(mem_tlb_p_o),
+    .mem_tlb_r(mem_tlb_r_o),
+    .mem_tlb_wi(mem_tlb_wi_o),
+    .mem_tlb_wr(mem_tlb_wr_o),
+    .wb_tlb_p(tlb_p),
+    .wb_tlb_r(tlb_r),
+    .wb_tlb_wi(tlb_wi),
+    .wb_tlb_wr(tlb_wr),
     .flush
 );
 
-Byte_t cp0_asid;
-Bit_t is_user_mode;
+//Byte_t cp0_asid;
+//Bit_t is_user_mode;
 Inst_addr_t inst_vir_addr, inst_phy_addr;
 Word_t  data_vir_addr, data_phy_addr;
 Bit_t mmu_miss1, mmu_d1, mmu_v1, mmu_illegal1, mmu_miss2, mmu_d2, mmu_v2, mmu_illegal2;
 Triblebit_t mmu_c1, mmu_c2;
+Word_t tlb_p_index;
+
+
+
 TLB_index_t tlb_rw_index;
 Bit_t tlb_rw_we;
-Word_t entry_hi_i, entry_lo1_i, entry_lo2_i, entry_hi_o, entry_lo1_o, entry_lo2_o, tlb_p_index;
+
+assign tlb_rw_index = tlb_wr ? cp0_random_o : cp0_index_o;
+assign tlb_rw_we = tlb_wr | tlb_wi;
+
 
 // mmu just test now
 mmu mmu_instance(
     .clk,
     .rst,
-    .asid(cp0_asid),
-    .is_user(is_user_mode),
-    .inst_vaddr(inst_vir_addr),
-    .data_vaddr(data_vir_addr),
+    .asid,
+    .is_user(user_mode),
+    .inst_vaddr(inst_addr_v),
+    .data_vaddr(data_addr_v),
 
-    .inst_paddr(inst_phy_addr),
-    .miss1(mmu_miss1),
+    .inst_paddr(inst_addr_p),
+    .miss1(inst_miss),
     .d1(mmu_d1),
-    .v1(mmu_v1),
+    .v1(inst_valid),
     .illegal1(mmu_illegal1),
     .c1(mmu_c1),
 
-    .data_paddr(data_phy_addr),
-    .miss2(mmu_miss2),
+    .data_paddr(data_addr_p),
+    .miss2(data_miss),
     .d2(mmu_d2),
-    .v2(mmu_v2),
+    .v2(data_valid),
     .illegal2(mmu_illegal2),
     .c2(mmu_c2),
 
     .tlb_rw_index,
     .tlb_rw_we,
     
-    .entry_hi_i,
-    .entry_lo1_i,
-    .entry_lo2_i,
+    .entry_hi_i(cp0_entryhi_o),
+    .entry_lo1_i(cp0_entrylo0_o),
+    .entry_lo2_i(cp0_entrylo1_o),
 
-    .entry_hi_o,
-    .entry_lo1_o,
-    .entry_lo2_o,
+    .entry_hi_o(cp0_entryhi_i),
+    .entry_lo1_o(cp0_entrylo0_i),
+    .entry_lo2_o(cp0_entrylo1_i),
 
-    .tlb_p_index
+    .tlb_p_index(cp0_index_i)
 );
 
 

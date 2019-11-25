@@ -58,11 +58,16 @@ module ex(
     output  Reg_addr_t  cp0_reg_write_addr_o,
     output  Word_t      cp0_reg_data_o,
 
-    input   Word_t      exception_type_i,
-    output  Word_t      exception_type_o,
+    input   Excp_set_t  exception_type_i,
+    output  Excp_set_t  exception_type_o,
+    
+    input   Inst_addr_t inst_addr_v_i,
+    output  Inst_addr_t inst_addr_v_o,
 
     output  Inst_addr_t pc_o 
 );
+
+assign inst_addr_v_o = inst_addr_v_i;
 
 assign is_in_delayslot_o = is_in_delayslot_i;
 
@@ -96,7 +101,22 @@ always_comb begin
         cp0_reg_read_addr_o <= `REG_ZERO;
     end else begin
         cp0_reg_read_addr_o <= reg2[`REG_ADDR_BUS];
-        if (`CP0_REGS_CAN_WRITE(mem_cp0_reg_write_addr)) begin // has a problem
+        if (mem_cp0_reg_we == `ENABLE && mem_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+            if (`CP0_REGS_CAN_WRITE(mem_cp0_reg_write_addr)) begin // has a problem
+                cp0_data <= mem_cp0_reg_data;
+            end else if(mem_cp0_reg_write_addr == `CP0_CAUSE) begin
+                cp0_data <= mem_cp0_reg_data && `CP0_CAUSE_MASK;
+            end
+        end else if(wb_cp0_reg_we == `ENABLE && wb_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
+            if (`CP0_REGS_CAN_WRITE(wb_cp0_reg_write_addr)) begin // has a problem
+                cp0_data <= wb_cp0_reg_data;
+            end else if(mem_cp0_reg_write_addr == `CP0_CAUSE) begin
+                cp0_data <= wb_cp0_reg_data && `CP0_CAUSE_MASK;
+            end
+        end else begin
+            cp0_data <= cp0_reg_data_i;
+        end
+        /*if (`CP0_REGS_CAN_WRITE(mem_cp0_reg_write_addr)) begin // has a problem
             if (mem_cp0_reg_we == `ENABLE && mem_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
                 cp0_data <= mem_cp0_reg_data;
             end else if(wb_cp0_reg_we == `ENABLE && wb_cp0_reg_write_addr == reg2[`REG_ADDR_BUS]) begin
@@ -110,7 +130,7 @@ always_comb begin
             end 
         end else begin
             cp0_data <= cp0_reg_data_i;
-        end
+        end*/
     end
 end
 

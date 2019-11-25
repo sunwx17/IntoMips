@@ -42,9 +42,14 @@ module id(
 
     output  Bit_t       stallreq,
 
-    output  Word_t      exception_type_o
+    input   Inst_addr_t inst_addr_v_i,
+    output  Inst_addr_t inst_addr_v_o,
+
+    input   Excp_set_t  exception_type_i,
+    output  Excp_set_t  exception_type_o
 );
 
+assign inst_addr_v_o = inst_addr_v_i;
 
 Oper_t      oper;
 Bit_t       reg1_read;
@@ -55,8 +60,11 @@ Bit_t       wreg_write;
 Reg_addr_t  wreg_addr;
 Word_t      immediate;
 
+/*assign exception_type_o.syscall = (oper == OP_SYSCALL);
+assign exception_type_o.invalid = (oper == OP_INVALID);
+assign exception_type_o.eret    = (oper == OP_ERET);*/
 
-assign exception_type_o = {19'b0, (oper == OP_ERET ? 1'b1 : 1'b0), 2'b0, (oper == OP_INVALID ? 1'b1 : 1'b0), (oper == OP_SYSCALL ? 1'b1 : 1'b0), 8'b0};
+//assign exception_type_o = {19'b0, (oper == OP_ERET ? 1'b1 : 1'b0), 2'b0, (oper == OP_INVALID ? 1'b1 : 1'b0), (oper == OP_SYSCALL ? 1'b1 : 1'b0), 8'b0};
 
 id_type id_type_instance(
     .inst,
@@ -93,6 +101,7 @@ always_comb begin
         pc_o <= `PC_RESET_ADDR;
         next_is_in_delayslot_o <= `DISABLE;
         is_in_delayslot_o <= `DISABLE;
+        exception_type_o <= `NO_EXCP;
     end else begin        
         oper_o <= oper;
         wreg_write_o <= wreg_write;
@@ -104,6 +113,10 @@ always_comb begin
         pc_o <= pc;
         next_is_in_delayslot_o <= `NEXT_IN_DELAYSLOT(oper);
         is_in_delayslot_o <= is_in_delayslot_i;
+        exception_type_o <= exception_type_i;
+        exception_type_o.syscall      <= (oper == OP_SYSCALL);
+        exception_type_o.invalid_inst <= (oper == OP_INVALID);
+        exception_type_o.eret         <= (oper == OP_ERET);
     end
 end
 
