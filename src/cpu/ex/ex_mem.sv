@@ -50,7 +50,10 @@ module ex_mem(
     output  Inst_addr_t mem_pc,
     
     input   Inst_addr_t ex_inst_addr_v,
-    output  Inst_addr_t mem_inst_addr_v
+    output  Inst_addr_t mem_inst_addr_v,
+
+    input   Inst_addr_t ex_data_addr_v,
+    output  Inst_addr_t mem_data_addr_v
 
 );
 
@@ -76,6 +79,7 @@ always @ (posedge clk) begin
         mem_is_in_delayslot     <= `DISABLE;
         mem_pc      <=  `PC_RESET_ADDR;
         mem_inst_addr_v <= `ZERO_WORD;
+        mem_data_addr_v <= `ZERO_WORD;
     end else if (stall[3] == `DISABLE) begin
         mem_wreg_write <= ex_wreg_write;
         mem_wreg_addr  <= ex_wreg_addr;
@@ -97,6 +101,7 @@ always @ (posedge clk) begin
         mem_is_in_delayslot     <= ex_is_in_delayslot;
         mem_pc      <=  ex_pc;
         mem_inst_addr_v <= ex_inst_addr_v;
+        mem_data_addr_v <= ex_data_addr_v;
     end
 end
     

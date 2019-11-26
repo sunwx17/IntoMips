@@ -64,6 +64,9 @@ module ex(
     input   Inst_addr_t inst_addr_v_i,
     output  Inst_addr_t inst_addr_v_o,
 
+    input   Bit_t       data_miss,
+    input   Bit_t       data_valid,
+
     output  Inst_addr_t pc_o 
 );
 
@@ -71,7 +74,21 @@ assign inst_addr_v_o = inst_addr_v_i;
 
 assign is_in_delayslot_o = is_in_delayslot_i;
 
-assign exception_type_o = exception_type_i;//TODO: 溢出异常
+//assign exception_type_o = exception_type_i;//TODO: 溢出异常
+
+always_comb begin
+    if (rst) begin
+        exception_type_o <= `NO_EXCP;
+    end else begin
+        exception_type_o <= exception_type_i;
+        exception_type_o.data_tlb_refill <= (`NEED_SAVE(oper) || `NEED_LOAD(oper)) && data_miss;
+        exception_type_o.data_tlb_invalid <= (`NEED_SAVE(oper) || `NEED_LOAD(oper)) && ~data_valid;
+    end
+end
+
+
+
+
 
 assign pc_o = pc;
 

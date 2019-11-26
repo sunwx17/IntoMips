@@ -98,7 +98,7 @@ reg clk_125 = 1'b0;
 always @(negedge clk_50M) begin
     clk_25M <= ~clk_25M;
 end
-always @(posedge clk_25M) begin
+always @(negedge clk_25M) begin
     clk_125 <= ~clk_125;
 end
 
@@ -374,7 +374,7 @@ end
 
 
 cpu cpu_instance(
-    .clk(clk_125),
+    .clk(clk_25M),
     .rst(reset_btn),
     .rom_data_i(inst_data),
     .rom_addr_o(inst_addr_v),

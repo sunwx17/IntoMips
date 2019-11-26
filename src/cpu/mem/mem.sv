@@ -55,10 +55,8 @@ module mem(
     output  Bit_t       is_in_delayslot_o,
     output  Word_t      cp0_epc_o,
 
-    input   Bit_t       data_miss,
-    input   Bit_t       data_valid,
-
     input   Inst_addr_t inst_addr_v,
+    input   Word_t      data_addr_v,
     output  Word_t      bad_addr_v,
 
     output  Bit_t       tlb_p,
@@ -120,18 +118,18 @@ always_comb begin
                 bad_addr_v <= inst_addr_v;
             end else if (exception_type_i.syscall) begin
                 exception_type_o <= EXC_SYSCALL;
-            end else if (exception_type_i.invalid_inst ) begin
+            end else if (exception_type_i.invalid_inst) begin
                 exception_type_o <= EXC_INVALID_INST;
             end else if (exception_type_i.ov) begin
                 exception_type_o <= EXC_OV;
             end else if (exception_type_i.eret) begin
                 exception_type_o <= EXC_ERET;
-            end else if ((mem_re_o || mem_we_o) && data_miss) begin
+            end else if (exception_type_i.data_tlb_refill) begin
                 exception_type_o <= EXC_DATA_TLB_REFILL;
-                bad_addr_v <= mem_addr_o;
-            end else if ((mem_re_o || mem_we_o) && ~data_valid) begin
+                bad_addr_v <= data_addr_v;
+            end else if (exception_type_i.data_tlb_invalid) begin
                 exception_type_o <= EXC_DATA_TLB_INVALID;
-                bad_addr_v <= mem_addr_o;
+                bad_addr_v <= data_addr_v;
             end
         end
     end

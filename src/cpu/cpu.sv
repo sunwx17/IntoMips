@@ -34,7 +34,7 @@ Word_t  inst_addr_p;
 Word_t  data_addr_p;
 
 assign rom_addr_o = inst_addr_p;
-assign ram_addr_o = data_addr_p;
+//assign ram_addr_o = data_addr_p;
 
 Bit_t   inst_miss;
 Bit_t   inst_valid;
@@ -226,6 +226,7 @@ Inst_addr_t id_inst_addr_v_o;
 Inst_addr_t ex_inst_addr_v_i;
 Inst_addr_t ex_inst_addr_v_o;
 Inst_addr_t mem_inst_addr_v_i;
+Word_t mem_data_addr_v_i;
 
 //stage if_id
 if_id if_id_instance(
@@ -444,7 +445,8 @@ ex ex_instance(
     .hi_o(ex_hi_o),
     .lo_o(ex_lo_o),
     .oper_o(ex_oper_o),
-    .mem_oper_addr(ex_mem_oper_addr_o),
+    //.mem_oper_addr(ex_mem_oper_addr_o),
+    .mem_oper_addr(data_addr_v),
     .mem_oper_data(ex_mem_oper_data_o),
     .is_in_delayslot_i(ex_is_in_delayslot_i),
     .is_in_delayslot_o(ex_is_in_delayslot_o),
@@ -464,6 +466,8 @@ ex ex_instance(
     .exception_type_o(ex_exception_type_o),
     .inst_addr_v_i(ex_inst_addr_v_i),
     .inst_addr_v_o(ex_inst_addr_v_o),
+    .data_miss,
+    .data_valid,
     .pc_o(ex_pc_o) 
 );
 
@@ -497,7 +501,8 @@ ex_mem ex_mem_instance(
     .mem_hi(mem_hi_i),
     .mem_lo(mem_lo_i),
     .ex_oper(ex_oper_o),
-    .ex_mem_oper_addr(ex_mem_oper_addr_o),
+    //.ex_mem_oper_addr(ex_mem_oper_addr_o),
+    .ex_mem_oper_addr(data_addr_p),
     .ex_mem_oper_data(ex_mem_oper_data_o),
     .mem_oper(mem_oper_i),
     .mem_mem_oper_addr(mem_mem_oper_addr_i),
@@ -517,7 +522,9 @@ ex_mem ex_mem_instance(
     .mem_is_in_delayslot(mem_is_in_delayslot_i),
     .mem_pc(mem_pc_i),
     .ex_inst_addr_v(ex_inst_addr_v_o),
-    .mem_inst_addr_v(mem_inst_addr_v_i) 
+    .mem_inst_addr_v(mem_inst_addr_v_i),
+    .ex_data_addr_v(data_addr_v),
+    .mem_data_addr_v(mem_data_addr_v_i) 
 );
 
 
@@ -548,8 +555,8 @@ mem mem_instance(
     .mem_oper_addr(mem_mem_oper_addr_i),
     .mem_oper_data(mem_mem_oper_data_i),
     .mem_data_i(ram_data_i),
-    .mem_addr_o(data_addr_v),
-    //.mem_addr_o(ram_addr_o),
+    //.mem_addr_o(data_addr_v),
+    .mem_addr_o(ram_addr_o),
     .mem_data_o(ram_data_o),
     .mem_we_o(ram_we_o),
     .mem_re_o(ram_re_o),
@@ -573,9 +580,8 @@ mem mem_instance(
     .pc_o(cp0_pc_i),
     .is_in_delayslot_o(cp0_is_in_delayslot_i),
     .cp0_epc_o(mem_cp0_epc_o),
-    .data_miss,
-    .data_valid,
     .inst_addr_v(mem_inst_addr_v_i),
+    .data_addr_v(mem_data_addr_v_i),
     .bad_addr_v,
     .tlb_p(mem_tlb_p_o),
     .tlb_r(mem_tlb_r_o),
