@@ -26,22 +26,19 @@ assign flash_ce_n = 1'b0; //可以?
 //不支持写
 assign flash_we_n = 1'b1;
 
-Word_t data_read; //存储读取的data
-assign bus_data_read = data_read;
-
 Flash_addr_t inner_addr; //存储读取的addr
 assign flash_a = inner_addr;
 
 typedef enum {IDLE, READ_0, READ_1} state_t;
 
-state_t cur_state = IDLE, nxt_state = IDLE;
+state_t cur_state = IDLE;
 
 always_ff @(posedge clk or posedge rst) begin
     if (rst) begin
         cur_state <= IDLE;
         flash_oe_n <= 1'b1;
         inner_addr <= 0;
-        data_read <= 0;
+        bus_data_read <= 0;
             //$display("in rst time = %t", $time);
     end else begin
         case(cur_state)
@@ -51,13 +48,13 @@ always_ff @(posedge clk or posedge rst) begin
                 cur_state <= read_op? READ_0: IDLE;
             end
             READ_0: begin
-                data_read[15:0] <= flash_d;
+                bus_data_read[15:0] <= flash_d;
                 inner_addr <= bus_addr + 2'h2;
                 cur_state <= READ_1;
             end
             READ_1: begin
-                data_read[31:16] <= flash_d;
-                //???
+                bus_data_read[31:16] <= flash_d;
+                flash_oe_n <= 1'b0;
                 cur_state <= IDLE;
             end
         endcase
