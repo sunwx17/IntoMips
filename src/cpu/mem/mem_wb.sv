@@ -31,6 +31,18 @@ module mem_wb(
     output  Reg_addr_t  wb_cp0_reg_write_addr,
     output  Word_t      wb_cp0_reg_data,
 
+
+    input   Bit_t       mem_tlb_p,
+    input   Bit_t       mem_tlb_r,
+    input   Bit_t       mem_tlb_wi,
+    input   Bit_t       mem_tlb_wr,
+
+    output  Bit_t       wb_tlb_p,
+    output  Bit_t       wb_tlb_r,
+    output  Bit_t       wb_tlb_wi,
+    output  Bit_t       wb_tlb_wr,
+
+
     input   Bit_t       flush
 );
 
@@ -47,6 +59,11 @@ always @ (posedge clk) begin
         wb_cp0_reg_we         <= `DISABLE;
         wb_cp0_reg_write_addr <= `REG_ZERO;
         wb_cp0_reg_data       <= `ZERO_WORD;
+
+        wb_tlb_p    <=  `DISABLE;
+        wb_tlb_r    <=  `DISABLE;
+        wb_tlb_wi   <=  `DISABLE;
+        wb_tlb_wr   <=  `DISABLE;
     end else if(stall[4] == `DISABLE) begin
         wb_wreg_write <= mem_wreg_write;
         wb_wreg_addr  <= mem_wreg_addr;
@@ -59,6 +76,11 @@ always @ (posedge clk) begin
         wb_cp0_reg_we         <= mem_cp0_reg_we;
         wb_cp0_reg_write_addr <= mem_cp0_reg_write_addr;
         wb_cp0_reg_data       <= mem_cp0_reg_data;
+
+        wb_tlb_p    <=  mem_tlb_p;
+        wb_tlb_r    <=  mem_tlb_r;
+        wb_tlb_wi   <=  mem_tlb_wi;
+        wb_tlb_wr   <=  mem_tlb_wr;
     end
 end
     

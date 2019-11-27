@@ -6,3 +6,15 @@ vivado/*.cache
 vivado/*.hw
 vivado/*.ip_user_files
 testbench/cpu/testcases/__pycache__
+ucore/obj/
+ucore/dep/
+ucore/*.o
+ucore/*.a
+ucore/*.bin
+ucore/*.ub
+ucore/boot/loader
+ucore/*.d
+ucore/tools/mksfs
+ucore/.gdb_history
+ucore/.config_*
+.vscode

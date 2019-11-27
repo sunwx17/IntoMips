@@ -92,9 +92,14 @@ assign leds[6] = uart_mode[1];*/
 
 //与主频反�?
 reg clk_25M = 1'b0;
+
+reg clk_125 = 1'b0;
 //cpu导入
 always @(negedge clk_50M) begin
     clk_25M <= ~clk_25M;
+end
+always @(negedge clk_25M) begin
+    clk_125 <= ~clk_125;
 end
 
 Bit_t       need_inst;
@@ -235,9 +240,10 @@ always_comb begin
 
     vga_write_op <= `DISABLE;
     vga_data_write <= `HIGH_BYTE;
+    vga_addr <= `ZERO_WORD;
 
     
-    if (data_in_uart_data || data_in_uart_status) begin
+    if (data_in_uart_data || data_in_uart_status || data_in_vga) begin
         if (inst_in_ext) begin
             ext_read_op <= inst_read_op;
             ext_write_op <= `DISABLE;
@@ -260,19 +266,17 @@ always_comb begin
             uart_write_op <= data_write_op;
             uart_data_write <= data_data_write;
             data_data_read <= uart_data_read;
-        end else begin
+        end else if (data_in_uart_status) begin
             uart_read_op <= `DISABLE;
             uart_write_op <= `DISABLE;
             uart_data_write <= `ZERO_WORD;
             data_data_read <= {30'b0, uart_mode};
+        end else begin
+            //vga
+            vga_write_op <= data_write_op;
+            vga_data_write <= data_data_write;
+            vga_addr <= data_addr_v & 32'h000fffff;
         end
-    end else if (data_in_vga) begin
-        //vga
-        vga_write_op <= 1'b1;
-        vga_data_write <= data_data_write;
-        //vga_data_write <= 32'h00000007;
-        vga_addr <= data_addr_v & 32'h000fffff;
-
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
 
         ext_read_op <= inst_in_ext ? inst_read_op : data_read_op;
@@ -304,7 +308,20 @@ always_comb begin
         ext_data_write_ex <= data_in_ext ? data_data_write : `ZERO_WORD;
         ext_mask_ex <= data_in_ext ? data_mask : 4'b0000;
 
-        base_read_op <= inst_in_base ? `DISABLE : inst_read_op;
+        base_read_op <= inst_in_base ? inst_read_op : `DISABLE;
+        base_write_op <= inst_in_base ? `DISABLE : `DISABLE;
+        base_addr <= inst_in_base ? inst_addr : `ZERO_WORD;
+        base_data_write <= inst_in_base ? `ZERO_WORD : `ZERO_WORD;
+        base_mask <= inst_in_base ? 4'b1111 : 4'b0000;
+        
+        
+        base_read_op_ex <= data_in_base ? data_read_op : `DISABLE;
+        base_write_op_ex <= data_in_base ? data_write_op : `DISABLE;
+        base_addr_ex <= data_in_base ? data_addr : `ZERO_WORD;
+        base_data_write_ex <= data_in_base ? data_data_write : `ZERO_WORD;
+        base_mask_ex <= data_in_base ? data_mask : 4'b0000;
+
+        /*base_read_op <= inst_in_base ? `DISABLE : inst_read_op;
         base_write_op <= inst_in_base ? `DISABLE : `DISABLE;
         base_addr <= inst_in_base ? `ZERO_WORD : inst_addr;
         base_data_write <= inst_in_base ? `ZERO_WORD : `ZERO_WORD;
@@ -315,7 +332,7 @@ always_comb begin
         base_write_op_ex <= data_in_base ? `DISABLE : data_write_op;
         base_addr_ex <= data_in_base ? `ZERO_WORD : data_addr;
         base_data_write_ex <= data_in_base ? `ZERO_WORD : data_data_write;
-        base_mask_ex <= data_in_base ? 4'b0000 : data_mask;
+        base_mask_ex <= data_in_base ? 4'b0000 : data_mask;*/
             
         inst_data <= inst_in_ext ? ext_data_read : base_data_read;
         data_data_read <= data_in_ext ? ext_data_read_ex : base_data_read_ex;
@@ -357,7 +374,7 @@ end
 
 
 cpu cpu_instance(
-    .clk(clk_25M),
+    .clk(clk_125),
     .rst(reset_btn),
     .rom_data_i(inst_data),
     .rom_addr_o(inst_addr_v),
@@ -369,13 +386,13 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({3'b0, uart_mode[0], 2'b0})
+    .int_i({3'b0, uart_mode[1], 2'b0})
     //.timer_int_o
 );
 
 
 bootrom_controller bootrom_controller_instance (
-    .clk(clk_50M),
+    .clk(clk_25M),
     .rst(reset_btn),
 
     .read_op(bootrom_read_op),
@@ -392,11 +409,37 @@ bootrom_controller bootrom_controller_instance (
 
 
 
+//base ram
+sram_controller base_sram_controller(
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .read_op(base_read_op),
+    .write_op(base_write_op),
+    .bus_data_write(base_data_write),
+    .bus_data_read(base_data_read),
+    .bus_addr(base_addr),
+    .byte_mask(base_mask),
+    .read_op_ex(base_read_op_ex),
+    .write_op_ex(base_write_op_ex),
+    .bus_data_write_ex(base_data_write_ex),
+    .bus_data_read_ex(base_data_read_ex),
+    .bus_addr_ex(base_addr_ex),
+    .byte_mask_ex(base_mask_ex),
+    .bus_stall(base_stallreq),
+    //.bus_stall
+    .ram_data(base_ram_data),
+    .ram_addr(base_ram_addr),
+    .ram_be_n(base_ram_be_n),
+    .ram_ce_n(base_ram_ce_n),
+    .ram_oe_n(base_ram_oe_n),
+    .ram_we_n(base_ram_we_n)
+);
+
 
 
 //ext ram store instructions
-sram_controller inst_ram_controller(
-    .clk(clk_50M),
+sram_controller ext_ram_controller(
+    .clk(clk_25M),
     .rst(reset_btn),
     .read_op(ext_read_op),
     .write_op(ext_write_op),
@@ -421,32 +464,6 @@ sram_controller inst_ram_controller(
 );
 
 
-//base ram
-sram_controller data_sram_controller(
-    .clk(clk_50M),
-    .rst(reset_btn),
-    .read_op(base_read_op),
-    .write_op(base_write_op),
-    .bus_data_write(base_data_write),
-    .bus_data_read(base_data_read),
-    .bus_addr(base_addr),
-    .byte_mask(base_mask),
-    .read_op_ex(base_read_op_ex),
-    .write_op_ex(base_write_op_ex),
-    .bus_data_write_ex(base_data_write_ex),
-    .bus_data_read_ex(base_data_read_ex),
-    .bus_addr_ex(base_addr_ex),
-    .byte_mask_ex(base_mask_ex),
-    .bus_stall(base_stallreq),
-    //.bus_stall
-    .ram_data(base_ram_data),
-    .ram_addr(base_ram_addr),
-    .ram_be_n(base_ram_be_n),
-    .ram_ce_n(base_ram_ce_n),
-    .ram_oe_n(base_ram_oe_n),
-    .ram_we_n(base_ram_we_n)
-);
-
 /*
 serial_controller serial_controller_instance(
     .clk(clk_50M), 
@@ -465,6 +482,8 @@ serial_controller serial_controller_instance(
     .uart_data(base_ram_data[7:0])
 );
 */
+
+//assign uart_mode = 2'b01;
 
 assign leds[0] = uart_mode[0];
 assign leds[1] = uart_mode[1];

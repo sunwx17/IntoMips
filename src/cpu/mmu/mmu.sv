@@ -54,14 +54,14 @@ generate if(`USE_MMU) begin:    generate_mmu
     assign miss1 = is_inst_mapped & temp_miss1;
     assign illegal1 = is_user & inst_vaddr[31];
     assign v1 = ~is_inst_mapped | temp_v1;
-    assign inst_paddr = is_inst_mapped ? temp_inst_paddr: {3'b0, inst_vaddr[28:0]};
+    assign inst_paddr = is_inst_mapped ? { 1'b1, temp_inst_paddr[30:0] } : inst_vaddr;// {3'b0, inst_vaddr[28:0]};
     
     assign is_peripheral = (data_vaddr[31:24] >= 8'ha2 && data_vaddr[31:24] <= 8'ha7);
     assign d2 = ~is_data_mapped | temp_d2;
     assign miss2 = is_data_mapped & temp_miss2;
     assign illegal2 = (is_user & data_vaddr[31]) & ~is_peripheral;
     assign v2 = ~is_data_mapped | temp_v2;
-    assign data_paddr = is_data_mapped ? temp_data_paddr : {3'b0, data_vaddr[28:0]};
+    assign data_paddr = is_data_mapped ? { 1'b1, temp_data_paddr[30:0] } : data_vaddr;// {3'b0, data_vaddr[28:0]};
 
     tlb tlb_instance(
         .clk,

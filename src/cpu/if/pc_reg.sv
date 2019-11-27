@@ -31,10 +31,12 @@ always @ (posedge clk) begin
         pc <= `PC_RESET_ADDR;
     end else if(flush == `ENABLE) begin
         pc <= new_pc;
-    end else if(branch_flag_i == `ENABLE) begin
-        pc <= branch_target_addr_i;
     end else if(stall[0] != `ENABLE) begin
-        pc <= pc + `INST_BYTE_NUM;
+        if(branch_flag_i == `ENABLE) begin
+            pc <= branch_target_addr_i;
+        end else begin
+            pc <= pc + `INST_BYTE_NUM;
+        end
     end
 
 end

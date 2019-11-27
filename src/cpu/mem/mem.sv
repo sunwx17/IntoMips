@@ -41,7 +41,7 @@ module mem(
     output  Reg_addr_t  cp0_reg_write_addr_o,
     output  Word_t      cp0_reg_data_o,
 
-    input   Word_t      exception_type_i,
+    input   Excp_set_t  exception_type_i,
     input   Inst_addr_t pc_i,
     input   Bit_t       is_in_delayslot_i,
     input   Word_t      cp0_status_i,
@@ -50,10 +50,19 @@ module mem(
     input   Bit_t       wb_cp0_reg_we,
     input   Reg_addr_t  wb_cp0_reg_write_addr,
     input   Word_t      wb_cp0_reg_data,
-    output  Word_t      exception_type_o,
+    output  Excp_t      exception_type_o,
     output  Inst_addr_t pc_o,
     output  Bit_t       is_in_delayslot_o,
-    output  Word_t      cp0_epc_o
+    output  Word_t      cp0_epc_o,
+
+    input   Inst_addr_t inst_addr_v,
+    input   Word_t      data_addr_v,
+    output  Word_t      bad_addr_v,
+
+    output  Bit_t       tlb_p,
+    output  Bit_t       tlb_r,
+    output  Bit_t       tlb_wi,
+    output  Bit_t       tlb_wr
 );
 
 assign is_in_delayslot_o = is_in_delayslot_i;
@@ -64,6 +73,11 @@ Word_t  cp0_cause;
 Word_t  cp0_status;
 
 assign cp0_epc_o = cp0_epc;
+
+assign tlb_p  = (oper_i == OP_TLBP);
+assign tlb_r  = (oper_i == OP_TLBR);
+assign tlb_wi = (oper_i == OP_TLBWI);
+assign tlb_wr = (oper_i == OP_TLBWR);
 
 always_comb begin
     if(rst == `ENABLE) begin
@@ -88,20 +102,34 @@ end
 
 always_comb begin
     if (rst == `ENABLE) begin
-        exception_type_o <= `ZERO_WORD;
+        exception_type_o <= EXC_NO;
+        bad_addr_v <= `ZERO_WORD;
     end else begin
-        exception_type_o <= `ZERO_WORD;
+        exception_type_o <= EXC_NO;
+        bad_addr_v <= `ZERO_WORD;
         if(pc_i != `PC_RESET_ADDR) begin
             if(((cp0_cause[`CP0_CAUSE_IP] & cp0_status[`CP0_STATUS_IM]) != `ZERO_BYTE) && cp0_status[1] == `DISABLE && cp0_status[0] == `ENABLE) begin
-                exception_type_o <= `EXCP_TYPE_INTERRUPT;
-            end else if (exception_type_i[8] == `ENABLE) begin
-                exception_type_o <= `EXCP_TYPE_SYSCALL;
-            end else if (exception_type_i[9] == `ENABLE) begin
-                exception_type_o <= `EXCP_TYPE_INVALID_INST;
-            end else if (exception_type_i[11] == `ENABLE) begin
-                exception_type_o <= `EXCP_TYPE_OV;
-            end else if (exception_type_i[12] == `ENABLE) begin
-                exception_type_o <= `EXCP_TYPE_ERET;
+                exception_type_o <= EXC_INTERRUPT;
+            end else if (exception_type_i.inst_tlb_refill) begin
+                exception_type_o <= EXC_INST_TLB_REFILL;
+                bad_addr_v <= inst_addr_v;
+            end else if (exception_type_i.inst_tlb_invalid) begin
+                exception_type_o <= EXC_INST_TLB_INVALID;
+                bad_addr_v <= inst_addr_v;
+            end else if (exception_type_i.syscall) begin
+                exception_type_o <= EXC_SYSCALL;
+            end else if (exception_type_i.invalid_inst) begin
+                exception_type_o <= EXC_INVALID_INST;
+            end else if (exception_type_i.ov) begin
+                exception_type_o <= EXC_OV;
+            end else if (exception_type_i.eret) begin
+                exception_type_o <= EXC_ERET;
+            end else if (exception_type_i.data_tlb_refill) begin
+                exception_type_o <= EXC_DATA_TLB_REFILL;
+                bad_addr_v <= data_addr_v;
+            end else if (exception_type_i.data_tlb_invalid) begin
+                exception_type_o <= EXC_DATA_TLB_INVALID;
+                bad_addr_v <= data_addr_v;
             end
         end
     end

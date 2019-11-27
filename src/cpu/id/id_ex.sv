@@ -26,8 +26,11 @@ module id_ex(
     input   Stall_t     stall,
 
     input   Bit_t       flush,
-    input   Word_t      id_exception_type,
-    output  Word_t      ex_exception_type 
+    input   Excp_set_t  id_exception_type,
+    output  Excp_set_t  ex_exception_type,
+    
+    input   Inst_addr_t id_inst_addr_v,
+    output  Inst_addr_t ex_inst_addr_v
 );
 
 always @ (posedge clk) begin
@@ -40,7 +43,8 @@ always @ (posedge clk) begin
         ex_pc <= `PC_RESET_ADDR;
         ex_is_in_delayslot <= `DISABLE;
         is_in_delayslot_o <= `DISABLE;
-        ex_exception_type <= `ZERO_WORD;
+        ex_exception_type <= `NO_EXCP;
+        ex_inst_addr_v <= `ZERO_WORD;
     end else if (stall[2] == `DISABLE) begin
         ex_oper <= id_oper;
         ex_reg1 <= id_reg1;
@@ -51,6 +55,7 @@ always @ (posedge clk) begin
         ex_is_in_delayslot <= id_is_in_delayslot;
         is_in_delayslot_o <= next_is_in_delayslot_i;
         ex_exception_type <= id_exception_type;
+        ex_inst_addr_v <= id_inst_addr_v;
     end
 end
 

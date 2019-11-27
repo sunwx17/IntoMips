@@ -153,8 +153,8 @@ initial begin
     unittest("arithmetic_1");
     unittest("arithmetic_2");
     unittest("jump");    
-    unittest("memory");
-    unittest("load");
+    //unittest("memory");
+    //unittest("load");
     unittest("cp0");
     //unittest("exception");
     //unittest("timer_int");
