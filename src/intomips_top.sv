@@ -374,7 +374,7 @@ end
 
 
 cpu cpu_instance(
-    .clk(clk_25M),
+    .clk(clk_125),
     .rst(reset_btn),
     .rom_data_i(inst_data),
     .rom_addr_o(inst_addr_v),
@@ -392,7 +392,7 @@ cpu cpu_instance(
 
 
 bootrom_controller bootrom_controller_instance (
-    .clk(clk_50M),
+    .clk(clk_25M),
     .rst(reset_btn),
 
     .read_op(bootrom_read_op),
@@ -411,7 +411,7 @@ bootrom_controller bootrom_controller_instance (
 
 //base ram
 sram_controller base_sram_controller(
-    .clk(clk_50M),
+    .clk(clk_25M),
     .rst(reset_btn),
     .read_op(base_read_op),
     .write_op(base_write_op),
@@ -439,7 +439,7 @@ sram_controller base_sram_controller(
 
 //ext ram store instructions
 sram_controller ext_ram_controller(
-    .clk(clk_50M),
+    .clk(clk_25M),
     .rst(reset_btn),
     .read_op(ext_read_op),
     .write_op(ext_write_op),

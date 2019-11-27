@@ -102,6 +102,27 @@ always_comb begin
 end
 
 always_comb begin
+    case (matched) 
+        16'h0001: matched_index <= 0;
+        16'h0002: matched_index <= 1;
+        16'h0004: matched_index <= 2;
+        16'h0008: matched_index <= 3;
+        16'h0010: matched_index <= 4;
+        16'h0020: matched_index <= 5;
+        16'h0040: matched_index <= 6;
+        16'h0080: matched_index <= 7;
+        16'h0100: matched_index <= 8;
+        16'h0200: matched_index <= 9;
+        16'h0400: matched_index <= 10;
+        16'h0800: matched_index <= 11;
+        16'h1000: matched_index <= 12;
+        16'h2000: matched_index <= 13;
+        16'h4000: matched_index <= 14;
+        16'h8000: matched_index <= 15;
+        default: matched_index <= 0;
+    endcase
+    //matched_index <= 0;
+    /*
     if(matched[0]) matched_index <= 0;
     else if(matched[1]) matched_index <= 1;
     else if(matched[2]) matched_index <= 2;
@@ -118,7 +139,7 @@ always_comb begin
     else if(matched[13]) matched_index <= 13;
     else if(matched[14]) matched_index <= 14;
     else if(matched[15]) matched_index <= 15;
-    else matched_index <= 0;
+    else matched_index <= 0;*/
 end
 
 
