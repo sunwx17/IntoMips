@@ -366,7 +366,7 @@ always_comb begin
         if (data_in_flash) begin
             //data in flash
             //inst must be in ext_ram or base_ram or bootrom
-            //can only use "lb"
+            //can only use "lh"
             flash_read_op <= data_read_op;
             flash_addr <= data_addr;
             data_data_read <= flash_data_read;
@@ -480,6 +480,7 @@ sram_controller ext_ram_controller(
 );
 
 flash_controller flash_controller_instance (
+    //it CANNOT work in 50MHz(tested)
     .clk(clk_25M),
     .rst(reset_btn),
     .bus_addr(flash_addr),
