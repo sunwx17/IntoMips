@@ -1,4 +1,4 @@
-`include "defines.svh"
+`include "peripheral_defines.svh"
 
 module flash_controller(
     input clk, rst,

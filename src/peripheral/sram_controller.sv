@@ -1,4 +1,4 @@
-`include "cpu_defines.svh"
+`include "peripheral_defines.svh"
 module sram_controller (
     //时钟信号
     input Bit_t     clk,
