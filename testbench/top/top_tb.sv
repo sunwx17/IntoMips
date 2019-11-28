@@ -24,15 +24,15 @@ end
 Word_t flash_addr;
 intomips_top intomips_top_instance(
     .clk_50M(clock_50),           //50MHz 时钟输入
-    .reset_btn(rst),         //BTN6手动复位按钮�?关，带消抖电路，按下时为1
+    .reset_btn(rst),         //BTN6手动复位按钮�?关，带消抖电路，按下时为1
 
 
-   /* //CPLD串口控制器信�?
-    output wire uart_rdn,         //读串口信号，低有�?
-    output wire uart_wrn,         //写串口信号，低有�?
-    input wire uart_dataready,    //串口数据准备�?
-    input wire uart_tbre,         //发�?�数据标�?
-    input wire uart_tsre,         //数据发�?�完毕标�?*/
+   /* //CPLD串口控制器信�?
+    output wire uart_rdn,         //读串口信号，低有�?
+    output wire uart_wrn,         //写串口信号，低有�?
+    input wire uart_dataready,    //串口数据准备�?
+    input wire uart_tbre,         //发�?�数据标�?
+    input wire uart_tsre,         //数据发�?�完毕标�?*/
 
     //BaseRAM信号
     .base_ram_data(base_sram.ram_data),

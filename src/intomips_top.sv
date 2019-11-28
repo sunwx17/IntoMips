@@ -123,6 +123,7 @@ Bit_t       data_in_bootrom;
 Bit_t       data_in_uart_data;
 Bit_t       data_in_uart_status;
 Bit_t       data_in_vga;
+Bit_t       data_in_usb;
 
 Inst_addr_t inst_addr;
 Inst_addr_t data_addr;
@@ -172,6 +173,13 @@ Bit_t       vga_write_op;
 Word_t      vga_data_write;
 Word_t      vga_addr;
 
+Bit_t       usb_read_op;
+Bit_t       usb_write_op;
+Word_t      usb_addr;
+Word_t      usb_data_read;
+Word_t      usb_data_write;
+Bit_t       usb_interrupt;
+
 
 Bit_t       inst_read_op;
 Word_t      inst_data;
@@ -185,6 +193,7 @@ Mask_t      data_mask;
 Bit_t       ext_stallreq;
 Bit_t       base_stallreq;
 Bit_t       flash_stallreq;
+Bit_t       usb_stallreq;
 Bit_t       stallreq;
 
 
@@ -197,7 +206,6 @@ Word_t  bootrom_data_read;
 Bit_t   bootrom_read_op_ex;
 Word_t  bootrom_addr_ex;
 Word_t  bootrom_data_read_ex;
-
 
 
 assign inst_addr = {10'b0, inst_addr_v[21:0]};
@@ -214,6 +222,7 @@ always_comb begin
     data_in_vga <= `ADDR_IN_VGA(data_addr_v);
     data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v);
     data_in_flash <= `ADDR_IN_FLASH(data_addr_v);
+    data_in_usb <= `ADDR_IN_USB(data_addr_v);
 end
 
 always_comb begin
@@ -382,6 +391,16 @@ always_comb begin
 
             stallreq <= flash_stallreq;
         end
+
+        if (data_in_usb) begin
+            usb_read_op <= data_read_op;
+            usb_write_op <= data_write_op;
+            usb_addr <= data_addr;
+            usb_data_write <= data_data_write;
+            data_data_read <= usb_data_read;
+
+            stallreq <= usb_stallreq;
+        end
     end
 
 
@@ -413,7 +432,7 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({3'b0, uart_mode[1], 2'b0})
+    .int_i({3'b0, uart_mode[1], usb_interrupt, 1'b0})
     //.timer_int_o
 );
 
@@ -564,6 +583,26 @@ vga_controller vga_controller_instance(
     .video_de
 );
 
+usb_controller usb_controller_instance(
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .read_op(usb_read_op),
+    .write_op(usb_write_op),
+    .bus_data_addr(usb_addr),
+    .bus_data_write(usb_data_write),
+    .bus_data_read(usb_data_read),
+    .bus_stall(usb_stallreq),
+    .usb_interrupt(usb_interrupt),
+    .sl811_a0,
+    .sl811_d(dm9k_sd[7:0]),
+    .sl811_wr_n,
+    .sl811_rd_n,
+    .sl811_cs_n,
+    .sl811_rst_n,
+    .sl811_dack_n,
+    .sl811_intrq,
+    .sl811_drq_n    
+);
 
 
 //assign leds[7:0] = base_ram_data[7:0];
