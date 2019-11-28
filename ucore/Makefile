@@ -1,6 +1,6 @@
 ON_FPGA :=y
 
-CROSS_COMPILE = mips-mti-elf-
+CROSS_COMPILE ?= mipsel-linux-gnu-
 
 # eliminate default suffix rules
 .SUFFIXES: .c .S .h
@@ -54,8 +54,8 @@ INCLUDES  := $(addprefix -I,$(SRC_DIR))
 INCLUDES  += -I$(SRCDIR)/include
 
 # reserve 1MB for user app
-USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep world
-INITRD_BLOCK_CNT := 4000 
+USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep
+INITRD_BLOCK_CNT := 2000 
 
 ifeq  ($(ON_FPGA), y)
 FPGA_LD_FLAGS += -S
