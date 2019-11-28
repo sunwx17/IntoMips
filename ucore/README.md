@@ -6,12 +6,12 @@ Build
 
 Build for FPGA:
 
-`make CROSS_COMPILE=<path-to-mips-mti-elf>/bin/mips-mti-elf- ON_FPGA=y -j4`
+`make ON_FPGA=y -j4`
 
 Simulation
 ----
 
-`make CROSS_COMPILE=<path-to-mips-mti-elf>/bin/mips-mti-elf- ON_FPGA=n qemu`
+`make ON_FPGA=n qemu`
 
 More
 ---
