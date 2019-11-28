@@ -33,15 +33,16 @@ Halfword_t data_write_inner;
 assign flash_d = write_op_inner?  data_write_inner: `HIGH_WORD;
 
 typedef enum {
+    RESTART,
     IDLE,
     READ_WORD_LOW_[`FLASH_WAIT_CYCLE],
     READ_WORD_HIGH_[`FLASH_WAIT_CYCLE],
-    WRITE_HWORD_[`FLASH_WAIT_CYCLE]
+    WRITE_HWORD_[`FLASH_WAIT_CYCLE],
+    NOP //necessary for cpu
 } State_t;
 State_t cur_state;
 
 `define RESET \
-    cur_state <= IDLE; \
     flash_ce_n <= 1'b1; \
     flash_oe_n <= 1'b1; \
     flash_we_n <= 1'b1; \
@@ -51,11 +52,24 @@ State_t cur_state;
 
 always_ff @ (posedge clk or posedge rst) begin
     if (rst) begin
+        cur_state <= RESTART;
         `RESET
     end else begin
         case(cur_state)
+            RESTART: begin
+                //设置read mode
+                flash_ce_n <= 1'b0;
+                flash_oe_n <= 1'b1;
+                flash_we_n <= 1'b0;
+                write_op_inner <= 1'b1;
+                flash_addr_inner <= 0;
+                data_write_inner <= 4'h00ff;
+                cur_state <= WRITE_HWORD_0;
+            end
+
             IDLE: begin
                 `RESET
+                cur_state <= IDLE;
                 if (read_op) begin
                     cur_state <= READ_WORD_LOW_0;
                     flash_ce_n <= 1'b0;
@@ -68,23 +82,24 @@ always_ff @ (posedge clk or posedge rst) begin
                     flash_we_n <= 1'b0;
                     flash_addr_inner <= bus_addr;
                     write_op_inner <= 1'b1;
-                    data_write_inner <= bus_data[15:0];
+                    data_write_inner <= bus_data_write[15:0];
                     bus_stall <= 1'b1;
-                end
+                end 
             end
 
             //read
             `FLASH_WAIT_STATES(cur_state, READ_WORD_LOW)
             
             `FLASH_LAST_WAIT_STATE(READ_WORD_LOW): begin
+                cur_state <= READ_WORD_HIGH_0;
                 bus_data_read[15:0] <= flash_d;
                 flash_addr_inner <= bus_addr + 2'h2;
-                cur_state <= READ_WORD_HIGH_0;
             end
 
             `FLASH_WAIT_STATES(cur_state, READ_WORD_HIGH)
 
             `FLASH_LAST_WAIT_STATE(READ_WORD_HIGH): begin
+                cur_state <= NOP;
                 bus_data_read[31: 16] <= flash_d;
                 `RESET
             end
@@ -93,7 +108,12 @@ always_ff @ (posedge clk or posedge rst) begin
             `FLASH_WAIT_STATES(cur_state, WRITE_HWORD)
 
             `FLASH_LAST_WAIT_STATE(WRITE_HWORD): begin
+                cur_state <= NOP;
                 `RESET
+            end
+
+            NOP: begin
+                cur_state <= IDLE;
             end
         endcase
     end

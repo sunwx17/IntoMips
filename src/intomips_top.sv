@@ -1,4 +1,6 @@
 `default_nettype wire
+`include "cpu_defines.svh"
+`include "peripheral_defines.svh"
 
 module intomips_top(
     input wire clk_50M,           //50MHz 时钟输入
@@ -154,8 +156,10 @@ Word_t      base_data_write_ex;
 Mask_t      base_mask_ex;
 
 Bit_t       flash_read_op;
+Bit_t       flash_write_op;
 Word_t      flash_addr;
 Word_t      flash_data_read;
+Word_t      flash_data_write;
 
 
 Bit_t       uart_read_op;
@@ -180,6 +184,7 @@ Mask_t      data_mask;
 
 Bit_t       ext_stallreq;
 Bit_t       base_stallreq;
+Bit_t       flash_stallreq;
 Bit_t       stallreq;
 
 
@@ -241,7 +246,9 @@ always_comb begin
     base_mask_ex <= 4'b0000;
 
     flash_read_op <= `DISABLE;
+    flash_write_op <= `DISABLE;
     flash_addr <= `ZERO_WORD;
+    flash_data_write <= `ZERO_WORD;
 
     stallreq <= `DISABLE;
 
@@ -368,8 +375,12 @@ always_comb begin
             //inst must be in ext_ram or base_ram or bootrom
             //can only use "lh"
             flash_read_op <= data_read_op;
+            flash_write_op <= data_write_op;
             flash_addr <= data_addr;
+            flash_data_write <= data_data_write;
             data_data_read <= flash_data_read;
+
+            stallreq <= flash_stallreq;
         end
     end
 
@@ -485,7 +496,10 @@ flash_controller flash_controller_instance (
     .rst(reset_btn),
     .bus_addr(flash_addr),
     .read_op(flash_read_op),
+    .write_op(flash_write_op),
     .bus_data_read(flash_data_read),
+    .bus_data_write(flash_data_write),
+    .bus_stall(flash_stallreq),
     .flash_a,
     .flash_d,
     .flash_rp_n,

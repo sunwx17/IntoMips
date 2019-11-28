@@ -1,11 +1,13 @@
 `ifndef PERIPHERAL_DEFINES_SVH
 `define PERIPHERAL_DEFINES_SVH
 
-`include "define.svh"
+`include "defines.svh"
+
+typedef logic[3:0] Sram_Mask_t;
 
 typedef logic[19:0] Ram_addr_t;
 typedef logic[22:0] Flash_addr_t;
-typedef logic[18:0] Vga_addr_t
+typedef logic[18:0] Vga_addr_t;
 
 //vga
 `define VGA_HSIZE   800
@@ -40,12 +42,16 @@ typedef logic[1:0]  Serial_mode_t;
     end
 
 `define WAIT_4_STATES(CUR_STATE, NAME) \
-    `WAITE_STATE(CUR_STATE, NAME, 0, 1) \
-    `WAITE_STATE(CUR_STATE, NAME, 1, 2) \
-    `WAITE_STATE(CUR_STATE, NAME, 2, 3) 
+    `WAIT_STATE(CUR_STATE, NAME, 0, 1) \
+    `WAIT_STATE(CUR_STATE, NAME, 1, 2) \
+    `WAIT_STATE(CUR_STATE, NAME, 2, 3) 
 
-`define FLASH_WAIT_CYCLE 4
-`define FLASH_WAIT_STATES(CUR_STATE, NAME) `WAIT_4_STATES(CUR_STATE, NAME)
-`define FLASH_LAST_WAIT_STATE(NAME) NAME``_``3
+`define WAIT_2_STATES(CUR_STATE, NAME) \
+    `WAIT_STATE(CUR_STATE, NAME, 0, 1) 
+
+
+`define FLASH_WAIT_CYCLE 2
+`define FLASH_WAIT_STATES(CUR_STATE, NAME) `WAIT_2_STATES(CUR_STATE, NAME)
+`define FLASH_LAST_WAIT_STATE(NAME) NAME``_``1
 
 `endif
