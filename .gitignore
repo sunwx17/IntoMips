@@ -12,6 +12,8 @@ ucore/*.o
 ucore/*.a
 ucore/*.bin
 ucore/*.ub
+ucore/boot/*.bin
+ucore/boot/*.o
 ucore/boot/loader
 ucore/boot/loader.o
 ucore/boot/loader.bin
