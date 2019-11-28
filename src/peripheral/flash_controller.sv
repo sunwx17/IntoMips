@@ -6,6 +6,7 @@ module flash_controller(
     input Word_t        bus_addr,       //总线地址
     input Bit_t         read_op,        //读信号 1为读
     output Word_t       bus_data_read,  //总线从flash读入数据 实际只有半字 两个半字拼在一起
+    output Bit_t        bus_stall,
 
 
     output Flash_addr_t flash_a,        //Flash地址，a0仅在8bit模式有效，16bit模式无意义
@@ -17,6 +18,9 @@ module flash_controller(
     output Bit_t        flash_we_n,     //Flash写使能信号，低有效
     output Bit_t        flash_byte_n    //Flash 8bit模式选择，低有效。在使用flash的16位模式时请设为1
 );
+
+Flash_addr_t flash_addr_inner;
+assign flash_a = flash_addr_inner; //为了满足时序
 
 assign flash_ce_n = 1'b0; //加速
 
@@ -33,23 +37,24 @@ always_ff @ (posedge clk or posedge rst) begin
     if (rst) begin
         cur_state   <= IDLE;
         flash_oe_n  <= 1'b1;
-        flash_a     <= `ZERO_WORD; 
+        flash_addr_inner <= `ZERO_WORD; 
+
     end else begin
         case(cur_state)
             IDLE: begin
                 cur_state   <= IDLE;
                 flash_oe_n  <= 1'b1;
-                flash_a     <= `ZERO_WORD;
+                flash_addr_inner <= `ZERO_WORD;
                 if (read_op) begin
                     cur_state   <= READ;
                     flash_oe_n  <= 1'b0;
-                    flash_a     <= bus_addr;
+                    flash_addr_inner <= bus_addr;
                 end
             end
             READ: begin
                 cur_state   <= IDLE;
                 flash_oe_n  <= 1'b1;
-                flash_a     <= `ZERO_WORD;
+                flash_addr_inner <= `ZERO_WORD;
 
                 bus_data_read   <= {flash_d, flash_d};
             end
