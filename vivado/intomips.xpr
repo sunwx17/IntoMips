@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="D:/Desktop/SECO/IntoMips/vivado/intomips.xpr">
+<Project Version="7" Minor="39" Path="/home/monell/code/IntoMips/vivado/intomips.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="8de52a4ed05c44eda4fb54cbd590c16f"/>
@@ -32,20 +32,20 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="1222"/>
+    <Option Name="WTXSimLaunchSim" Val="1356"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="11"/>
-    <Option Name="WTModelSimExportSim" Val="11"/>
-    <Option Name="WTQuestaExportSim" Val="11"/>
-    <Option Name="WTIesExportSim" Val="11"/>
-    <Option Name="WTVcsExportSim" Val="11"/>
-    <Option Name="WTRivieraExportSim" Val="11"/>
-    <Option Name="WTActivehdlExportSim" Val="11"/>
+    <Option Name="WTXSimExportSim" Val="14"/>
+    <Option Name="WTModelSimExportSim" Val="14"/>
+    <Option Name="WTQuestaExportSim" Val="14"/>
+    <Option Name="WTIesExportSim" Val="14"/>
+    <Option Name="WTVcsExportSim" Val="14"/>
+    <Option Name="WTRivieraExportSim" Val="14"/>
+    <Option Name="WTActivehdlExportSim" Val="14"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -277,6 +277,12 @@
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/peripheral/peripheral_defines.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -892,6 +898,63 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../testbench/model/28F640P30.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/model/sram_model.sv">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cloud/kernel.bin"/>
+      <File Path="$PPRDIR/../testbench/model/include/def.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/model/include/TimingData.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/model/include/UserData.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/model/include/BankLib.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/model/include/CUIcommandData.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/model/include/data.svh">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../testbench/cloud/flash_lh.mem">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="top_tb"/>
@@ -900,19 +963,6 @@
         <Option Name="TransportIntDelay" Val="0"/>
         <Option Name="SrcSet" Val="sources_1"/>
         <Option Name="xsim.simulate.runtime" Val="5000000"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="blk_mem_bootrom" Type="BlockSrcs" RelSrcDir="$PSRCDIR/blk_mem_bootrom">
-      <File Path="$PSRCDIR/sources_1/ip/blk_mem_bootrom/blk_mem_bootrom.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="blk_mem_bootrom"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
     <FileSet Name="blk_mem_ascii_rom" Type="BlockSrcs" RelSrcDir="$PSRCDIR/blk_mem_ascii_rom">
@@ -928,6 +978,19 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
+    <FileSet Name="blk_mem_bootrom" Type="BlockSrcs" RelSrcDir="$PSRCDIR/blk_mem_bootrom">
+      <File Path="$PSRCDIR/sources_1/ip/blk_mem_bootrom/blk_mem_bootrom.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="blk_mem_bootrom"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
   </FileSets>
   <Simulators>
     <Simulator Name="XSim">
@@ -940,11 +1003,17 @@
     <Simulator Name="Questa">
       <Option Name="Description" Val="Questa Advanced Simulator"/>
     </Simulator>
+    <Simulator Name="IES">
+      <Option Name="Description" Val="Incisive Enterprise Simulator (IES)"/>
+    </Simulator>
+    <Simulator Name="Xcelium">
+      <Option Name="Description" Val="Xcelium Parallel Simulator"/>
+    </Simulator>
+    <Simulator Name="VCS">
+      <Option Name="Description" Val="Verilog Compiler Simulator (VCS)"/>
+    </Simulator>
     <Simulator Name="Riviera">
       <Option Name="Description" Val="Riviera-PRO Simulator"/>
-    </Simulator>
-    <Simulator Name="ActiveHDL">
-      <Option Name="Description" Val="Active-HDL Simulator"/>
     </Simulator>
   </Simulators>
   <Runs Version="1" Minor="10">
@@ -957,7 +1026,7 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="blk_mem_bootrom_synth_1" Type="Ft3:Synth" SrcSet="blk_mem_bootrom" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_bootrom" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/blk_mem_bootrom_synth_1" IncludeInArchive="true">
+    <Run Id="blk_mem_ascii_rom_synth_1" Type="Ft3:Synth" SrcSet="blk_mem_ascii_rom" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_ascii_rom" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/blk_mem_ascii_rom_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
@@ -966,9 +1035,11 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="blk_mem_ascii_rom_synth_1" Type="Ft3:Synth" SrcSet="blk_mem_ascii_rom" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_ascii_rom" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/blk_mem_ascii_rom_synth_1" IncludeInArchive="true">
+    <Run Id="blk_mem_bootrom_synth_1" Type="Ft3:Synth" SrcSet="blk_mem_bootrom" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_bootrom" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/blk_mem_bootrom_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
+          <Desc>Vivado Synthesis Defaults</Desc>
+        </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -992,7 +1063,7 @@
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="blk_mem_bootrom_impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_bootrom" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="blk_mem_bootrom_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="blk_mem_ascii_rom_impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_ascii_rom" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="blk_mem_ascii_rom_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
@@ -1008,9 +1079,11 @@
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2018"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="blk_mem_ascii_rom_impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_ascii_rom" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="blk_mem_ascii_rom_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="blk_mem_bootrom_impl_1" Type="Ft2:EntireDesign" Part="xc7a100tfgg676-2L" ConstrsSet="blk_mem_bootrom" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="blk_mem_bootrom_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
+          <Desc>Default settings for Implementation.</Desc>
+        </StratHandle>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

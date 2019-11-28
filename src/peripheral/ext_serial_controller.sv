@@ -1,4 +1,4 @@
-`include "defines.svh"
+`include "peripheral_defines.svh"
 
 module ext_serial_controller(
     input Bit_t             clk,

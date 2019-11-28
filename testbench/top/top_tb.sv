@@ -14,13 +14,14 @@ initial begin
     rst = 1'b1;
     $readmemh({"memory_byte", ".mem"}, ext_sram.sram_mem);
     //$readmemh({"vga_ascii_demo", ".mem"}, ext_sram.sram_mem);
-    $readmemh({"kernel", ".mem"}, base_sram.sram_mem);
+    //$readmemh({"kernel", ".mem"}, base_sram.sram_mem);
+    $readmemh({"flash_lh", ".mem"}, base_sram.sram_mem);
     #200 rst = 1'b0;
     #5000000 rst = 1'b1;
     #5002000 $stop;
 end
 
-
+Word_t flash_addr;
 intomips_top intomips_top_instance(
     .clk_50M(clock_50),           //50MHz 时钟输入
     .reset_btn(rst),         //BTN6手动复位按钮开关，带消抖电路，按下时为1
@@ -49,8 +50,17 @@ intomips_top intomips_top_instance(
     .ext_ram_oe_n(ext_sram.ram_oe_n),
     .ext_ram_we_n(ext_sram.ram_we_n),
 
-    .uart_dataready(1'b0)
+    //flash信号
+    .flash_a(flash_addr),
+    .flash_d(fake_flash.DQ),
+    .flash_rp_n(fake_flash.RP_N),
+    .flash_vpen(fake_flash.WP_N),
+    .flash_ce_n(fake_flash.E_N),
+    .flash_oe_n(fake_flash.G_N),
+    .flash_we_n(fake_flash.W_N),
 
+
+    .uart_dataready(1'b0)
 );
 
 fake_sram ext_sram(
@@ -73,6 +83,23 @@ fake_sram0 base_sram(
     .ram_we_n(intomips_top_instance.base_ram_we_n) 
 );
 
+parameter FLASH_INIT_FILE = "kernel.bin";
+
+x28fxxxp30 #(.FILENAME_MEM(FLASH_INIT_FILE)) fake_flash(
+    .A(flash_addr[1+:22]), 
+    .DQ(intomips_top_instance.flash_d), 
+    .W_N(intomips_top_instance.flash_we_n), 
+    .G_N(intomips_top_instance.flash_oe_n),
+    .E_N(intomips_top_instance.flash_ce_n), 
+    .L_N(1'b0),
+    .K(1'b0),
+    .WP_N(intomips_top_instance.flash_vpen),
+    .RP_N(intomips_top_instance.flash_rp_n),
+    .VDD('d3300), 
+    .VDDQ('d3300), 
+    .VPP('d1800), 
+    .Info(1'b1)
+);
 
 
 

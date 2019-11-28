@@ -17,13 +17,6 @@ typedef logic[15:0] Halfword_t;
 typedef logic[31:0] Word_t;
 typedef logic[63:0] Doubleword_t;
 
-//ram data format
-typedef logic[19:0] Ram_addr_t;
-//flash data format
-typedef logic[22:0] Flash_addr_t;
-//vga data format
-typedef logic[18:0] Vga_addr_t;
-
 `define ZERO_BIT    1'b0
 `define ZERO_BYTE   8'h0
 `define ZERO_HWORD  16'h0
@@ -36,28 +29,6 @@ typedef logic[18:0] Vga_addr_t;
 //mmu
 `define USE_MMU     1
 
-//vga
-`define VGA_HSIZE   800
-`define VGA_HMAX    1040
-`define VGA_VSIZE   600
-`define VGA_VMAX    666
-`define VGA_HFP     856
-`define VGA_HSP     976 
-`define VGA_VFP     637
-`define VGA_VSP     643
-`define VGA_NORMAL_HSIZE        800
-`define VGA_NORMAL_VSIZE        592
-`define VGA_BLOCK_HSIZE         8
-`define VGA_BLOCK_VSIZE         16
-`define VGA_BLOCK_HNUM          100
-`define VGA_BLOCK_VNUM          37
-
-//typedef logic[127:0] Ascii_data_t;
-typedef logic[0:127] Ascii_data_t;
-typedef logic[11:0] Graphics_block_addr_t;
-typedef logic[9:0] Block_bit_addr_t;
-
-typedef logic[1:0]  Serial_mode_t;
 
 //instruction
 `define INST_WIDTH          32
@@ -91,6 +62,7 @@ typedef Reg_data_t[`REG_NUM - 1:0]  Regs_t;
 `define ADDR_IN_UART_STATUS(addr)   (addr == 32'hBFD003FC)
 `define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA000e74)
 `define ADDR_IN_BOOTROM(addr)       (addr >= 32'h8fc00000 && addr < 32'h8fc04000)
+`define ADDR_IN_FLASH(addr)         (addr >= 32'h81000000 && addr < 32'h81800000)
 
 
 

@@ -1,4 +1,4 @@
-`include "defines.svh"
+`include "peripheral_defines.svh"
 
 module serial_controller(
     input clk, rst,
