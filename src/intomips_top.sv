@@ -1,4 +1,6 @@
 `default_nettype wire
+`include "cpu_defines.svh"
+`include "peripheral_defines.svh"
 
 module intomips_top(
     input wire clk_50M,           //50MHz 时钟输入
@@ -90,9 +92,7 @@ assign leds[6] = uart_mode[1];*/
 
 //reg a = 1'b0;
 
-//与主频反�?
 reg clk_25M = 1'b0;
-
 reg clk_125 = 1'b0;
 //cpu导入
 always @(negedge clk_50M) begin
@@ -113,6 +113,9 @@ Bit_t       data_in_ext;
 
 Bit_t       inst_in_base;
 Bit_t       data_in_base;
+
+//inst cannot be in flash
+Bit_t       data_in_flash;
 
 Bit_t       inst_in_bootrom;
 Bit_t       data_in_bootrom;
@@ -152,6 +155,11 @@ Word_t      base_data_read_ex;
 Word_t      base_data_write_ex;
 Mask_t      base_mask_ex;
 
+Bit_t       flash_read_op;
+Bit_t       flash_write_op;
+Word_t      flash_addr;
+Word_t      flash_data_read;
+Word_t      flash_data_write;
 
 
 Bit_t       uart_read_op;
@@ -176,6 +184,7 @@ Mask_t      data_mask;
 
 Bit_t       ext_stallreq;
 Bit_t       base_stallreq;
+Bit_t       flash_stallreq;
 Bit_t       stallreq;
 
 
@@ -204,7 +213,7 @@ always_comb begin
     data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v);
     data_in_vga <= `ADDR_IN_VGA(data_addr_v);
     data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v);
-    
+    data_in_flash <= `ADDR_IN_FLASH(data_addr_v);
 end
 
 always_comb begin
@@ -235,6 +244,11 @@ always_comb begin
     base_addr_ex <= `ZERO_WORD;
     base_data_write_ex <=  `ZERO_WORD;
     base_mask_ex <= 4'b0000;
+
+    flash_read_op <= `DISABLE;
+    flash_write_op <= `DISABLE;
+    flash_addr <= `ZERO_WORD;
+    flash_data_write <= `ZERO_WORD;
 
     stallreq <= `DISABLE;
 
@@ -355,6 +369,19 @@ always_comb begin
         inst_data <= inst_in_ext ? ext_data_read : (inst_in_base ? base_data_read : `ZERO_WORD);
         data_data_read <= data_in_ext ? ext_data_read : (data_in_base ? base_data_read : `ZERO_WORD);
         
+
+        if (data_in_flash) begin
+            //data in flash
+            //inst must be in ext_ram or base_ram or bootrom
+            //can only use "lh"
+            flash_read_op <= data_read_op;
+            flash_write_op <= data_write_op;
+            flash_addr <= data_addr;
+            flash_data_write <= data_data_write;
+            data_data_read <= flash_data_read;
+
+            stallreq <= flash_stallreq;
+        end
     end
 
 
@@ -463,6 +490,25 @@ sram_controller ext_ram_controller(
     .ram_we_n(ext_ram_we_n)
 );
 
+flash_controller flash_controller_instance (
+    //it CANNOT work in 50MHz(tested)
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .bus_addr(flash_addr),
+    .read_op(flash_read_op),
+    .write_op(flash_write_op),
+    .bus_data_read(flash_data_read),
+    .bus_data_write(flash_data_write),
+    .bus_stall(flash_stallreq),
+    .flash_a,
+    .flash_d,
+    .flash_rp_n,
+    .flash_vpen,
+    .flash_ce_n,
+    .flash_oe_n,
+    .flash_we_n,
+    .flash_byte_n
+);
 
 /*
 serial_controller serial_controller_instance(
