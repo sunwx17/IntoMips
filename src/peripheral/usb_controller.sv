@@ -1,14 +1,17 @@
-`include "defines.svh"
+`include "peripheral_defines.svh"
 
-module usb_controler (
-    input clk, rst,
+module usb_controller (
+    input Bit_t     clk,
+    input Bit_t     rst,
 
     input Bit_t     read_op,
     input Bit_t     write_op,
 
-    input Byte_t    bus_data_write,
-    output Byte_t   bus_data_read,
+    input Word_t    bus_data_addr,
+    input Word_t    bus_data_write,
+    output Word_t   bus_data_read,
     output Bit_t    bus_stall,
+    output Bit_t    usb_interrupt,
     
 
     output Bit_t    sl811_a0,
@@ -22,87 +25,93 @@ module usb_controler (
     input  Bit_t    sl811_drq_n
 );
 
-//TODO: 中断
+assign usb_interrupt = sl811_intrq;
 
 Bit_t write_op_inner;
 Byte_t data_write_inner;
-assign sl811_d = write_op_inner? data_write_inner: `HIGH_BYTE;
+assign sl811_d = write_op_inner? data_write_inner: `HIGH_WORD;
 
-#define `WAIT_CYCLES 3
+Word_t data_addr_inner;
+assign data_addr_inner = bus_data_addr >> 2;
+/*
+实际usb只有两个地址0x???????0 和0x???????4
+前者为地址寄存器的位置，后者为数据寄存器的位置
+实质上将地址后移两位后取末尾位来满足usb的要求
+*/
+
 typedef enum {
     IDLE,
-    READ_[`WAIT_CYCLES],
-    WRITE_[`WAIT_CYCLES],
-    HOLD_[`WAIT_CYCLES]
+    READ_[`USB_WAIT_CYCLE],
+    WRITE_[`USB_WAIT_CYCLE],
+    HOLD_[`USB_WAIT_CYCLE],
+    NOP
 } State_t;
 
 State_t cur_state;
 
-`define WAIT_STATE(NAME, A, B) NAME``_``A: begin \
-    cur_state <= NAME``_``B; \
-end
-
-`define WAIT_STATES(NAME, A, B) `WAITE_STATE(NAME, 0, 1) \
-    `WAITE_STATE(NAME, 1, 2) \
-    `WAITE_STATE(NAME, 2, 3) 
-
-`define RESET \
-    sl811_a0 <= 1'b0;
-
-
 always_ff @(posedge clk or posedge rst) begin
     if (rst) begin
+        cur_state <= IDLE;
+
+        sl811_cs_n <= 1'b1;
+        sl811_wr_n <= 1'b1;
+        sl811_rd_n <= 1'b1;
         write_op_inner <= 1'b0;
         bus_data_read <= `ZERO_WORD;
         bus_stall <= 1'b0;
-
-        cur_state <= IDLE;
-    end begin
+    end else begin
         case(cur_state)
             IDLE: begin
+                cur_state <= IDLE;
+
                 sl811_cs_n <= 1'b1;
                 sl811_wr_n <= 1'b1;
                 sl811_rd_n <= 1'b1;
                 write_op_inner <= 1'b0;
-                sl811_a0 <= bus_data_addr[0];
+                sl811_a0 <= data_addr_inner[0];
                 if (read_op) begin
+                    cur_state <= READ_0;
+
                     sl811_cs_n <= 1'b0;
                     sl811_rd_n <= 1'b0;
                     bus_stall <= 1'b1;
-                    cur_state <= READ_0;
                 end else if (write_op) begin
+                    cur_state <= WRITE_0;
+
                     sl811_cs_n <= 1'b0;
                     sl811_wr_n <= 1'b0;
-                    write_op <= 1'b1;
-                    data_write_inner <= bus_data_write;
+                    write_op_inner <= 1'b1;
+                    data_write_inner <= bus_data_write[7:0];
                     bus_stall <= 1'b1;
-                    cur_state <= WRITE_0;
                 end
             end
 
-            `WAIT_STATES(READ)
+            `USB_WAIT_STATES(cur_state, READ)
 
-            READ_3: begin
+            `USB_LAST_WAIT_STATE(READ): begin
+                cur_state <= HOLD_0;
+
                 sl811_cs_n <= 1'b1;
                 sl811_rd_n <= 1'b1;
-                bus_data_read <= sl811_d;
-                cur_state <= HOLD_0;
+                bus_data_read <= {4{sl811_d}};
             end
 
-            `WAIT_STATES(WRITE)
+            `USB_WAIT_STATES(cur_state, WRITE)
 
-            WRITE_3: begin
+            `USB_LAST_WAIT_STATE(WRITE): begin
+                cur_state <= HOLD_0;
+
                 sl811_cs_n <= 1'b1;
                 sl811_wr_n <= 1'b1;
-                cur_state <= HOLD_0;
             end
 
-            `WAIT_STATES(HOLD)
+            `USB_WAIT_STATES(cur_state, HOLD)
 
-            HOLD_3: begin
-                inner_write_op <= 1'b0;
-                bus_stall <= 1'b0;
+            `USB_LAST_WAIT_STATE(HOLD): begin
                 cur_state <= IDLE;
+
+                write_op_inner <= 1'b0;
+                bus_stall <= 1'b0;
             end
         endcase
     end
