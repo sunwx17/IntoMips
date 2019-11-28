@@ -1,4 +1,4 @@
-`include "defines.svh"
+`include "peripheral_defines.svh"
 
 module vga_controller(
     input clk_25M, clk_50M, rst,
@@ -17,14 +17,6 @@ module vga_controller(
     output Bit_t        video_clk,          //像素时钟输出
     output Bit_t        video_de            //行数据有效信号，用于区分消隐区
 );
-
-
-        
-
-
-
-
-
 
 
 typedef enum {IDLE, WRITE} State_t;
