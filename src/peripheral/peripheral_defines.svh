@@ -32,4 +32,20 @@ typedef logic[9:0] Block_bit_addr_t;
 typedef logic[1:0]  Serial_mode_t;
 
 
+
+//generate waiting state
+`define WAIT_STATE(CUR_STATE, NAME, A, B) \
+    NAME``_``A: begin \
+        CUR_STATE <= NAME``_``B; \
+    end
+
+`define WAIT_4_STATES(CUR_STATE, NAME) \
+    `WAITE_STATE(CUR_STATE, NAME, 0, 1) \
+    `WAITE_STATE(CUR_STATE, NAME, 1, 2) \
+    `WAITE_STATE(CUR_STATE, NAME, 2, 3) 
+
+`define FLASH_WAIT_CYCLE 4
+`define FLASH_WAIT_STATES(CUR_STATE, NAME) `WAIT_4_STATES(CUR_STATE, NAME)
+`define FLASH_LAST_WAIT_STATE(NAME) NAME``_``3
+
 `endif

@@ -5,7 +5,9 @@ module flash_controller(
 
     input Word_t        bus_addr,       //总线地址
     input Bit_t         read_op,        //读信号 1为读
-    output Word_t       bus_data_read,  //总线从flash读入数据 实际只有半字 两个半字拼在一起
+    input Bit_t         write_op,
+    output Word_t       bus_data_read,  //总线从flash读入数据 一个word
+    input Word_t        bus_data_write, //总线向flash写一个半字， 取bus_data_write[15:0]
     output Bit_t        bus_stall,
 
 
@@ -22,44 +24,80 @@ module flash_controller(
 Flash_addr_t flash_addr_inner;
 assign flash_a = flash_addr_inner; //为了满足时序
 
-assign flash_ce_n = 1'b0; //加速
-
 assign flash_rp_n = 1'b1; //防止不必要延迟
 assign flash_vpen = 1'b1;
 assign flash_byte_n = 1'b1; //使用16bit模式(halfword)
-//不支持写
-assign flash_we_n = 1'b1;
 
-typedef enum {IDLE, READ} State_t;
+Bit_t write_op_inner;
+Halfword_t data_write_inner;
+assign flash_d = write_op_inner?  data_write_inner: `HIGH_WORD;
+
+typedef enum {
+    IDLE,
+    READ_WORD_LOW_[`FLASH_WAIT_CYCLE],
+    READ_WORD_HIGH_[`FLASH_WAIT_CYCLE],
+    WRITE_HWORD_[`FLASH_WAIT_CYCLE]
+} State_t;
 State_t cur_state;
+
+`define RESET \
+    cur_state <= IDLE; \
+    flash_ce_n <= 1'b1; \
+    flash_oe_n <= 1'b1; \
+    flash_we_n <= 1'b1; \
+    flash_addr_inner <= `ZERO_WORD; \
+    write_op_inner <= 1'b0; \
+    bus_stall <= 1'b0;
 
 always_ff @ (posedge clk or posedge rst) begin
     if (rst) begin
-        cur_state   <= IDLE;
-        flash_oe_n  <= 1'b1;
-        flash_addr_inner <= `ZERO_WORD; 
-
+        `RESET
     end else begin
         case(cur_state)
             IDLE: begin
-                cur_state   <= IDLE;
-                flash_oe_n  <= 1'b1;
-                flash_addr_inner <= `ZERO_WORD;
+                `RESET
                 if (read_op) begin
-                    cur_state   <= READ;
-                    flash_oe_n  <= 1'b0;
+                    cur_state <= READ_WORD_LOW_0;
+                    flash_ce_n <= 1'b0;
+                    flash_oe_n <= 1'b0;
                     flash_addr_inner <= bus_addr;
+                    bus_stall <= 1'b1;
+                end else if (write_op) begin
+                    cur_state <= WRITE_HWORD_0;
+                    flash_ce_n <= 1'b0;
+                    flash_we_n <= 1'b0;
+                    flash_addr_inner <= bus_addr;
+                    write_op_inner <= 1'b1;
+                    data_write_inner <= bus_data[15:0];
+                    bus_stall <= 1'b1;
                 end
             end
-            READ: begin
-                cur_state   <= IDLE;
-                flash_oe_n  <= 1'b1;
-                flash_addr_inner <= `ZERO_WORD;
 
-                bus_data_read   <= {flash_d, flash_d};
+            //read
+            `FLASH_WAIT_STATES(cur_state, READ_WORD_LOW)
+            
+            `FLASH_LAST_WAIT_STATE(READ_WORD_LOW): begin
+                bus_data_read[15:0] <= flash_d;
+                flash_addr_inner <= bus_addr + 2'h2;
+                cur_state <= READ_WORD_HIGH_0;
+            end
+
+            `FLASH_WAIT_STATES(cur_state, READ_WORD_HIGH)
+
+            `FLASH_LAST_WAIT_STATE(READ_WORD_HIGH): begin
+                bus_data_read[31: 16] <= flash_d;
+                `RESET
+            end
+
+            //write
+            `FLASH_WAIT_STATES(cur_state, WRITE_HWORD)
+
+            `FLASH_LAST_WAIT_STATE(WRITE_HWORD): begin
+                `RESET
             end
         endcase
     end
 end
 
+`undef RESET
 endmodule
