@@ -8,10 +8,10 @@ _start:
     lui $3, 0x8000
     lui $4, 0x8040
 _load:
-    lh $5, 0x0($2)
-    addiu $2, $2, 0x2
-    sh $5, 0x0($3)
-    addiu $3, $3, 0x2
+    lw $5, 0x0($2)
+    addiu $2, $2, 0x4
+    sw $5, 0x0($3)
+    addiu $3, $3, 0x4
     bne $3, $4, _load
     nop
 _init:
