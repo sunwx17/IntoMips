@@ -7,12 +7,12 @@
 //`define PC_RESET_ADDR   32'h8fc00000
 `define PC_RESET_ADDR   32'h80000000
 
-`define PC_INTERRUPT    32'h80001180
-`define PC_SYSCALL      32'h80001180
-`define PC_INVALID_INST 32'h80001180
-`define PC_OV           32'h80001180
-`define PC_TLB_INVALID  32'h80001180
-`define PC_TLB_REFILL   32'h80001000
+`define PC_INTERRUPT    32'h8002a180
+`define PC_SYSCALL      32'h8002a180
+`define PC_INVALID_INST 32'h8002a180
+`define PC_OV           32'h8002a180
+`define PC_TLB_INVALID  32'h8002a180
+`define PC_TLB_REFILL   32'h8002a000
 
 
 
