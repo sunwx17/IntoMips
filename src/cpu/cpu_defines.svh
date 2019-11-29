@@ -45,6 +45,7 @@ typedef logic[`SEL_WIDTH - 1:0] Sel_t;
 `define CP0_CONTEXT     4
 `define CP0_PAGEMASK    5
 `define CP0_WIRED       6
+`define CP0_BADVADDR    8
 `define CP0_COUNT       9
 `define CP0_ENTRYHI     10
 `define CP0_COMPARE     11
@@ -115,15 +116,19 @@ typedef struct packed {
     Bit_t   eret;
     Bit_t   inst_tlb_refill;
     Bit_t   inst_tlb_invalid;
-    Bit_t   data_tlb_refill;
-    Bit_t   data_tlb_invalid;
+    Bit_t   data_tlb_refill_load;
+    Bit_t   data_tlb_invalid_load;
+    Bit_t   data_tlb_refill_store;
+    Bit_t   data_tlb_invalid_store;
 } Excp_set_t;
 
 `define NO_EXCP {$bits(Excp_set_t){1'b0}}
 
 typedef enum {
     EXC_INTERRUPT, EXC_SYSCALL, EXC_INVALID_INST, EXC_OV, EXC_ERET,
-    EXC_INST_TLB_REFILL, EXC_INST_TLB_INVALID, EXC_DATA_TLB_REFILL, EXC_DATA_TLB_INVALID,
+    EXC_INST_TLB_REFILL, EXC_INST_TLB_INVALID,
+    EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_INVALID_LOAD, 
+    EXC_DATA_TLB_REFILL_STORE, EXC_DATA_TLB_INVALID_STORE,
     EXC_NO
 } Excp_t;
 
@@ -138,10 +143,11 @@ typedef enum {
 
 //`define NEED_CHANGE_BD(excp_code) ((excp_code == `EXCP_TYPE_INTERRUPT) || (((excp_code == `EXCP_TYPE_SYSCALL) || (excp_code == `EXCP_TYPE_INVALID_INST) || (excp_code == `EXCP_TYPE_OV)) && cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] == `DISABLE))
 
-`define ORDINARY_EXCEPTION(excp_code) ((excp_code == EXC_SYSCALL) || (excp_code == EXC_INVALID_INST) || (excp_code == EXC_OV) || (excp_code == EXC_INST_TLB_REFILL) || (excp_code == EXC_INST_TLB_INVALID) || (excp_code == EXC_DATA_TLB_REFILL) || (excp_code == EXC_DATA_TLB_INVALID))
+`define ORDINARY_EXCEPTION(excp_code) ((excp_code == EXC_SYSCALL) || (excp_code == EXC_INVALID_INST) || (excp_code == EXC_OV) || (excp_code == EXC_INST_TLB_REFILL) || (excp_code == EXC_INST_TLB_INVALID) || (excp_code == EXC_DATA_TLB_REFILL_LOAD) || (excp_code == EXC_DATA_TLB_INVALID_LOAD) || (excp_code == EXC_DATA_TLB_REFILL_STORE) || (excp_code == EXC_DATA_TLB_INVALID_STORE))
 
 `define EXC_CODE_INTERRUPT      5'b00000
 `define EXC_CODE_TLBL           5'b00010
+`define EXC_CODE_TLBS           5'b00011
 `define EXC_CODE_SYSCALL        5'b01000
 `define EXC_CODE_INVALID_INST   5'b01010
 `define EXC_CODE_OV             5'b01100

@@ -17,6 +17,7 @@ module cp0(
     output  Reg_data_t  pagemask_o,
     output  Reg_data_t  wired_o,
     output  Reg_data_t  entryhi_o,
+    output  Reg_data_t  badvaddr_o,
     
     output  Reg_data_t  count_o,
     output  Reg_data_t  compare_o,
@@ -54,6 +55,7 @@ assign context_o = cp0_regs[`CP0_CONTEXT];
 assign pagemask_o = cp0_regs[`CP0_PAGEMASK];
 assign wired_o = cp0_regs[`CP0_WIRED];
 assign entryhi_o = cp0_regs[`CP0_ENTRYHI];
+assign badvaddr_o = cp0_regs[`CP0_BADVADDR];
 
 assign count_o = cp0_regs[`CP0_COUNT];
 assign compare_o = cp0_regs[`CP0_COMPARE];
@@ -112,6 +114,7 @@ always @ (posedge clk) begin
         cp0_regs[`CP0_PAGEMASK] <= `ZERO_WORD;
         cp0_regs[`CP0_WIRED]    <= `ZERO_WORD;
         cp0_regs[`CP0_ENTRYHI]  <= `ZERO_WORD;
+        cp0_regs[`CP0_BADVADDR] <= `ZERO_WORD;
 
         cp0_regs[`CP0_COUNT]    <= `ZERO_WORD;
         cp0_regs[`CP0_COMPARE]  <= `ZERO_WORD;
@@ -175,12 +178,20 @@ always @ (posedge clk) begin
                 cp0_regs[`CP0_CAUSE][`CP0_CAUSE_EXCCODE] <= `EXC_CODE_TLBL;//TODO
                 cp0_regs[`CP0_CONTEXT][`CP0_CONTEXT_BADVPN2] <= bad_addr_v[`ADDR_VPN2];
                 cp0_regs[`CP0_ENTRYHI][`CP0_ENTRYHI_VPN2] <= bad_addr_v[`ADDR_VPN2];
+                cp0_regs[`CP0_BADVADDR] <= bad_addr_v;
                 cp0_regs[`CP0_EPC] <= bad_addr_v;
             end
-            EXC_DATA_TLB_REFILL, EXC_DATA_TLB_INVALID : begin
+            EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_INVALID_LOAD : begin
                 cp0_regs[`CP0_CAUSE][`CP0_CAUSE_EXCCODE] <= `EXC_CODE_TLBL;//TODO
                 cp0_regs[`CP0_CONTEXT][`CP0_CONTEXT_BADVPN2] <= bad_addr_v[`ADDR_VPN2];
                 cp0_regs[`CP0_ENTRYHI][`CP0_ENTRYHI_VPN2] <= bad_addr_v[`ADDR_VPN2];
+                cp0_regs[`CP0_BADVADDR] <= bad_addr_v;
+            end
+            EXC_DATA_TLB_REFILL_STORE, EXC_DATA_TLB_INVALID_STORE : begin
+                cp0_regs[`CP0_CAUSE][`CP0_CAUSE_EXCCODE] <= `EXC_CODE_TLBS;//TODO
+                cp0_regs[`CP0_CONTEXT][`CP0_CONTEXT_BADVPN2] <= bad_addr_v[`ADDR_VPN2];
+                cp0_regs[`CP0_ENTRYHI][`CP0_ENTRYHI_VPN2] <= bad_addr_v[`ADDR_VPN2];
+                cp0_regs[`CP0_BADVADDR] <= bad_addr_v;
             end
             default : begin end
         endcase

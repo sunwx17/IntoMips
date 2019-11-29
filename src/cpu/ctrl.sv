@@ -35,10 +35,10 @@ always_comb begin
             EXC_OV : begin
                 new_pc <= `PC_OV;
             end
-            EXC_INST_TLB_REFILL, EXC_DATA_TLB_REFILL : begin
+            EXC_INST_TLB_REFILL, EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_REFILL_STORE : begin
                 new_pc <= `PC_TLB_REFILL;
             end
-            EXC_INST_TLB_INVALID, EXC_DATA_TLB_INVALID : begin
+            EXC_INST_TLB_INVALID, EXC_DATA_TLB_INVALID_LOAD, EXC_DATA_TLB_INVALID_STORE : begin
                 new_pc <= `PC_TLB_INVALID;
             end
             EXC_ERET : begin

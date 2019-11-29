@@ -204,16 +204,16 @@ assign inst_addr = {10'b0, inst_addr_v[21:0]};
 assign data_addr = {10'b0, data_addr_v[21:0]};
 
 always_comb begin
-    inst_in_ext <= `ADDR_IN_EXT(inst_addr_v);
-    inst_in_base <= `ADDR_IN_BASE(inst_addr_v);
-    inst_in_bootrom <= `ADDR_IN_BOOTROM(inst_addr_v);
-    data_in_ext <= `ADDR_IN_EXT(data_addr_v);
-    data_in_base <= `ADDR_IN_BASE(data_addr_v);
-    data_in_uart_data <= `ADDR_IN_UART_DATA(data_addr_v);
-    data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v);
-    data_in_vga <= `ADDR_IN_VGA(data_addr_v);
-    data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v);
-    data_in_flash <= `ADDR_IN_FLASH(data_addr_v);
+    inst_in_ext <= `ADDR_IN_EXT(inst_addr_v) && inst_read_op;
+    inst_in_base <= `ADDR_IN_BASE(inst_addr_v) && inst_read_op;
+    inst_in_bootrom <= `ADDR_IN_BOOTROM(inst_addr_v) && inst_read_op;
+    data_in_ext <= `ADDR_IN_EXT(data_addr_v) && (data_read_op || data_write_op);
+    data_in_base <= `ADDR_IN_BASE(data_addr_v) && (data_read_op || data_write_op);
+    data_in_uart_data <= `ADDR_IN_UART_DATA(data_addr_v) && (data_read_op || data_write_op);
+    data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v) && (data_read_op || data_write_op);
+    data_in_vga <= `ADDR_IN_VGA(data_addr_v) && (data_read_op || data_write_op);
+    data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v) && (data_read_op || data_write_op);
+    data_in_flash <= `ADDR_IN_FLASH(data_addr_v) && (data_read_op || data_write_op);
 end
 
 always_comb begin
@@ -529,18 +529,18 @@ serial_controller serial_controller_instance(
 );
 */
 
-//assign uart_mode = 2'b01;
+assign uart_mode = 2'b01;
 
 assign leds[0] = uart_mode[0];
 assign leds[1] = uart_mode[1];
 
 ext_serial_controller serial_controller_instance(
-    .clk(clk_50M), 
+    .clk(clk_25M), 
     .read_op(uart_read_op), 
     .write_op(uart_write_op),
     .bus_data_write(uart_data_write),
     .bus_data_read(uart_data_read),
-    .mode(uart_mode),
+    //.mode(uart_mode),
 
     .txd,
     .rxd

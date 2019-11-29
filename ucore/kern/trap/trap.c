@@ -163,11 +163,12 @@ static void handle_tlbmiss(struct trapframe* tf, int write)
 
   static int entercnt = 0;
   entercnt ++;
-  //kprintf("## enter handle_tlbmiss %d times\n", entercnt);
+  kprintf("## enter handle_tlbmiss %d times, this write is%d\n", entercnt, write);
   int in_kernel = trap_in_kernel(tf);
   assert(current_pgdir != NULL);
   //print_trapframe(tf);
   uint32_t badaddr = tf->tf_vaddr;
+  kprintf("badaddrv is %x\n", badaddr);
   int ret = 0;
   pte_t *pte = get_pte(current_pgdir, tf->tf_vaddr, 0);
   if(pte==NULL || ptep_invalid(pte)){   //PTE miss, pgfault
@@ -176,7 +177,9 @@ static void handle_tlbmiss(struct trapframe* tf, int write)
     //tlb will not be refill in do_pgfault,
     //so a vmm pgfault will trigger 2 exception
     //permission check in tlb miss
+    kprintf("this pgfault into\n");
     ret = pgfault_handler(tf, badaddr, get_error_code(write, pte));
+    kprintf("this pgfault comeback, ret = %d\n", ret);
   }else{ //tlb miss only, reload it
     /* refill two slot */
     /* check permission */
@@ -187,9 +190,11 @@ static void handle_tlbmiss(struct trapframe* tf, int write)
     }else{
       if(!ptep_u_read(pte)){
         ret = -1;
+        kprintf("this exit, ret = -1\n");
         goto exit;
       }
       if(write && !ptep_u_write(pte)){
+        kprintf("this exit, ret = -2\n");
         ret = -2;
         goto exit;
       }
@@ -281,6 +286,7 @@ mips_trap(struct trapframe *tf)
   // dispatch based on what type of trap occurred
   // used for previous projects
   if (current == NULL) {
+    kprintf("trap_dispatch\n\n");
     trap_dispatch(tf);
   }
   else {
@@ -288,10 +294,12 @@ mips_trap(struct trapframe *tf)
     struct trapframe *otf = current->tf;
     current->tf = tf;
 
+    kprintf("in kernel before\n\n");
     bool in_kernel = trap_in_kernel(tf);
-
+    kprintf("in kernel over\n\n");
     trap_dispatch(tf);
 
+    kprintf("in trap_dispatch over\n\n");
     current->tf = otf;
     if (!in_kernel) {
       if (current->flags & PF_EXITING) {

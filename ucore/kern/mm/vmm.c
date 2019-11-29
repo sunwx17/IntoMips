@@ -366,7 +366,7 @@ int
 do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
   int ret = -E_INVAL;
   struct vma_struct *vma = find_vma(mm, addr);
-  //kprintf("## %08x %08x\n", error_code, addr);
+  kprintf("## error_code: %08x\n## addr: %08x\n## vma: %08x\n## vma->start: %08x\n", error_code, addr, vma, vma->vm_start);
 
   pgfault_num++;
   if (vma == NULL || vma->vm_start > addr) {

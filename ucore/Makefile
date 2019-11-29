@@ -187,7 +187,7 @@ $(OBJDIR)/ucore-kernel-initrd.bin: $(OBJDIR)/ucore-kernel-initrd
 $(OBJDIR)/ucore-kernel-initrd.dump: $(OBJDIR)/ucore-kernel-initrd
 	$(OBJDUMP) -D $< > $@
 
-$(OBJDIR)/ucore-kernel-initrd.mem: $(OBJDIR)/ucore-kernel-initrd
+$(OBJDIR)/ucore-kernel-initrd.mem: $(OBJDIR)/ucore-kernel-initrd.bin
 	cat $< | xxd -c 4 -g 1 | cut -d " " -f 2,3,4,5 > $@
 
 boot/loader.bin: boot/bootasm.S

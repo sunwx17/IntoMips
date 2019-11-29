@@ -901,9 +901,14 @@ do_kill(int pid) {
 static int
 kernel_execve(const char *name, const char **argv) {
     int argc = 0, ret;
+    kprintf("1\n");
     while (argv[argc] != NULL) {
+        
+        kprintf("n\n");
         argc ++;
     }
+    
+    kprintf("hhh\n");
     //panic("unimpl");
     asm volatile(
       "la $v0, %1;\n" /* syscall no. */
@@ -918,6 +923,7 @@ kernel_execve(const char *name, const char **argv) {
       : "i"(SYSCALL_BASE+SYS_exec), "r"(name), "r"(argc), "r"(argv), "r"(argc) 
       : "a0", "a1", "a2", "a3", "v0"
     );
+    kprintf("qwer\n");
     return ret;
 }
 
