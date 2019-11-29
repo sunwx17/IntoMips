@@ -39,7 +39,7 @@ always_comb begin
     end
 end
 
-always_ff @ (posedge clk_25M or posedge rst) begin
+always_ff @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         last_write_op <= 1'b0;
     end else begin
@@ -56,7 +56,7 @@ end
 
 assign graphics_in = ascii_out;
 
-always_ff @ (posedge clk_25M) begin
+always_ff @ (posedge clk_50M) begin
     inner_write_op <= 1'b0;
     graphics_write_addr <= `ZERO_WORD;
     if (last_write_op) begin
@@ -78,7 +78,9 @@ assign video_clk = clk_25M;
 
 Ascii_data_t graphics_out, graphics_out_inner;
 Block_bit_addr_t pixel_addr;
-assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata & 6'b111) + (vdata & 4'b1111) * `VGA_BLOCK_HSIZE: 0;
+//assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata & 6'b111) + (vdata & 4'b1111) * `VGA_BLOCK_HSIZE: 0;
+//assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {6'b000000, hdata[2:0]} + {2'b00, vdata[3:0], 3'b000}: 0;
+assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
 assign video_red = {3{graphics_out[pixel_addr]}};
 assign video_green = {3{graphics_out[pixel_addr]}};
 assign video_blue = {2{graphics_out[pixel_addr]}};
@@ -86,25 +88,19 @@ assign video_blue = {2{graphics_out[pixel_addr]}};
 
 
 
-Graphics_block_addr_t cur_block_addr;
+Graphics_block_addr_t cur_block_addr, cur_block_addr_inner;
+//cannot work in 25MHz
 //assign cur_block_addr = (vdata >> 4) * `VGA_BLOCK_HNUM + (hdata >> 3);
-
 Graphics_block_addr_t addr_4x;
-Graphics_block_addr_t cur_block_addr_inner;
 assign addr_4x = (vdata >> 4) << 2;
-assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
-/*
-always @ (negedge clk_50M) begin
-    cur_block_addr_inner <= (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
-end
-*/
+assign cur_block_addr_inner = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+
+
 always @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         graphics_out <= 0;
-        cur_block_addr_inner <= 0;
     end else begin
         graphics_out <= graphics_out_inner;
-        cur_block_addr_inner <= cur_block_addr;
     end
 end
 
@@ -135,24 +131,6 @@ end
 assign video_hsync = ((hdata >= `VGA_HFP) && (hdata < `VGA_HSP)) ? 1'b1: 1'b0;
 assign video_vsync = ((vdata >= `VGA_VFP) && (vdata < `VGA_VSP)) ? 1'b1: 1'b0;
 assign video_de = ((hdata < `VGA_HSIZE) & (vdata < `VGA_VSIZE));
-
-
-//内部使用ip核 block memory generator
-//addr: 19bit
-//data: 32bit
-/*
-blk_mem_gen_0 blk_mem_gen_instance(
-    //write port
-    .clka(clk_25M),
-    .wea(write_op),
-    .addra(bus_addr[18:0]),
-    .dina(bus_data[7:0]),
-    //read port
-    .clkb(clk_50M),
-    .addrb(cur_addr[18:0]),
-    .doutb(pixel)
-);
-*/
 
 //ascii rom
 //addra: 7bit
