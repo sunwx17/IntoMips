@@ -548,7 +548,7 @@ serial_controller serial_controller_instance(
 );
 */
 
-assign uart_mode = 2'b01;
+//assign uart_mode = 2'b01;
 
 assign leds[0] = uart_mode[0];
 assign leds[1] = uart_mode[1];
@@ -559,7 +559,7 @@ ext_serial_controller serial_controller_instance(
     .write_op(uart_write_op),
     .bus_data_write(uart_data_write),
     .bus_data_read(uart_data_read),
-    //.mode(uart_mode),
+    .mode(uart_mode),
 
     .txd,
     .rxd

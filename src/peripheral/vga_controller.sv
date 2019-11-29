@@ -103,7 +103,7 @@ Graphics_block_addr_t cur_block_addr, cur_block_addr_inner;
 //assign cur_block_addr_inner = (vdata >> 4) * `VGA_BLOCK_HNUM + (hdata >> 3);
 Graphics_block_addr_t addr_4x;
 assign addr_4x = (vdata >> 4) << 2;
-assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3) + display_row_offset * `VGA_BLOCK_HNUM;
 assign cur_block_addr_inner = cur_block_addr < `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr: (cur_block_addr < 2 * `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr - `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM: 0);
 
 

@@ -31,7 +31,8 @@ _start:
     ori     $2, $0, 0x64
     sb      $2, 0xb($1)
     nop
-    nop
+    ori     $2, $0, 0x1
+    sb      $2, 0xe74($1)
     nop
     nop
     nop
