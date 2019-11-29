@@ -72,11 +72,11 @@ end
 //高/宽
 logic[11:0] hdata;
 logic[11:0] vdata;
-//像素时钟为50MHz
-assign video_clk = clk_50M;
+
+assign video_clk = clk_25M;
 
 
-Ascii_data_t graphics_out;
+Ascii_data_t graphics_out, graphics_out_inner;
 Block_bit_addr_t pixel_addr;
 assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata & 6'b111) + (vdata & 4'b1111) * `VGA_BLOCK_HSIZE: 0;
 assign video_red = {3{graphics_out[pixel_addr]}};
@@ -88,14 +88,28 @@ assign video_blue = {2{graphics_out[pixel_addr]}};
 
 //assign cur_addr = (hdata < `VGA_HSIZE && vdata < `VGA_VSIZE)? (vdata * `VGA_HSIZE + hdata): 0;
 
-Graphics_block_addr_t cur_block_addr, cur_block_addr_h, cur_block_addr_v;
-assign cur_block_addr_h = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata >> 3): 0;
-assign cur_block_addr_v = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (vdata >> 4): 0;
-assign cur_block_addr = cur_block_addr_v * `VGA_BLOCK_HNUM + cur_block_addr_h;
+Graphics_block_addr_t cur_block_addr//, cur_block_addr_h, cur_block_addr_v;
+//assign cur_block_addr = (vdata >> 4) * `VGA_BLOCK_HNUM + (hdata >> 3);
 
+Graphics_block_addr_t addr_4x;
+Graphics_block_addr_t cur_block_addr_inner;
+assign addr_4x = (vdata >> 4) << 2;
+assign cur_block_addr_inner = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+/*
+always @ (negedge clk_50M) begin
+    cur_block_addr_inner <= (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+end
+*/
+always @ (posedge clk_25M or posedge rst) begin
+    if (rst) begin
+        graphics_out <= 0;
+    end else begin
+        graphics_out <= graphics_out_inner;
+    end
+end
 
 // hdata
-always @ (posedge clk_50M or posedge rst) begin
+always @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         hdata <= 0;
     end else if (hdata == `VGA_HMAX) begin
@@ -106,7 +120,7 @@ always @ (posedge clk_50M or posedge rst) begin
 end
 
 // vdata
-always @ (posedge clk_50M or posedge rst) begin
+always @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         vdata <= 0;
     end else if (hdata == `VGA_HMAX) begin
@@ -162,8 +176,8 @@ blk_mem_graphics graphics_instrance(
     .dina(graphics_in),
     //read port
     .clkb(clk_50M),
-    .addrb(cur_block_addr),
-    .doutb(graphics_out)
+    .addrb(cur_block_addr_inner),
+    .doutb(graphics_out_inner)
 );
 
 
