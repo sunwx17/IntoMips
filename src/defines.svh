@@ -60,7 +60,7 @@ typedef Reg_data_t[`REG_NUM - 1:0]  Regs_t;
 `define ADDR_IN_EXT(addr)           (addr >= 32'h80400000 && addr < 32'h80800000)
 `define ADDR_IN_UART_DATA(addr)     (addr == 32'hBFD003F8)
 `define ADDR_IN_UART_STATUS(addr)   (addr == 32'hBFD003FC)
-`define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA000e74)
+`define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA000E75)
 `define ADDR_IN_BOOTROM(addr)       (addr >= 32'h8fc00000 && addr < 32'h8fc04000)
 `define ADDR_IN_FLASH(addr)         (addr >= 32'h81000000 && addr < 32'h81800000)
 `define ADDR_IN_USB(addr)           (addr >= 32'hbc020000 && addr < 32'hbc020004)

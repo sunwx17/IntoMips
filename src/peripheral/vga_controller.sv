@@ -18,6 +18,7 @@ module vga_controller(
     output Bit_t        video_de            //行数据有效信号，用于区分消隐区
 );
 
+Graphics_block_addr_t display_row_offset;
 
 typedef enum {IDLE, WRITE} State_t;
 State_t cur_state;
@@ -33,7 +34,11 @@ Graphics_block_addr_t last_graphics_write_addr;
 always_comb begin
     //write_op在下降沿给出
     if (write_op) begin
-        ascii_addr <= bus_data - 32;
+        if (bus_addr == `VGA_OFFSET_REG) begin
+            ascii_addr <= `ZERO_WORD;
+        end else begin
+            ascii_addr <= bus_data - 32;
+        end
     end else begin
         ascii_addr <= `ZERO_WORD;
     end
@@ -42,13 +47,18 @@ end
 always_ff @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         last_write_op <= 1'b0;
+        display_row_offset <= `ZERO_WORD;
     end else begin
         //write ascii of the last period
         last_write_op <= 1'b0;
         last_graphics_write_addr <= `ZERO_WORD;
         if (write_op) begin
-            last_write_op <= 1'b1;
-            last_graphics_write_addr <= bus_addr;
+            if (bus_addr == `VGA_OFFSET_REG) begin
+                display_row_offset <= bus_data[7:0];
+            end else begin
+                last_write_op <= 1'b1;
+                last_graphics_write_addr <= bus_addr;
+            end
         end
     end
 end
@@ -90,15 +100,16 @@ assign video_blue = {2{graphics_out[pixel_addr]}};
 
 Graphics_block_addr_t cur_block_addr, cur_block_addr_inner;
 //cannot work in 25MHz
-//assign cur_block_addr = (vdata >> 4) * `VGA_BLOCK_HNUM + (hdata >> 3);
+//assign cur_block_addr_inner = (vdata >> 4) * `VGA_BLOCK_HNUM + (hdata >> 3);
 Graphics_block_addr_t addr_4x;
 assign addr_4x = (vdata >> 4) << 2;
-assign cur_block_addr_inner = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+assign cur_block_addr_inner = cur_block_addr < `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr: (cur_block_addr < 2 * `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr - `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM: 0);
 
 
 always @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
-        graphics_out <= 0;
+        graphics_out <= `ZERO_WORD;
     end else begin
         graphics_out <= graphics_out_inner;
     end
