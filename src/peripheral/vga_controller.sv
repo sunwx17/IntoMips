@@ -39,7 +39,7 @@ always_comb begin
     end
 end
 
-always_ff @ (posedge clk_50M or posedge rst) begin
+always_ff @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         last_write_op <= 1'b0;
     end else begin
@@ -56,7 +56,7 @@ end
 
 assign graphics_in = ascii_out;
 
-always_ff @ (posedge clk_50M) begin
+always_ff @ (posedge clk_25M) begin
     inner_write_op <= 1'b0;
     graphics_write_addr <= `ZERO_WORD;
     if (last_write_op) begin
@@ -86,15 +86,13 @@ assign video_blue = {2{graphics_out[pixel_addr]}};
 
 
 
-//assign cur_addr = (hdata < `VGA_HSIZE && vdata < `VGA_VSIZE)? (vdata * `VGA_HSIZE + hdata): 0;
-
-Graphics_block_addr_t cur_block_addr//, cur_block_addr_h, cur_block_addr_v;
+Graphics_block_addr_t cur_block_addr;
 //assign cur_block_addr = (vdata >> 4) * `VGA_BLOCK_HNUM + (hdata >> 3);
 
 Graphics_block_addr_t addr_4x;
 Graphics_block_addr_t cur_block_addr_inner;
 assign addr_4x = (vdata >> 4) << 2;
-assign cur_block_addr_inner = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
 /*
 always @ (negedge clk_50M) begin
     cur_block_addr_inner <= (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
@@ -103,8 +101,10 @@ end
 always @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         graphics_out <= 0;
+        cur_block_addr_inner <= 0;
     end else begin
         graphics_out <= graphics_out_inner;
+        cur_block_addr_inner <= cur_block_addr;
     end
 end
 
