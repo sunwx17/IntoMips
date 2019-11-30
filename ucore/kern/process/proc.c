@@ -828,10 +828,12 @@ do_wait(int pid, int *code_store) {
       return -E_INVAL;
     }
   }
+  kprintf("\n@1\n");
 
   struct proc_struct *proc;
   bool intr_flag, haskid;
 repeat:
+  kprintf("\n@2\n");
   haskid = 0;
   if (pid != 0) {
     proc = find_proc(pid);
@@ -851,18 +853,24 @@ repeat:
             }
         }
     }
+  kprintf("\n@3\n");
     if (haskid) {
         current->state = PROC_SLEEPING;
         current->wait_state = WT_CHILD;
+  kprintf("\n@4\n");
         schedule();
+  kprintf("\n@5\n");
         if (current->flags & PF_EXITING) {
+  kprintf("\n@6\n");
             do_exit(-E_KILLED);
         }
         goto repeat;
     }
+  kprintf("\n@7\n");
     return -E_BAD_PROC;
 
 found:
+  kprintf("\n@8\n");
     if (proc == idleproc || proc == initproc) {
         panic("wait idleproc or initproc.\n");
     }
@@ -966,6 +974,7 @@ init_main(void *arg) {
     }
 
     while (do_wait(0, NULL) == 0) {
+        kprintf("after do_wait, before schedule.\n\n");
         schedule();
     }
 
@@ -1018,6 +1027,7 @@ proc_init(void) {
 
     initproc = find_proc(pid);
     set_proc_name(initproc, "init");
+    kprintf("now pid: %d, initproc->pid: %d", pid, initproc->pid);
 
     assert(idleproc != NULL && idleproc->pid == 0);
     assert(initproc != NULL && initproc->pid == 1);

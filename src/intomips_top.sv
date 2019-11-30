@@ -419,6 +419,8 @@ always_comb begin
 end
 
 
+Bit_t timer_int;
+
 cpu cpu_instance(
     .clk(clk_125),
     .rst(reset_btn),
@@ -432,8 +434,8 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({3'b0, uart_mode[1], usb_interrupt, 1'b0})
-    //.timer_int_o
+    .int_i({timer_int, 2'b0, uart_mode[1], usb_interrupt, 1'b0}),
+    .timer_int_o(timer_int)
 );
 
 
@@ -548,7 +550,7 @@ serial_controller serial_controller_instance(
 );
 */
 
-assign uart_mode = 2'b01;
+//assign uart_mode = 2'b01;
 
 assign leds[0] = uart_mode[0];
 assign leds[1] = uart_mode[1];
@@ -559,7 +561,7 @@ ext_serial_controller serial_controller_instance(
     .write_op(uart_write_op),
     .bus_data_write(uart_data_write),
     .bus_data_read(uart_data_read),
-    //.mode(uart_mode),
+    .mode(uart_mode),
 
     .txd,
     .rxd

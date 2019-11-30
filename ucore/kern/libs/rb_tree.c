@@ -430,6 +430,7 @@ check_compare2(rb_node *node, void *key) {
 
 void
 check_rb_tree(void) {
+    kprintf("check rb tree start!");
     rb_tree *tree = rb_tree_create(check_compare1);
     assert(tree != NULL);
 
@@ -465,8 +466,38 @@ check_rb_tree(void) {
         all[j] = z;
     }
 
+    kprintf("before link start!\n");
     memset(mark, 0, sizeof(int) * total);
+    kprintf("link start!\n");
+        int p = 0;
     for (i = 0; i < total; i ++) {
+        kprintf("all[%d]->data=%d\n", i, all[i]->data);
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
+        p = p + 1;
         mark[all[i]->data] = 1;
     }
     for (i = 0; i < total; i ++) {

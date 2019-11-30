@@ -78,28 +78,40 @@ void
 schedule(void) {
     bool intr_flag;
     struct proc_struct *next;
+    kprintf("\n$ 1\n");
     local_intr_save(intr_flag);
+    kprintf("\n$ 2\n");
     {
         current->need_resched = 0;
+    kprintf("\n$ 3\n");
         if (current->state == PROC_RUNNABLE) {
+    kprintf("\n$ 4\n");
             sched_class_enqueue(current);
         }
+    kprintf("\n$ 5\n");
         if ((next = sched_class_pick_next()) != NULL) {
+    kprintf("\n$ 6\n");
             sched_class_dequeue(next);
         }
+    kprintf("\n$ 7\n");
         if (next == NULL) {
+    kprintf("\n$ 8\n");
             next = idleproc;
         }
         next->runs ++;
+    kprintf("\n$ 9\n");
         if (next != current) {
-            //kprintf("########################\n");
-            //kprintf("c %d TO %d\n", current->pid, next->pid);
-            //print_trapframe(next->tf);
-            //kprintf("@@@@@@@@@@@@@@@@@@@@@@@@\n");
+            kprintf("########################\n");
+            kprintf("c %d TO %d\n", current->pid, next->pid);
+            print_trapframe(next->tf);
+            kprintf("@@@@@@@@@@@@@@@@@@@@@@@@\n");
             proc_run(next);
+    kprintf("\n$ 10\n");
         }
     }
+    kprintf("\n$ 11\n");
     local_intr_restore(intr_flag);
+    kprintf("\n$ 12\n");
 }
 
 void

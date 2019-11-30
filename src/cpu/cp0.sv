@@ -134,6 +134,8 @@ always @ (posedge clk) begin
 
         if(cp0_regs[`CP0_COMPARE]  != `ZERO_WORD && cp0_regs[`CP0_COUNT] == cp0_regs[`CP0_COMPARE]) begin
             timer_int_o <= `ENABLE;
+        end else begin
+            timer_int_o <= `DISABLE;
         end
 
         if(we_i == `ENABLE) begin
