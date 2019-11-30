@@ -421,6 +421,9 @@ end
 
 Bit_t timer_int;
 
+assign leds[3] = timer_int;
+assign leds[2] = usb_interrupt;
+
 cpu cpu_instance(
     .clk(clk_125),
     .rst(reset_btn),
@@ -434,7 +437,7 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({timer_int, 2'b0, uart_mode[1], usb_interrupt, 1'b0}),
+    .int_i({timer_int, 2'b0, uart_mode[1], /*usb_interrupt,*/ 2'b0}),
     .timer_int_o(timer_int)
 );
 
