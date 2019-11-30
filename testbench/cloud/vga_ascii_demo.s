@@ -32,8 +32,14 @@ _start:
     sb      $2, 0xb($1)
     nop
     nop
-    nop
-    nop
+    ori     $2, $0, 32
+    sb      $2, 0xc($1)
+    ori     $2, $0, 0x48
+    sb      $2, 0xd($1)
+    ori     $2, $0, 32
+    sb      $2, 0xe($1)
+    ori     $2, $0, 0x48
+    sb      $2, 0xf($1)
     nop
     nop
     nop

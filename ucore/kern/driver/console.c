@@ -6,6 +6,7 @@
 #include <trap.h>
 #include <memlayout.h>
 #include <sync.h>
+#include "vga.h"
 
 /* stupid I/O delay routine necessitated by historical PC design flaws */
 static void
@@ -176,6 +177,9 @@ cons_putc(int c) {
     local_intr_save(intr_flag);
     {
         serial_putc(c);
+#ifdef MACH_FPGA
+        vga_putc(c);
+#endif
     }
     local_intr_restore(intr_flag);
 }
