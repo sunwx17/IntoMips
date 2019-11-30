@@ -232,7 +232,7 @@ Word_t mem_data_addr_v_i;
 if_id if_id_instance(
     .clk,
     .rst,
-    .if_pc(rom_addr_o),
+    .if_pc(inst_addr_v),
     .if_inst(rom_data_i),
     .if_miss(inst_miss),
     .if_valid(inst_valid),
