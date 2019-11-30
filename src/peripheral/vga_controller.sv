@@ -37,14 +37,14 @@ always_comb begin
         if (bus_addr == `VGA_OFFSET_REG) begin
             ascii_addr <= `ZERO_WORD;
         end else begin
-            ascii_addr <= bus_data - 32;
+            ascii_addr <= bus_data >= 32? bus_data - 32: 0;
         end
     end else begin
         ascii_addr <= `ZERO_WORD;
     end
 end
 
-always_ff @ (posedge clk_50M or posedge rst) begin
+always_ff @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         last_write_op <= 1'b0;
         display_row_offset <= `ZERO_WORD;
@@ -64,14 +64,16 @@ always_ff @ (posedge clk_50M or posedge rst) begin
 end
 
 
-assign graphics_in = ascii_out;
+//assign graphics_in = ascii_out;
 
-always_ff @ (posedge clk_50M) begin
+always_ff @ (posedge clk_25M) begin
     inner_write_op <= 1'b0;
     graphics_write_addr <= `ZERO_WORD;
+    graphics_in <= `ZERO_WORD;
     if (last_write_op) begin
         inner_write_op <= 1'b1;
         graphics_write_addr <= last_graphics_write_addr;
+        graphics_in <= ascii_out;
     end 
 end
         
