@@ -92,10 +92,20 @@ Ascii_data_t graphics_out, graphics_out_inner;
 Block_bit_addr_t pixel_addr;
 //assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata & 6'b111) + (vdata & 4'b1111) * `VGA_BLOCK_HSIZE: 0;
 //assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {6'b000000, hdata[2:0]} + {2'b00, vdata[3:0], 3'b000}: 0;
-assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
+
+//assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
 assign video_red = {3{graphics_out[pixel_addr]}};
 assign video_green = {3{graphics_out[pixel_addr]}};
 assign video_blue = {2{graphics_out[pixel_addr]}};
+
+always_ff @ (posedge clk_25M or posedge rst) begin
+    if (rst) begin
+        pixel_addr <= `ZERO_WORD;
+    end else begin
+        pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
+    end
+end
+
 
 
 
