@@ -10,6 +10,9 @@ typedef logic[22:0] Flash_addr_t;
 typedef logic[18:0] Vga_addr_t;
 
 //vga
+//for cpu it's BA000E74
+`define VGA_OFFSET_REG          32'h00000E74
+
 `define VGA_HSIZE   800
 `define VGA_HMAX    1040
 `define VGA_VSIZE   600
