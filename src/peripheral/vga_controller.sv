@@ -85,7 +85,7 @@ end
 logic[11:0] hdata;
 logic[11:0] vdata;
 
-assign video_clk = clk_25M;
+assign video_clk = clk_50M;
 
 
 Ascii_data_t graphics_out, graphics_out_inner;
@@ -98,7 +98,7 @@ assign video_red = {3{graphics_out[pixel_addr]}};
 assign video_green = {3{graphics_out[pixel_addr]}};
 assign video_blue = {2{graphics_out[pixel_addr]}};
 
-always_ff @ (posedge clk_25M or posedge rst) begin
+always_ff @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         pixel_addr <= `ZERO_WORD;
     end else begin
@@ -118,8 +118,14 @@ assign addr_4x = (vdata >> 4) << 2;
 assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3) + display_row_offset * `VGA_BLOCK_HNUM;
 assign cur_block_addr_inner = cur_block_addr < `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr: (cur_block_addr < 2 * `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr - `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM: 0);
 
+/*
+always_comb begin
+    cur_block_addr_inner_inner <= cur_block_addr == `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM - 1? 0: cur_block_addr_inner + 1;
+end
+*/
 
-always @ (posedge clk_25M or posedge rst) begin
+
+always @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         graphics_out <= `ZERO_WORD;
     end else begin
@@ -128,10 +134,10 @@ always @ (posedge clk_25M or posedge rst) begin
 end
 
 // hdata
-always @ (posedge clk_25M or posedge rst) begin
+always @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         hdata <= 0;
-    end else if (hdata == `VGA_HMAX) begin
+    end else if (hdata == (`VGA_HMAX - 1)) begin
         hdata <= 0;
     end else begin
         hdata <= hdata + 1;
@@ -139,11 +145,11 @@ always @ (posedge clk_25M or posedge rst) begin
 end
 
 // vdata
-always @ (posedge clk_25M or posedge rst) begin
+always @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         vdata <= 0;
-    end else if (hdata == `VGA_HMAX) begin
-        if (vdata == `VGA_VMAX) begin
+    end else if (hdata == (`VGA_HMAX - 1)) begin
+        if (vdata == (`VGA_VMAX - 1)) begin
             vdata <= 0;
         end else begin
             vdata <= vdata + 1;
@@ -164,19 +170,31 @@ blk_mem_ascii_rom ascii_rom_instance(
     .douta(ascii_out)
 );
 
+
+//vga clk wiz
+//clk_50M_in: 1bit
+//clk_100M_out: 1bit
+//locked
+Bit_t clk_100M;
+vga_clk_wiz vga_clk_wiz_instance(
+    .clk_50M_in(clk_50M),
+    .clk_100M_out(clk_100M)
+    //.locked(???)
+);
+
 //graphics block rom
 //addra: 12bit
 //dina: 128bit
 //addrb: 12bit
 //doutb: 128bit
-blk_mem_graphics graphics_instrance(
+blk_mem_graphics graphics_instance(
     //write port
     .clka(clk_50M),
     .wea(inner_write_op),
     .addra(graphics_write_addr),
     .dina(graphics_in),
     //read port
-    .clkb(clk_50M),
+    .clkb(clk_100M),
     .addrb(cur_block_addr_inner),
     .doutb(graphics_out_inner)
 );
