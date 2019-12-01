@@ -79,4 +79,5 @@ void vga_write(int v, int h, int c) {
     outb(VGA_BASE + v * VGA_HSIZE + h, c & 0xFF);
     //outb(VGA_BASE + v * VGA_HSIZE + h, 0);
     __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
 }
