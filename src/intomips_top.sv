@@ -437,7 +437,7 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({timer_int, 2'b0, uart_mode[1], /*usb_interrupt,*/ 2'b0}),
+    .int_i({timer_int, 2'b0, uart_mode[1], usb_interrupt, 1'b0}),
     .timer_int_o(timer_int)
 );
 
