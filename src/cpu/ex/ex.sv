@@ -209,6 +209,7 @@ always_comb begin
         cp0_reg_data_o <= `ZERO_WORD;
         
     end else begin
+        stallreq <= `DISABLE;
         wreg_write_o <= wreg_write_i;
         wreg_addr_o  <= wreg_addr_i;
         wreg_data_o  <= `ZERO_WORD;

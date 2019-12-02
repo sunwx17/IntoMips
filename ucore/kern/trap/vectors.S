@@ -16,6 +16,7 @@
 .extern ramReserved
 .extern ramExcHandle_tlbmiss
 .extern ramExcHandle_general
+.extern ramExcHandle_breakpoint
 
 .set noreorder
 .global __exception_vector
@@ -69,7 +70,8 @@ __exception_vector:
 	RVECENT(ramReserved,46)
 	RVECENT(ramReserved,47)
   XVECENT(ramExcHandle_general, 0x180) 
-	RVECENT(ramReserved,49)
+  XVECENT(ramExcHandle_general, 0x180) 
+	//RVECENT(ramReserved,49)
 	RVECENT(ramReserved,50)
 	RVECENT(ramReserved,51)
 	RVECENT(ramReserved,52)
@@ -84,7 +86,8 @@ __exception_vector:
 	RVECENT(ramReserved,61)
 	RVECENT(ramReserved,62)
 	RVECENT(ramReserved,63)
-	RVECENT(ramReserved,64)
+  XVECENT(ramExcHandle_breakpoint, 0x200) 
+	//RVECENT(ramReserved,64)
 	RVECENT(ramReserved,65)
 	RVECENT(ramReserved,66)
 	RVECENT(ramReserved,67)

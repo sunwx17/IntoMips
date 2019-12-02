@@ -97,6 +97,8 @@ Reg_data_t  cp0_config_o;
 //Reg_data_t  cp0_prid_o;
 Reg_data_t  cp0_ebase_o;
 
+Reg_data_t  cp0_breakpoint_o;
+
 Excp_t      cp0_exception_type_i;
 Inst_addr_t cp0_pc_i;
 Bit_t       cp0_is_in_delayslot_i;
@@ -155,6 +157,8 @@ cp0 cp0_instance(
     //.prid_o(cp0_prid_o),
     .ebase_o(cp0_ebase_o),
 
+    .breakpoint_o(cp0_breakpoint_o),
+
     .tlbr_op(cp0_tlbr_op),
     .entryhi_i(cp0_entryhi_i),
     .entrylo0_i(cp0_entrylo0_i),
@@ -188,6 +192,7 @@ ctrl ctrl_instance(
     .stallreq_from_id(stallreq_from_id),
     .stallreq_from_ex(stallreq_from_ex),
     .stall(stall),
+    .cp0_ebase_i(cp0_ebase_o),
     .cp0_epc_i(mem_cp0_epc_o),
     .exception_type_i(cp0_exception_type_i),
     .new_pc(new_pc),
@@ -317,7 +322,8 @@ id id_instance(
     .inst_addr_v_i(id_inst_addr_v_i),
     .inst_addr_v_o(id_inst_addr_v_o),
     .exception_type_i(id_exception_type_i),
-    .exception_type_o(id_exception_type_o)
+    .exception_type_o(id_exception_type_o),
+    .breakpoint_i(cp0_breakpoint_o)
 );
 
 

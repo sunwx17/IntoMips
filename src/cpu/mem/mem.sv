@@ -136,6 +136,8 @@ always_comb begin
             end else if (exception_type_i.data_tlb_invalid_store) begin
                 exception_type_o <= EXC_DATA_TLB_INVALID_STORE;
                 bad_addr_v <= data_addr_v;
+            end else if (exception_type_i.breakpoint) begin
+                exception_type_o <= EXC_BREAKPOINT;
             end
         end
     end

@@ -7,6 +7,7 @@ module ctrl(
     input  Bit_t    stallreq_from_ex,
     output Stall_t  stall,
 
+    input  Word_t       cp0_ebase_i,
     input  Word_t       cp0_epc_i,
     input  Excp_t       exception_type_i,
     output Inst_addr_t  new_pc,
@@ -24,25 +25,28 @@ always_comb begin
         flush <= `ENABLE;        
         case (exception_type_i)
             EXC_INTERRUPT : begin
-                new_pc <= `PC_INTERRUPT;
+                new_pc <= cp0_ebase_i + `PC_INTERRUPT;
             end
             EXC_SYSCALL : begin
-                new_pc <= `PC_SYSCALL;
+                new_pc <= cp0_ebase_i + `PC_SYSCALL;
             end
             EXC_INVALID_INST : begin
-                new_pc <= `PC_INVALID_INST;
+                new_pc <= cp0_ebase_i + `PC_INVALID_INST;
             end
             EXC_OV : begin
-                new_pc <= `PC_OV;
+                new_pc <= cp0_ebase_i + `PC_OV;
             end
             EXC_INST_TLB_REFILL, EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_REFILL_STORE : begin
-                new_pc <= `PC_TLB_REFILL;
+                new_pc <= cp0_ebase_i + `PC_TLB_REFILL;
             end
             EXC_INST_TLB_INVALID, EXC_DATA_TLB_INVALID_LOAD, EXC_DATA_TLB_INVALID_STORE : begin
-                new_pc <= `PC_TLB_INVALID;
+                new_pc <= cp0_ebase_i + `PC_TLB_INVALID;
             end
             EXC_ERET : begin
                 new_pc <= cp0_epc_i;
+            end
+            EXC_BREAKPOINT : begin
+                new_pc <= cp0_ebase_i + `PC_BREAKPOINT;
             end
             default : begin end
         endcase

@@ -27,6 +27,8 @@ module cp0(
     output  Reg_data_t  config_o,
     output  Reg_data_t  ebase_o,
 
+    output  Reg_data_t  breakpoint_o,
+
     output  Bit_t       timer_int_o,
 
     input   Bit_t       tlbr_op,
@@ -66,6 +68,8 @@ assign epc_o = cp0_regs[`CP0_EPC];
 assign config_o = cp0_regs[`CP0_CONFIG];
 
 assign ebase_o = cp0_regs[`CP0_EBASE];
+
+assign breakpoint_o = cp0_regs[`CP0_BREAKPOINT];
 
 
 /*always @ (posedge clk) begin
@@ -123,6 +127,7 @@ always @ (posedge clk) begin
         cp0_regs[`CP0_EPC]      <= `ZERO_WORD;
         cp0_regs[`CP0_EBASE]    <= `ZERO_WORD;
         cp0_regs[`CP0_CONFIG]   <= `CP0_CONFIG_INIT;
+        cp0_regs[`CP0_BREAKPOINT] <= `ZERO_WORD;
         
         timer_int_o <= `DISABLE;
     end else begin

@@ -7,12 +7,13 @@
 `define PC_RESET_ADDR   32'h8fc00000
 //`define PC_RESET_ADDR   32'h80000000
 
-`define PC_INTERRUPT    32'h8002a180
-`define PC_SYSCALL      32'h8002a180
-`define PC_INVALID_INST 32'h8002a180
-`define PC_OV           32'h8002a180
-`define PC_TLB_INVALID  32'h8002a180
-`define PC_TLB_REFILL   32'h8002a000
+`define PC_INTERRUPT    32'h00000180
+`define PC_SYSCALL      32'h00000180
+`define PC_INVALID_INST 32'h00000180
+`define PC_OV           32'h00000180
+`define PC_TLB_INVALID  32'h00000180
+`define PC_TLB_REFILL   32'h00000000
+`define PC_BREAKPOINT   32'h00000200
 
 
 
@@ -57,6 +58,8 @@ typedef logic[`SEL_WIDTH - 1:0] Sel_t;
 
 `define CP0_EBASE       15
 //`define CP0_CONFIG_1    16
+
+`define CP0_BREAKPOINT  25
 
 `define CP0_STATUS_INIT 32'b0001_0000_0000_0000_0000_0000_0000_0000
 `define CP0_CONFIG_INIT 32'b0001_1110_0000_0000_0000_0000_0000_0000//16
@@ -120,6 +123,7 @@ typedef struct packed {
     Bit_t   data_tlb_invalid_load;
     Bit_t   data_tlb_refill_store;
     Bit_t   data_tlb_invalid_store;
+    Bit_t   breakpoint;
 } Excp_set_t;
 
 `define NO_EXCP {$bits(Excp_set_t){1'b0}}
@@ -129,6 +133,7 @@ typedef enum {
     EXC_INST_TLB_REFILL, EXC_INST_TLB_INVALID,
     EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_INVALID_LOAD, 
     EXC_DATA_TLB_REFILL_STORE, EXC_DATA_TLB_INVALID_STORE,
+    EXC_BREAKPOINT,
     EXC_NO
 } Excp_t;
 
