@@ -23,6 +23,8 @@ typedef logic[63:0] Doubleword_t;
 `define ZERO_WORD   32'h0
 `define ZERO_DWORD  64'h0
 
+`define ONE_WORD    32'hffff
+
 `define HIGH_WORD   32'bZ
 `define HIGH_BYTE   8'bZ
 

@@ -10,9 +10,6 @@ typedef logic[22:0] Flash_addr_t;
 typedef logic[18:0] Vga_addr_t;
 
 //vga
-//for cpu it's BA000E74
-`define VGA_OFFSET_REG          32'h00000E74
-
 `define VGA_HSIZE   800
 `define VGA_HMAX    1040
 `define VGA_VSIZE   600
@@ -28,14 +25,37 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_BLOCK_HNUM          100
 `define VGA_BLOCK_VNUM          37
 
+`define VGA_TEXT_FIELD          7:0
+`define VGA_FG_COLOR_FIELD      15:8
+`define VGA_BG_COLOR_FIELD      23:16
+`define VGA_COLOR_FIELD         23:8
+
+`define VGA_FG_RED              7:5
+`define VGA_FG_GREEN            4:2
+`define VGA_FG_BLUE             1:0
+`define VGA_BG_RED              15:13
+`define VGA_BG_GREEN            12:10
+`define VGA_BG_BLUE             9:8
+
+
+`define VGA_RED                 7:5
+`define VGA_GREEN               4:2
+`define VGA_BLUE                1:0
+
+
 //graphics
 typedef logic[0:127] Ascii_data_t;
 typedef logic[11:0] Graphics_block_addr_t;
 typedef logic[9:0] Block_bit_addr_t;
+typedef logic[15:0] Color_t;
 
 //serial
 typedef logic[1:0]  Serial_mode_t;
 
+//vga
+typedef logic[2:0]  Vga_red_t;
+typedef logic[2:0]  Vga_green_t;
+typedef logic[1:0]  Vga_blue_t;
 
 
 //generate waiting state
