@@ -1,7 +1,7 @@
 #pragma once
 
 #define VGA_BASE            0xba000000
-#define VGA_OFFSET_REG      0xba000e74
+#define VGA_COLOR_REG       0xba000e74
 
 #define VGA_HSIZE           100
 #define VGA_VSIZE           37
@@ -44,6 +44,12 @@
 #define DEL                 127
 
 #define SPACE               32
+
+//32bit layout
+//[..8bit../ bg(8bit) / fg(8bit) / ascii(8bit)]
+#define VGA_COLOR_CHAR(bg, fg, ch)      (((bg) << 16) | ((fg) << 8) | (ch))
+
+
 
 void vga_putc(int c);
 void vga_putc_controll(int c);
