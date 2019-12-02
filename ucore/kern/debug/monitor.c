@@ -23,6 +23,9 @@ struct command {
 static struct command commands[] = {
     {"help", "Display this list of commands.", mon_help},
     {"kerninfo", "Display information about the kernel.", mon_kerninfo},
+    {"writebp", "Write break point", mon_write_breakpoint},
+    {"readbp", "Read break point", mon_read_breakpoint},
+    {"start", "Start program", mon_start},
 };
 
 /* return if kernel is panic, in kern/debug/panic.c */
