@@ -5,6 +5,9 @@
 #include <monitor.h>
 #include <kdebug.h>
 
+//for debug
+#include <./../include/asm/mipsregs.h>
+
 /* *
  * Simple command-line kernel monitor useful for controlling the
  * kernel and exploring the system interactively.
@@ -20,6 +23,9 @@ struct command {
 static struct command commands[] = {
     {"help", "Display this list of commands.", mon_help},
     {"kerninfo", "Display information about the kernel.", mon_kerninfo},
+    {"writebp", "Write break point", mon_write_breakpoint},
+    {"readbp", "Read break point", mon_read_breakpoint},
+    {"start", "Start program", mon_start},
 };
 
 /* return if kernel is panic, in kern/debug/panic.c */
@@ -124,3 +130,57 @@ mon_kerninfo(int argc, char **argv, struct trapframe *tf) {
     return 0;
 }
 
+int parse_32hex(char* argv) {
+    int i, tmp;
+    for (i = 7; i >= 0; i--) {
+        tmp = 0;
+        switch(argv[7 - i]) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
+                tmp = argv[7 - i] - '0';
+                break;
+            }
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f': {
+                tmp = argv[7 - i] - 'a';
+                break;
+            }
+        }
+        tmp += (tmp << 4) + tmp;
+    }
+    return tmp;
+}
+
+int mon_write_breakpoint(int argc, char **argv, struct trapframe *tf) {
+    int old_bp = read_break_point();
+    int new_bp = parse_32hex(argv[0]);
+
+
+    kprintf("set break point from %08x to %08x\n", old_bp, new_bp);
+
+    write_break_point(new_bp);   
+    return 0;
+}
+
+int mon_start(int argc, char **argv, struct trapframe *tf) {
+    return -1;
+}
+
+
+int mon_read_breakpoint(int argc, char **argv, struct trapframe *tf) {
+    int bp = read_break_point();
+    kprintf("current break point ($25) is %08x\n", bp);
+    return 0;
+}
