@@ -601,6 +601,7 @@ do {								\
 			"mfc0\t%0, " #source ", " #sel "\n\t"		\
 			".set\tmips0\n\t"				\
 			: "=r" (__res));				\
+	kprintf("__res = %08x\n", __res);	\
 	__res;								\
 })
 
