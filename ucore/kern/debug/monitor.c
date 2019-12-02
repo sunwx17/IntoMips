@@ -131,7 +131,8 @@ mon_kerninfo(int argc, char **argv, struct trapframe *tf) {
 }
 
 int parse_32hex(char* argv) {
-    int i, tmp;
+    int i;
+    uint32_t ans = 0, tmp, tmptmp;
     for (i = 7; i >= 0; i--) {
         tmp = 0;
         switch(argv[7 - i]) {
@@ -154,23 +155,24 @@ int parse_32hex(char* argv) {
             case 'd':
             case 'e':
             case 'f': {
-                tmp = argv[7 - i] - 'a';
+                tmp = argv[7 - i] - 'a' + 10;
                 break;
             }
         }
-        tmp += (tmp << 4) + tmp;
+        ans = (ans << 4) + tmp;
     }
-    return tmp;
+    return ans;
 }
 
 int mon_write_breakpoint(int argc, char **argv, struct trapframe *tf) {
-    int old_bp = read_break_point();
-    int new_bp = parse_32hex(argv[0]);
-
-
+    uint32_t old_bp = read_break_point();
+    uint32_t new_bp = parse_32hex(argv[0]);
+    kprintf("\narg is %s\n", argv[0]);
     kprintf("set break point from %08x to %08x\n", old_bp, new_bp);
 
     write_break_point(new_bp);   
+    uint32_t cur_bp = read_break_point();
+    kprintf("now breakpoint is %08x\n", cur_bp);
     return 0;
 }
 
@@ -180,7 +182,7 @@ int mon_start(int argc, char **argv, struct trapframe *tf) {
 
 
 int mon_read_breakpoint(int argc, char **argv, struct trapframe *tf) {
-    int bp = read_break_point();
+    uint32_t bp = read_break_point();
     kprintf("current break point ($25) is %08x\n", bp);
     return 0;
 }
