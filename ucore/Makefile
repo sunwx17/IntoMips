@@ -53,8 +53,8 @@ OBJ       += $(patsubst $(SRCDIR)/%.S, $(OBJDIR)/%.o, $(ASMSRC))
 INCLUDES  := $(addprefix -I,$(SRC_DIR))
 INCLUDES  += -I$(SRCDIR)/include
 
-# reserve 1MB for user app
-USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep echo
+# reserve 4MB for user app
+USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep echo snake
 INITRD_BLOCK_CNT := 4000 
 
 ifeq  ($(ON_FPGA), y)
