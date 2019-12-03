@@ -92,12 +92,16 @@ static void interrupt_handler(struct trapframe *tf)
   int i;
   for(i=0;i<8;i++){
     if(tf->tf_cause & tf->tf_status & (1<<(CAUSEB_IP+i))){
+      //kprintf("status: %08x\n", tf->tf_status);
       switch(i){
         case TIMER0_IRQ:
           clock_int_handler(NULL);
           break;
         case COM1_IRQ:
           serial_int_handler(NULL);
+          break;
+        case 3:
+          kprintf("now in int\n");
           break;
         default:
           print_trapframe(tf);

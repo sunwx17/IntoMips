@@ -13,6 +13,15 @@
 static bool device_present;
 #define printf(...)                     kprintf(__VA_ARGS__)
 
+//#define USERLAND_TEST
+
+void
+usb_int_init(void) {
+  pic_enable(3);
+  kprintf("usb interrupt has inited.\n");
+}
+
+
 void sl811_write(unsigned char reg, unsigned char data) {
     __nop
     __nop
@@ -39,50 +48,12 @@ void sl811_write_buf(int base, const char *buf, int n) {
 }
 void sl811_read_buf(int base, char *buf, int n) {
     int i;
-    for (i = 0; i < n; ++i) 
+    for (i = 0; i < n; ++i) {
       buf[i] = sl811_read(base + i);
-}
-
-#ifdef USERLAND_TEST
-void print_mem(const char *start, int count) {
-    int x = 0;
-    int i = 0, j;
-    for (; ; ++i) {
-        printf("0x%08x:  ", (unsigned int)(start + i * 16));
-        for (j = 0; j < 16; ++j) {
-            printf("%02x ", start[i * 16 + j]);
-            x += 1;
-            if (x == count) {
-                printf("\n");
-                return;
-            }
-        }
-        printf("\n");
+      //kprintf("buf[%d]: %d", i, buf[i]);
     }
 }
 
-int hex2i(const char *hex) {
-    int len = strlen(hex);
-    int i;
-    int sum = 0;
-    char c;
-    int base = 1;
-    for (i = 0; i < len; ++i) {
-        c = hex[len - i - 1];
-        if ('0' <= c && c <= '9') {
-            sum += (c - '0') * base;
-        }
-        else if ('a' <= c && c <= 'f') {
-            sum += (c - 'a' + 10) * base;
-        }
-        else if ('A' <= c && c <= 'F') {
-            sum += (c - 'A' + 10) * base;
-        }
-        base <<= 4;
-    }
-    return sum;
-}
-#endif
 
 void reset_sl811() {
     sl811_write(0xf, 0xae);
@@ -121,66 +92,6 @@ void reset_sl811() {
 
 }
 
-#ifdef USERLAND_TEST
-void print_sl811(int start, int count) {
-    int x = 0;
-    int i = 0, j;
-    for (; i < 8; ++i) {
-        printf("0x%02x:  ", start + i * 16);
-        for (j = 0; j < 16; ++j) {
-            printf("%02x ", sl811_read(start + i * 16 + j));
-            x += 1;
-            if (x == count) {
-                printf("\n");
-                return;
-            }
-        }
-        printf("\n");
-    }
-}
-
-int isset(unsigned x, int bit) {
-    return (x & (1 << bit)) == 0 ? 0 : 1;
-}
-
-void print_sl811_info() {
-    int cr1 = sl811_read(SL11H_CTLREG1);
-    int ien = sl811_read(SL11H_IRQ_ENABLE);
-    int ist = sl811_read(SL11H_IRQ_STATUS);
-    int rev = sl811_read(SL11H_HWREVREG) >> 4;
-
-    int hcr = sl811_read(SL11H_HOSTCTLREG);
-    int addr = sl811_read(SL11H_BUFADDRREG);
-    int len = sl811_read(SL11H_BUFLNTHREG);
-    int st = sl811_read(SL11H_PKTSTATREG);
-    int n_tx = sl811_read(SL11H_XFERCNTREG);
-
-    printf("Ctrl Regs:\n");
-    printf("  CR1: (Sus,Speed,JK,RST,SOF)\n");
-    printf("       (%d,%d,%d,%d,%d)\n", 
-        isset(cr1, 6), isset(cr1, 5), isset(cr1,4), isset(cr1,3),isset(cr1,0));
-
-    printf("  IRQ_EN: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
-    printf("       (%d,%d,%d,%d,%d)\n", 
-        isset(ien, 6), isset(ien, 5), isset(ien,4), isset(ien,1),isset(ien,0));
-
-    printf("  IRQ_ST: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
-    printf("       (%d,%d,%d,%d,%d)\n", 
-        isset(ist, 6), isset(ist, 5), isset(ist,4), isset(ist,1),isset(ist,0));
-    printf("  REV: %x\n", rev);
-
-    printf("USB Regs:\n");
-    printf("  HCR: (Pre,D0/1,SyncSOF,ISO,Direction,En,Arm)\n");
-    printf("       (%d,%d,%d,%d,%d,%d,%d)\n", 
-        isset(hcr, 7), isset(hcr,6),isset(hcr,5),isset(hcr,4), isset(hcr,2),isset(hcr,1),isset(hcr,0));
-
-    printf("  Addr/Len: (%x, %x)\n", addr, len);
-    printf("  Status: (Stall,NAK,Overflow,Setup,Seq,Timeout,Err,ACK)\n");
-    printf("          (%d,%d,%d,%d,%d,%d,%d,%d)\n",
-        isset(st,7),isset(st,6),isset(st,5),isset(st,4),isset(st,3),isset(st,2),isset(st,1),isset(st,0));
-    printf("  N Transmitted %x\n", n_tx);
-}
-#endif
 
 int last_status = 0;
 
@@ -189,13 +100,17 @@ int wait_transfer() {
     int i;
     for (i = 0; i < 100; ++i) {
         /* ctl = sl811_read(SL11H_HOSTCTLREG); */
+        //kprintf("this in wait transfer, i: %d\n", i);
         schedule();
         irq = sl811_read(SL11H_IRQ_STATUS);
+        //kprintf("flag 2\n");
         /* if ((ctl & 1) == 0) { */
         if ((irq & 1) != 0) {
+            //kprintf("flag 3\n");
             sl811_write(SL11H_IRQ_STATUS, 0xff);
             st = sl811_read(SL11H_PKTSTATREG);
             last_status = st;
+            //kprintf("flag 4\n");
             // usleep(wait_transfer_time);
             return 0;
             /* if ((st & 0xC7) == 1) { */
@@ -271,6 +186,7 @@ int in_packet(char *buf,
                 printf("in packet error\n");
             return -1;
         }
+        //kprintf("in packet last status: %d\n", last_status);
         if ((last_status & SL11H_STATMASK_ACK)) {
             sl811_read_buf(buf_addr, buf, len);
             return 0;
@@ -441,54 +357,7 @@ usb_set_conf(int ep, int addr, int idx) {
     return 0;
 }
 
-#ifdef USERLAND_TEST
-void
-usbhub_get_status(char *buf, int ep, int addr, int port) {
-    int a, b, c;
-    struct usb_setup_pkt pkt;
-    int status_len = 4;
-    SET(&pkt, req_type, USB_REQ_TYPE_IN | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_OTHER);
-    SET(&pkt, req, GET_STATUS);
-    SET(&pkt, val, 0);
-    SET(&pkt, idx, port);
-    SET(&pkt, cnt, status_len);
-    a = setup_packet(&pkt, ep, addr);
-    b = in_packet(buf, status_len, ep, addr, 1); 
-    c = status_packet(ep, addr);
-    printf("Cycles: %d, %d, %d\n", a, b, c);
-    printf("USB Hub GetStatus returned:\n");
-    print_mem(buf, status_len);
-}
-void
-usbhub_set_feature(int ep, int addr, int port, int feature) {
-    int a, b; char buf[10];
-    struct usb_setup_pkt pkt;
-    SET(&pkt, req_type, USB_REQ_TYPE_IN | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_OTHER);
-    SET(&pkt, req, SET_FEATURE);
-    SET(&pkt, val, feature);
-    SET(&pkt, idx, port);
-    SET(&pkt, cnt, 0);
-    a = setup_packet(&pkt, ep, addr);
-    b = in_packet(buf, 0, ep, addr, 1);
-    /* c = status_packet(ep, addr); */
-    printf("Cycles: %d, %d\n", a, b);
-    printf("USB Hub Feature set: %x\n", feature);
-}
-void
-usbhub_clear_feature(int ep, int addr, int port, int feature) {
-    int a, b; char buf[10];
-    struct usb_setup_pkt pkt;
-    SET(&pkt, req_type, USB_REQ_TYPE_IN | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_OTHER);
-    SET(&pkt, req, CLEAR_FEATURE);
-    SET(&pkt, val, feature);
-    SET(&pkt, idx, port);
-    SET(&pkt, cnt, 0);
-    a = setup_packet(&pkt, ep, addr);
-    b = in_packet(buf, 0, ep, addr, 1);
-    printf("Cycles: %d, %d\n", a, b);
-    printf("USB Hub Feature cleared: %x\n", feature);
-}
-#endif
+
 
 int
 usb_int_in(char *buf, int len, int ep, int addr) {
@@ -505,7 +374,7 @@ kthread_sl811(void *arg) {
     int addr = 1, ep = 1, i;
     printf("sl811 kthread started\n");
     while(1){
-        // kprintf("kthread_sl811 running\n");
+        //kprintf("kthread_sl811 running\n");
         // do_sleep(1000);
 
         if (usb_int_in(g_buf, 8, ep, addr) == 0){
@@ -519,7 +388,7 @@ kthread_sl811(void *arg) {
                     ascii = usb_hid_usage_table_shift[scan];
                 else
                     ascii = usb_hid_usage_table[scan];
-                // printf("%d ", scan);
+                //printf("%d ", scan);
                 pressed_now[ascii] = 1;
             }
             // printf("\n");
@@ -544,9 +413,11 @@ usb_sl811_init(void)
     int addr = 0, len; 
     int ep = 0;
     struct usb_dev_desc desc;
+    //usb_int_init();
     reset_sl811();
     if(!device_present)
         return;
+    kprintf("this in usb_sl811_init\n");
     if(usb_get_dev_desc(&desc, ep, addr) != 0)
         return;
     if(usb_set_address(ep, addr, 1) != 0)
@@ -701,7 +572,7 @@ int main(int argc, char **argv) {
         int addr = 1, ep = 1;
         addr = hex2i(argv[2]);
         ep = hex2i(argv[3]);
-        usb_int_in(g_buf, ep, addr);
+        usb_int_in(g_buf,8 , ep, addr);
     }
     else if (strcmp(cmd, "msleep") == 0 && argc == 3) {
         msleep(hex2i(argv[2]));
@@ -712,7 +583,7 @@ int main(int argc, char **argv) {
             printf("sl811 daemon started, from child\n");
             int addr = 1, ep = 1;
             while (1) {
-                if (usb_int_in(g_buf, ep, addr) < 0)
+                if (usb_int_in(g_buf,8 , ep, addr) < 0)
                 break;
             }
         }
@@ -738,7 +609,7 @@ int main(int argc, char **argv) {
             printf("sl811 daemon started, from child\n");
             int addr = 1, ep = 1;
             while (1) {
-                if (usb_int_in(g_buf, ep, addr) < 0)
+                if (usb_int_in(g_buf ,8 , ep, addr) < 0)
                 break;
             }
         }
@@ -759,6 +630,161 @@ int main(int argc, char **argv) {
     }
     return 0;
 }
+
+
+#ifdef USERLAND_TEST
+void print_sl811(int start, int count) {
+    int x = 0;
+    int i = 0, j;
+    for (; i < 8; ++i) {
+        printf("0x%02x:  ", start + i * 16);
+        for (j = 0; j < 16; ++j) {
+            printf("%02x ", sl811_read(start + i * 16 + j));
+            x += 1;
+            if (x == count) {
+                printf("\n");
+                return;
+            }
+        }
+        printf("\n");
+    }
+}
+
+int isset(unsigned x, int bit) {
+    return (x & (1 << bit)) == 0 ? 0 : 1;
+}
+
+void print_sl811_info() {
+    int cr1 = sl811_read(SL11H_CTLREG1);
+    int ien = sl811_read(SL11H_IRQ_ENABLE);
+    int ist = sl811_read(SL11H_IRQ_STATUS);
+    int rev = sl811_read(SL11H_HWREVREG) >> 4;
+
+    int hcr = sl811_read(SL11H_HOSTCTLREG);
+    int addr = sl811_read(SL11H_BUFADDRREG);
+    int len = sl811_read(SL11H_BUFLNTHREG);
+    int st = sl811_read(SL11H_PKTSTATREG);
+    int n_tx = sl811_read(SL11H_XFERCNTREG);
+
+    printf("Ctrl Regs:\n");
+    printf("  CR1: (Sus,Speed,JK,RST,SOF)\n");
+    printf("       (%d,%d,%d,%d,%d)\n", 
+        isset(cr1, 6), isset(cr1, 5), isset(cr1,4), isset(cr1,3),isset(cr1,0));
+
+    printf("  IRQ_EN: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
+    printf("       (%d,%d,%d,%d,%d)\n", 
+        isset(ien, 6), isset(ien, 5), isset(ien,4), isset(ien,1),isset(ien,0));
+
+    printf("  IRQ_ST: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
+    printf("       (%d,%d,%d,%d,%d)\n", 
+        isset(ist, 6), isset(ist, 5), isset(ist,4), isset(ist,1),isset(ist,0));
+    printf("  REV: %x\n", rev);
+
+    printf("USB Regs:\n");
+    printf("  HCR: (Pre,D0/1,SyncSOF,ISO,Direction,En,Arm)\n");
+    printf("       (%d,%d,%d,%d,%d,%d,%d)\n", 
+        isset(hcr, 7), isset(hcr,6),isset(hcr,5),isset(hcr,4), isset(hcr,2),isset(hcr,1),isset(hcr,0));
+
+    printf("  Addr/Len: (%x, %x)\n", addr, len);
+    printf("  Status: (Stall,NAK,Overflow,Setup,Seq,Timeout,Err,ACK)\n");
+    printf("          (%d,%d,%d,%d,%d,%d,%d,%d)\n",
+        isset(st,7),isset(st,6),isset(st,5),isset(st,4),isset(st,3),isset(st,2),isset(st,1),isset(st,0));
+    printf("  N Transmitted %x\n", n_tx);
+}
+#endif
+
+
+#ifdef USERLAND_TEST
+void print_mem(const char *start, int count) {
+    int x = 0;
+    int i = 0, j;
+    for (; ; ++i) {
+        printf("0x%08x:  ", (unsigned int)(start + i * 16));
+        for (j = 0; j < 16; ++j) {
+            printf("%02x ", start[i * 16 + j]);
+            x += 1;
+            if (x == count) {
+                printf("\n");
+                return;
+            }
+        }
+        printf("\n");
+    }
+}
+
+int hex2i(const char *hex) {
+    int len = strlen(hex);
+    int i;
+    int sum = 0;
+    char c;
+    int base = 1;
+    for (i = 0; i < len; ++i) {
+        c = hex[len - i - 1];
+        if ('0' <= c && c <= '9') {
+            sum += (c - '0') * base;
+        }
+        else if ('a' <= c && c <= 'f') {
+            sum += (c - 'a' + 10) * base;
+        }
+        else if ('A' <= c && c <= 'F') {
+            sum += (c - 'A' + 10) * base;
+        }
+        base <<= 4;
+    }
+    return sum;
+}
+#endif
+
+
+#ifdef USERLAND_TEST
+void
+usbhub_get_status(char *buf, int ep, int addr, int port) {
+    int a, b, c;
+    struct usb_setup_pkt pkt;
+    int status_len = 4;
+    SET(&pkt, req_type, USB_REQ_TYPE_IN | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_OTHER);
+    SET(&pkt, req, GET_STATUS);
+    SET(&pkt, val, 0);
+    SET(&pkt, idx, port);
+    SET(&pkt, cnt, status_len);
+    a = setup_packet(&pkt, ep, addr);
+    b = in_packet(buf, status_len, ep, addr, 1); 
+    c = status_packet(ep, addr);
+    printf("Cycles: %d, %d, %d\n", a, b, c);
+    printf("USB Hub GetStatus returned:\n");
+    print_mem(buf, status_len);
+}
+void
+usbhub_set_feature(int ep, int addr, int port, int feature) {
+    int a, b; char buf[10];
+    struct usb_setup_pkt pkt;
+    SET(&pkt, req_type, USB_REQ_TYPE_IN | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_OTHER);
+    SET(&pkt, req, SET_FEATURE);
+    SET(&pkt, val, feature);
+    SET(&pkt, idx, port);
+    SET(&pkt, cnt, 0);
+    a = setup_packet(&pkt, ep, addr);
+    b = in_packet(buf, 0, ep, addr, 1);
+    /* c = status_packet(ep, addr); */
+    printf("Cycles: %d, %d\n", a, b);
+    printf("USB Hub Feature set: %x\n", feature);
+}
+void
+usbhub_clear_feature(int ep, int addr, int port, int feature) {
+    int a, b; char buf[10];
+    struct usb_setup_pkt pkt;
+    SET(&pkt, req_type, USB_REQ_TYPE_IN | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_OTHER);
+    SET(&pkt, req, CLEAR_FEATURE);
+    SET(&pkt, val, feature);
+    SET(&pkt, idx, port);
+    SET(&pkt, cnt, 0);
+    a = setup_packet(&pkt, ep, addr);
+    b = in_packet(buf, 0, ep, addr, 1);
+    printf("Cycles: %d, %d\n", a, b);
+    printf("USB Hub Feature cleared: %x\n", feature);
+}
+#endif
+
 
 #endif
 
