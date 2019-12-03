@@ -207,11 +207,7 @@ proc_run(struct proc_struct *proc) {
             //load_sp(next->kstack + KSTACKSIZE);
             lcr3(next->cr3);
             tlb_invalidate_all();
-            kprintf("## flag 1\n");
-            //kprintf("## ## &(prev->context):%08x, &(next->context):%08x\n", &(prev->context), &(next->context));
-            //kprintf("## ## next ra: %08x, another ra: %08x\n", *((int*)((int)&(next->context) + 40)), next->context.sf_ra);
             switch_to(&(prev->context), &(next->context));
-            kprintf("## flag 2\n");
         }
         local_intr_restore(intr_flag);
     }
@@ -228,7 +224,6 @@ forkret(void) {
     //kprintf("## ## ## what in epc + 4: %08x\n", *(int*)(next_pc + 4));
     //kprintf("## ## ## what in epc + 8: %08x\n", *(int*)(next_pc + 8));
     forkrets(current->tf);
-    kprintf("## ## ## forkret ra: %08x\n", __read_reg($31)); 
 }
 
 // hash_proc - add proc into proc hash_list
