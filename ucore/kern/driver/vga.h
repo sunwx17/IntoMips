@@ -47,7 +47,7 @@
 
 //32bit layout
 //[..8bit../ bg(8bit) / fg(8bit) / ascii(8bit)]
-#define VGA_COLOR_CHAR(bg, fg, ch)      (((bg) << 16) | ((fg) << 8) | (ch))
+#define VGA_COLOR_CHAR(bg, fg, ch)      ((((bg) & 0xff) << 16) | (((fg) & 0xff) << 8) | ((ch) & 0xff))
 
 
 

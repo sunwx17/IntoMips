@@ -78,9 +78,10 @@ void vga_scroll() {
 void vga_write(int v, int h, int c) {
     //static int color = 0;
     //color = color == 255? 0: color + 1;
-    //outw(VGA_BASE + v * VGA_HSIZE + h, (0x3 << 16) | ((~0xe0) << 8) | (c & 0xff));
-    outw(VGA_BASE + v * VGA_HSIZE + h, ((((~0xe0) & 0xff) << 8) | (c & 0xff)));
-    //outw(VGA_BASE + v * VGA_HSIZE + h, (0x3 << 16) | (((~0xe0) & 0xff) << 8)  | (c & 0xff));
+    //outw(VGA_BASE + v * VGA_HSIZE + h, (0x3 << 16) | ((0xe0) << 8) | (c & 0xff));
+    //outw(VGA_BASE + v * VGA_HSIZE + h, ((0xe0) << 8) | (c & 0xff));
+    outw(VGA_BASE + v * VGA_HSIZE + h, VGA_COLOR_CHAR(0, 0, c));
+    //outw(VGA_BASE + v * VGA_HSIZE + h, (0x3 << 16) | (((0xe0) & 0xff) << 8)  | (c & 0xff));
     //outw(VGA_BASE + v * VGA_HSIZE + h, (c & 0xff));
     //outb(VGA_BASE + v * VGA_HSIZE + h, 0);
     __asm__ __volatile__("nop");
