@@ -20,6 +20,10 @@ always_comb begin
         stall <= 6'b000000;
         flush <= `DISABLE;
         new_pc <= `PC_RESET_ADDR;
+    end else if (stallreq_from_bus == `ENABLE) begin
+        stall <= 6'b111111;
+        flush <= `DISABLE;
+        new_pc <= `PC_RESET_ADDR;
     end else if (exception_type_i != EXC_NO) begin
         stall <= 6'b000000;
         flush <= `ENABLE;        
@@ -50,10 +54,6 @@ always_comb begin
             end
             default : begin end
         endcase
-    end else if (stallreq_from_bus == `ENABLE) begin
-        stall <= 6'b111111;
-        flush <= `DISABLE;
-        new_pc <= `PC_RESET_ADDR;
     end else if (stallreq_from_ex == `ENABLE) begin
         stall <= 6'b001111;
         flush <= `DISABLE;

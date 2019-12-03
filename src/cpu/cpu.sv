@@ -172,7 +172,8 @@ cp0 cp0_instance(
     .timer_int_o(timer_int_o),
     .exception_type_i(cp0_exception_type_i),
     .pc_i(cp0_pc_i),
-    .is_in_delayslot_i(cp0_is_in_delayslot_i) 
+    .is_in_delayslot_i(cp0_is_in_delayslot_i),
+    .stallreq_bus(stallreq_from_bus)
 );
 
 

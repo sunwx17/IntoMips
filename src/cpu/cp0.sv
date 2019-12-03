@@ -43,7 +43,9 @@ module cp0(
 
     input   Excp_t      exception_type_i,
     input   Inst_addr_t pc_i,
-    input   Bit_t       is_in_delayslot_i 
+    input   Bit_t       is_in_delayslot_i,
+    
+    input   Bit_t       stallreq_bus
 );
 
 
@@ -133,7 +135,7 @@ always @ (posedge clk) begin
     end else begin
         cp0_regs[`CP0_COUNT] <= cp0_regs[`CP0_COUNT] + 1;
         cp0_regs[`CP0_RANDOM] <= (cp0_regs[`CP0_RANDOM] > cp0_regs[`CP0_WIRED]) ? cp0_regs[`CP0_RANDOM] - 1 : `TLB_ENTRY_NUM - 1;
-        cp0_regs[`CP0_CAUSE][`CP0_CAUSE_IP_H] <= int_i;
+        cp0_regs[`CP0_CAUSE][`CP0_CAUSE_IP_H] <= stallreq_bus ? 6'b0 : int_i;
 
         //$display("count : %x, compare :  %x", cp0_regs[`CP0_COUNT], cp0_regs[`CP0_COMPARE]);
 
@@ -161,7 +163,7 @@ always @ (posedge clk) begin
                 cp0_regs[`CP0_EPC] <= pc_i;
                 cp0_regs[`CP0_CAUSE][`CP0_CAUSE_BD] <= `DISABLE;
             end
-            cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] <= `ENABLE;
+            cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] <= stallreq_bus ? `DISABLE : `ENABLE;
         end
         case (exception_type_i)
             EXC_INTERRUPT : begin
