@@ -80,6 +80,8 @@ void vga_write(int v, int h, int c) {
     //color = color == 255? 0: color + 1;
     //outw(VGA_BASE + v * VGA_HSIZE + h, (0x3 << 16) | ((~0xe0) << 8) | (c & 0xff));
     outw(VGA_BASE + v * VGA_HSIZE + h, ((~0xe0) << 8) | (c & 0xff));
+    //outw(VGA_BASE + v * VGA_HSIZE + h, (0x3 << 16) | (((~0xe0) & 0xff) << 8)  | (c & 0xff));
+    //outw(VGA_BASE + v * VGA_HSIZE + h, (c & 0xff));
     //outb(VGA_BASE + v * VGA_HSIZE + h, 0);
     __asm__ __volatile__("nop");
     __asm__ __volatile__("nop");
