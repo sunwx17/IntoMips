@@ -87,7 +87,7 @@ int hex2i(const char *hex) {
 void reset_sl811() {
     sl811_write(0xf, 0xae);
     sl811_write(0x5, 0x8);
-    do_sleep(50);
+    //do_sleep(50);
     sl811_write(0x5, 0x0);
     sl811_write(0xd, 0xff);
     int st = sl811_read(0xd);
@@ -112,7 +112,7 @@ void reset_sl811() {
     sl811_write(0xe, 0xe0);
 
     sl811_write(0x5, 8);
-    do_sleep(50);
+    //do_sleep(50);
     sl811_write(0xf, 0xae);
     sl811_write(0x5, 0x1);
     sl811_write(0x8, 0x1);

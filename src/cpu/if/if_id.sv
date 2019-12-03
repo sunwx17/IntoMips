@@ -3,7 +3,7 @@
 
 module if_id(
     input                   clk, rst,
-    input   Inst_addr_t     if_pc,
+    (*MAKE_DEBUG="TRUE"*)input   Inst_addr_t     if_pc,
     input   Inst_t          if_inst,
     input   Bit_t           if_miss,
     input   Bit_t           if_valid,

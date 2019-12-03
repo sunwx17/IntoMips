@@ -72,6 +72,7 @@ ramExcHandle_breakpoint:
    la  t9, monitor
    jal t9 /* call it */
    nop				/* delay slot */
+   j exception_return
    nop
 
 
@@ -311,6 +312,8 @@ exception_return:
    /* done */
 
    mtc0 k0, CP0_EPC /* Copr.0 reg 13 == PC for exception */
+   //lui k1, 0x8050
+   //sw k0, 0(k1)
    nop
    eret
    nop

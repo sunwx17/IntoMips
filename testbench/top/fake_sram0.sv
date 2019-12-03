@@ -1,4 +1,4 @@
-`include "cpu_defines.svh"
+`include "peripheral_defines.svh"
 module fake_sram0(
     input clk,
     inout Word_t       ram_data,       //RAM数据，低8位与CPLD串口控制器共享

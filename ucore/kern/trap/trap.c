@@ -213,6 +213,7 @@ exit:
 
 static void
 trap_dispatch(struct trapframe *tf) {
+  //kprintf("tf addr: %08x\n", (int)tf);
   int code = GET_CAUSE_EXCODE(tf->tf_cause);
   switch(code){
     case EX_IRQ:

@@ -184,7 +184,7 @@ always @ (posedge clk) begin
                 cp0_regs[`CP0_CONTEXT][`CP0_CONTEXT_BADVPN2] <= bad_addr_v[`ADDR_VPN2];
                 cp0_regs[`CP0_ENTRYHI][`CP0_ENTRYHI_VPN2] <= bad_addr_v[`ADDR_VPN2];
                 cp0_regs[`CP0_BADVADDR] <= bad_addr_v;
-                cp0_regs[`CP0_EPC] <= bad_addr_v;
+                //cp0_regs[`CP0_EPC] <= bad_addr_v;
             end
             EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_INVALID_LOAD : begin
                 cp0_regs[`CP0_CAUSE][`CP0_CAUSE_EXCCODE] <= `EXC_CODE_TLBL;//TODO
@@ -197,6 +197,9 @@ always @ (posedge clk) begin
                 cp0_regs[`CP0_CONTEXT][`CP0_CONTEXT_BADVPN2] <= bad_addr_v[`ADDR_VPN2];
                 cp0_regs[`CP0_ENTRYHI][`CP0_ENTRYHI_VPN2] <= bad_addr_v[`ADDR_VPN2];
                 cp0_regs[`CP0_BADVADDR] <= bad_addr_v;
+            end
+            EXC_BREAKPOINT : begin
+                cp0_regs[`CP0_CAUSE][`CP0_CAUSE_EXCCODE] <= `EXC_CODE_BREAKPOINT;
             end
             default : begin end
         endcase
