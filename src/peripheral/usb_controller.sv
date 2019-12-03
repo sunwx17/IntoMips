@@ -26,6 +26,8 @@ module usb_controller (
 );
 
 assign usb_interrupt = sl811_intrq;
+assign sl811_dack_n = 1'b1;
+assign sl811_rst_n = 1'b1;
 
 Bit_t write_op_inner;
 Byte_t data_write_inner;
