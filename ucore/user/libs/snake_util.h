@@ -11,7 +11,11 @@
 #include <ulib.h>
 #endif
 
+// when use *nix x64, use ON_X64 macro
 //#define ON_X64
+
+// when USE_ARROW_KEY is uncommented, use arrow key to control; else use wsad to control
+// #define USE_ARROW_KEY
 
 /**
  * sleep time milliseconds

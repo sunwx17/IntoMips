@@ -98,6 +98,7 @@ int get_direction(char *buf)
     return -1;
 }
 
+// now use wsad to control
 // -2 for exit
 int read_direction()
 {
@@ -125,6 +126,7 @@ int read_direction()
             break;
         }
         else {
+#ifdef USE_ARROW_KEY
             if(state == 0) {
                 if(ch == 27)
                     state = 1;
@@ -159,6 +161,28 @@ int read_direction()
                 else
                     state = 0;
             }
+#else
+            if(ch == 'w') {
+                ret = 0;
+                break;
+            }
+            else if(ch == 'd') {
+                ret = 1;
+                break;
+            }
+            else if(ch == 's') {
+                ret = 2;
+                break;
+            }
+            else if(ch == 'a') {
+                ret = 3;
+                break;
+            }
+            else if(ch == 27) {
+                ret = -2;
+                break;
+            }
+#endif
 
         }
     }
@@ -197,7 +221,7 @@ void show_map(unsigned char *map, int width, int height, int clear)
     int i,j;
     if(clear == 1) {
         // int i;
-        for(i = 0; i < height + 3; ++i) {
+        for(i = 0; i < height + 2; ++i) {
             printf("\033[1A"); //先回到上一行
             printf("\033[K");  //清除该行
         }
@@ -224,9 +248,9 @@ void begin_game() {
     default_init_game();
     int width = get_width();
     int height = get_height();
-// #ifdef ON_X64
+#ifdef ON_X64
     printf("\033c");
-// #endif
+#endif
 
     int count = 0;
     while(!is_game_over()) {
