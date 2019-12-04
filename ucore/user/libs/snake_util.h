@@ -29,4 +29,9 @@ int Sleep(unsigned int time);
 
 unsigned int get_time_millis();
 
+//get x mod m, use 2 div
+int modm(int x, int m);
+//get x div m, use 2 div
+int divm(int x, int m);
+
 #endif //SNAKE_SNAKE_UTIL_H

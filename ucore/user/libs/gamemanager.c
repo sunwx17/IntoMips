@@ -91,8 +91,8 @@ int is_food_in_snake()
 void get_new_food()
 {
     do {
-        data_ptr->food_x = rand() % data_ptr->height;
-        data_ptr->food_y = rand() % data_ptr->width;
+        data_ptr->food_x = modm(rand() , data_ptr->height);
+        data_ptr->food_y = modm(rand() , data_ptr->width);
     }while(is_food_in_snake());
 }
 
@@ -143,12 +143,12 @@ int get_score()
 
 int map_x(int x)
 {
-    return (x + data_ptr->height) % data_ptr->height;
+    return modm((x + data_ptr->height) , data_ptr->height);
 }
 
 int map_y(int y)
 {
-    return (y + data_ptr->width) % (data_ptr->width);
+    return modm((y + data_ptr->width) , data_ptr->width);
 }
 
 // This function should be called before food is assigned
@@ -156,12 +156,12 @@ int map_y(int y)
 void generate_new_snake()
 {
     if(data_ptr->snake_len > 0) {
-        data_ptr->x_pos[0] = rand() % data_ptr->height;
-        data_ptr->y_pos[0] = rand() % data_ptr->width;
+        data_ptr->x_pos[0] = modm(rand() , data_ptr->height);
+        data_ptr->y_pos[0] = modm(rand() , data_ptr->width);
     }
     int i;
     for(i = 1; i < data_ptr->snake_len; ++i) {
-        int dir = rand() % 4;
+        int dir = modm(rand() , 4);
         data_ptr->x_pos[i] = map_x(data_ptr->x_pos[i-1] + ux[dir]);
         data_ptr->y_pos[i] = map_y(data_ptr->y_pos[i-1] + uy[dir]);
     }

@@ -78,3 +78,35 @@ int put_c(int ch) {
     fprintf(1, "%c", ch);
 #endif
 }
+
+int modm(int x, int m)
+{
+    int n;
+    while(1) {
+        n = 1;
+        while( x - n * m >= 0) {
+//            printf("x - n * m = %d\n", x - n * m);
+            n <<= 1;
+
+        }
+        x -= (n >> 1) * m;
+        if(n == 1)
+            return x;
+    }
+}
+
+int divm(int x, int m)
+{
+    int n, ret = 0;
+    while(1) {
+        n = 1;
+        while( x - n * m >= 0) {
+//            printf("x - n * m = %d\n", x - n * m);
+            n <<= 1;
+        }
+        ret += (n >> 1);
+        x -= (n >> 1) * m;
+        if(n == 1)
+            return ret;
+    }
+}
