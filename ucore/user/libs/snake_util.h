@@ -6,6 +6,7 @@
 #define SNAKE_SNAKE_UTIL_H
 
 // #include <stddef.h>
+#include "div.h"
 #ifndef ON_X64
 #include <ulib.h>
 #endif
@@ -29,9 +30,5 @@ int Sleep(unsigned int time);
 
 unsigned int get_time_millis();
 
-//get x mod m, use 2 div
-int modm(int x, int m);
-//get x div m, use 2 div
-int divm(int x, int m);
 
 #endif //SNAKE_SNAKE_UTIL_H
