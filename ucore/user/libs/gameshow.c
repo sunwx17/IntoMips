@@ -18,6 +18,21 @@
 #include <string.h>
 #include "snake_util.h"
 
+#ifdef SHOW_VGA
+#include <vga.h>
+
+// light green color
+// 0x1 橘黄
+// 0x2 shi黄
+// 0x3 yellow
+
+// with bg = 0xf, fg = 0xf, blue
+
+static const int lgreen = 230;
+static const int lwhite = 0xf;
+static const int bgreen = 0x9;
+#endif
+
 #define BUF_SIZE 4096
 
 
@@ -219,6 +234,7 @@ int map_index(int x, int y, int w)
 void show_map(unsigned char *map, int width, int height, int clear)
 {
     int i,j;
+    #ifndef SHOW_VGA
     if(clear == 1) {
         // int i;
         for(i = 0; i < height + 2; ++i) {
@@ -226,23 +242,74 @@ void show_map(unsigned char *map, int width, int height, int clear)
             printf("\033[K");  //清除该行
         }
     }
+    #else
+    if(clear == 1) {
+        for(i = 0; i < VGA_VSIZE; ++i)
+            for(j = 0; j < VGA_HSIZE; ++j)
+                vga_write(i, j, ' ');
+    }
+    #endif
     for(i = 0; i < height + 2; ++i) {
         for(j = 0; j < width + 2; ++j) {
             if(i == 0 || i == height + 1 || j == 0 || j == width + 1) {
+            #ifdef SHOW_VGA
+                vga_write_c_bf_color(i, j, ' ', bgreen, lgreen);
+            #else
                 put_c('*');
+            #endif
             }
             else {
+            #ifdef SHOW_VGA
+                if(map[map_index(i - 1, j - 1, width)] == 1)
+                    vga_write_c_color(i, j, 'x', lgreen);
+                else if(map[map_index(i - 1,j - 1, width)] == 2)
+                    vga_write_c_color(i, j, '*', lgreen);
+                else if(map[map_index(i - 1, j - 1, width)] == 0)
+                    vga_write(i, j, ' ');
+            #else
                 if(map[map_index(i - 1, j - 1, width)] == 1)
                     put_c('x');
                 else if(map[map_index(i - 1,j - 1, width)] == 2)
                     put_c('*');
                 else if(map[map_index(i - 1, j - 1, width)] == 0)
                     put_c(' ');
+            #endif
             }
         }
+        #ifndef SHOW_VGA
         printf("\n");
+        #endif
     }
 }
+
+#ifdef SHOW_VGA
+void test_vga_color()
+{
+    int bg, fg;
+    int i = 0, j = 0;
+    int stop_flag = 0;
+    for(bg = 0; bg < 0xff; ++bg) {
+        if(stop_flag)
+            break;
+        for(fg = 0; fg < 0xff; ++fg) {
+            vga_write_c_bf_color(i, j++, 'a', bg, fg);
+            // if(j >= VGA_HSIZE) {
+            //     j = 0;
+            //     i++;
+            // }
+            // if(i >= VGA_VSIZE) {
+            //     // vga_scroll();
+            //     stop_flag = 1;
+            //     break;
+            // }
+        }
+        i++;
+        if(i >= VGA_VSIZE) {
+            break;
+        }
+    }
+}
+#endif
 
 void begin_game() {
     default_init_game();
@@ -256,10 +323,16 @@ void begin_game() {
     while(!is_game_over()) {
         unsigned char *map;
         get_map(&map);
+        #ifndef SHOW_VGA
+        int should_clear = 1;
         if(count++ == 0)
-            show_map(map, width, height, 0);
-        else
-            show_map(map, width, height, 1);
+            should_clear = 0;
+        #else
+        int should_clear = 0;
+        if(count++ == 0)
+            should_clear = 1;
+        #endif
+        show_map(map, width, height, should_clear);
         int dir = read_direction();
         if(dir == -2)
             break;

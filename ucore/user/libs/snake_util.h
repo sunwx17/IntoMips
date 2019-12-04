@@ -17,6 +17,8 @@
 // when USE_ARROW_KEY is uncommented, use arrow key to control; else use wsad to control
 // #define USE_ARROW_KEY
 
+#define SHOW_VGA
+
 /**
  * sleep time milliseconds
  * @param time
