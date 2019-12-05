@@ -18,6 +18,22 @@
 #include <string.h>
 #include "snake_util.h"
 
+#ifdef SHOW_VGA
+#include <vga.h>
+
+// light green color
+// 0x1 橘黄
+// 0x2 shi黄
+// 0x3 yellow
+// 230 some green
+// with bg = 0xf, fg = 0xf, blue
+
+
+static const int lgreen = 227;
+static const int lwhite = 0xf;
+static const int bgreen = 61;
+#endif
+
 #define BUF_SIZE 4096
 
 
@@ -98,6 +114,7 @@ int get_direction(char *buf)
     return -1;
 }
 
+// now use wsad to control
 // -2 for exit
 int read_direction()
 {
@@ -125,6 +142,7 @@ int read_direction()
             break;
         }
         else {
+#ifdef USE_ARROW_KEY
             if(state == 0) {
                 if(ch == 27)
                     state = 1;
@@ -159,6 +177,28 @@ int read_direction()
                 else
                     state = 0;
             }
+#else
+            if(ch == 'w') {
+                ret = 0;
+                break;
+            }
+            else if(ch == 'd') {
+                ret = 1;
+                break;
+            }
+            else if(ch == 's') {
+                ret = 2;
+                break;
+            }
+            else if(ch == 'a') {
+                ret = 3;
+                break;
+            }
+            else if(ch == 27) {
+                ret = -2;
+                break;
+            }
+#endif
 
         }
     }
@@ -192,50 +232,133 @@ int map_index(int x, int y, int w)
     return x * w + y;
 }
 
+void show_snake_node(int x, int y) {
+#ifdef SHOW_VGA    
+    vga_write_c_bf_color(x, y << 1, ' ', bgreen, lgreen);
+    vga_write_c_bf_color(x, (y << 1) | 0x1, ' ', bgreen, lgreen);
+#else
+    put_c('*');
+#endif
+}
+
+void show_wall_node(int x, int y) {
+#ifdef SHOW_VGA
+    vga_write_c_bf_color(x, y << 1, ' ', bgreen, lgreen);
+    vga_write_c_bf_color(x, (y << 1) | 0x1, ' ', bgreen, lgreen);
+#else
+    put_c('*');
+#endif   
+}
+
+void show_food(int x, int y) {
+#ifdef SHOW_VGA
+    vga_write_c_color(x, y << 1, 'x', lgreen);
+#else
+    put_c('x');
+#endif
+}
+
+void blank_cover(int x, int y) {
+#ifdef SHOW_VGA
+    vga_write_c_color(x, y << 1, ' ', 0);
+    vga_write_c_color(x, (y << 1) | 1, ' ', 0);
+#else
+    put_c(' ');
+#endif
+}
+
 void show_map(unsigned char *map, int width, int height, int clear)
 {
     int i,j;
+    #ifndef SHOW_VGA
     if(clear == 1) {
         // int i;
-        for(i = 0; i < height + 3; ++i) {
+        for(i = 0; i < height + 2; ++i) {
             printf("\033[1A"); //先回到上一行
             printf("\033[K");  //清除该行
         }
     }
+    #else
+    if(clear == 1) {
+        for(i = 0; i < VGA_VSIZE; ++i)
+            for(j = 0; j < VGA_HSIZE; ++j)
+                vga_write(i, j, ' ');
+    }
+    #endif
     for(i = 0; i < height + 2; ++i) {
         for(j = 0; j < width + 2; ++j) {
             if(i == 0 || i == height + 1 || j == 0 || j == width + 1) {
-                put_c('*');
+                show_wall_node(i, j);
             }
             else {
-                if(map[map_index(i - 1, j - 1, width)] == 1)
-                    put_c('x');
-                else if(map[map_index(i - 1,j - 1, width)] == 2)
-                    put_c('*');
+                if(map[map_index(i - 1, j - 1, width)] == 1) {
+                    show_food(i, j);
+                }
+                else if(map[map_index(i - 1,j - 1, width)] == 2) {
+                    show_snake_node(i, j);
+                }
                 else if(map[map_index(i - 1, j - 1, width)] == 0)
-                    put_c(' ');
+                    blank_cover(i, j);
             }
         }
+        #ifndef SHOW_VGA
         printf("\n");
+        #endif
     }
 }
+
+#ifdef SHOW_VGA
+void test_vga_color()
+{
+    int bg, fg;
+    int i = 0, j = 0;
+    int stop_flag = 0;
+    for(bg = 0; bg < 0xff; bg += 1) {
+        if(stop_flag)
+            break;
+        for(fg = 0; fg < 0xff; fg += 1) {
+            vga_write_c_bf_color(i, j++, 'a', bg, fg);
+            if(j >= VGA_HSIZE) {
+                j = 0;
+                i++;
+            }
+            if(i >= VGA_VSIZE) {
+                // vga_scroll();
+                stop_flag = 1;
+                break;
+            }
+        }
+        i++;
+        j = 0;
+        if(i >= VGA_VSIZE) {
+            break;
+        }
+    }
+}
+#endif
 
 void begin_game() {
     default_init_game();
     int width = get_width();
     int height = get_height();
-// #ifdef ON_X64
+#ifdef ON_X64
     printf("\033c");
-// #endif
+#endif
 
     int count = 0;
     while(!is_game_over()) {
         unsigned char *map;
         get_map(&map);
+        #ifndef SHOW_VGA
+        int should_clear = 1;
         if(count++ == 0)
-            show_map(map, width, height, 0);
-        else
-            show_map(map, width, height, 1);
+            should_clear = 0;
+        #else
+        int should_clear = 0;
+        if(count++ == 0)
+            should_clear = 1;
+        #endif
+        show_map(map, width, height, should_clear);
         int dir = read_direction();
         if(dir == -2)
             break;
