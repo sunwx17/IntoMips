@@ -21,8 +21,9 @@ usb_int_init(void) {
   kprintf("usb interrupt has inited.\n");
 }
 
-
+unsigned char sl811_read(unsigned char reg);
 void sl811_write(unsigned char reg, unsigned char data) {
+    //kprintf("write reg is %d, data is %d\n", reg, data);
     __nop
     __nop
     __nop
@@ -31,13 +32,80 @@ void sl811_write(unsigned char reg, unsigned char data) {
     __nop
     __nop
     outb(SL811+4, data);
+    __nop
+    __nop
+    __nop
+    sl811_read(reg);
 }
 unsigned char sl811_read(unsigned char reg) {
     outb(SL811, reg);
     __nop
     __nop
     __nop
-    return inb(SL811+4);
+    unsigned char c = inb(SL811+4);
+    //kprintf("read reg is %d, data is %d\n", reg, c);
+    return c;
+}
+
+
+
+void print_sl811(int start, int count) {
+    int x = 0;
+    int i = 0, j;
+    for (; i < 8; ++i) {
+        printf("0x%02x:  ", start + i * 16);
+        for (j = 0; j < 16; ++j) {
+            printf("%02x ", sl811_read(start + i * 16 + j));
+            x += 1;
+            if (x == count) {
+                printf("\n");
+                return;
+            }
+        }
+        printf("\n");
+    }
+}
+
+int isset(unsigned x, int bit) {
+    return (x & (1 << bit)) == 0 ? 0 : 1;
+}
+
+void print_sl811_info() {
+    int cr1 = sl811_read(SL11H_CTLREG1);
+    int ien = sl811_read(SL11H_IRQ_ENABLE);
+    int ist = sl811_read(SL11H_IRQ_STATUS);
+    int rev = sl811_read(SL11H_HWREVREG) >> 4;
+
+    int hcr = sl811_read(SL11H_HOSTCTLREG);
+    int addr = sl811_read(SL11H_BUFADDRREG);
+    int len = sl811_read(SL11H_BUFLNTHREG);
+    int st = sl811_read(SL11H_PKTSTATREG);
+    int n_tx = sl811_read(SL11H_XFERCNTREG);
+
+    printf("Ctrl Regs:\n");
+    printf("  CR1: (Sus,Speed,JK,RST,SOF)\n");
+    printf("       (%d,%d,%d,%d,%d)\n", 
+        isset(cr1, 6), isset(cr1, 5), isset(cr1,4), isset(cr1,3),isset(cr1,0));
+
+    printf("  IRQ_EN: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
+    printf("       (%d,%d,%d,%d,%d)\n", 
+        isset(ien, 6), isset(ien, 5), isset(ien,4), isset(ien,1),isset(ien,0));
+
+    printf("  IRQ_ST: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
+    printf("       (%d,%d,%d,%d,%d)\n", 
+        isset(ist, 6), isset(ist, 5), isset(ist,4), isset(ist,1),isset(ist,0));
+    printf("  REV: %x\n", rev);
+
+    printf("USB Regs:\n");
+    printf("  HCR: (Pre,D0/1,SyncSOF,ISO,Direction,En,Arm)\n");
+    printf("       (%d,%d,%d,%d,%d,%d,%d)\n", 
+        isset(hcr, 7), isset(hcr,6),isset(hcr,5),isset(hcr,4), isset(hcr,2),isset(hcr,1),isset(hcr,0));
+
+    printf("  Addr/Len: (%x, %x)\n", addr, len);
+    printf("  Status: (Stall,NAK,Overflow,Setup,Seq,Timeout,Err,ACK)\n");
+    printf("          (%d,%d,%d,%d,%d,%d,%d,%d)\n",
+        isset(st,7),isset(st,6),isset(st,5),isset(st,4),isset(st,3),isset(st,2),isset(st,1),isset(st,0));
+    printf("  N Transmitted %x\n", n_tx);
 }
 
 
@@ -89,7 +157,6 @@ void reset_sl811() {
     sl811_write(0x8, 0x1);
     sl811_write(0xd, 0xff);
     /* sl811_write(0x6, 0x1); */
-
 }
 
 
@@ -156,7 +223,7 @@ int setup_packet(const struct usb_setup_pkt* ppkt,
         return -1;
     }
     sl811_write(SL11H_IRQ_STATUS, 0xff);
-    /* printf("setup_packet done\n"); */
+    printf("setup_packet done\n");
     return 0;
 }
 
@@ -414,7 +481,12 @@ usb_sl811_init(void)
     int ep = 0;
     struct usb_dev_desc desc;
     //usb_int_init();
+    //unsigned char c = sl811_read(0x0e);
+    //kprintf("init start reg 0e has data %d", c);
+    print_sl811_info();
     reset_sl811();
+    kprintf("-----------after reset------------\n");
+    print_sl811_info();
     if(!device_present)
         return;
     kprintf("this in usb_sl811_init\n");
@@ -633,65 +705,9 @@ int main(int argc, char **argv) {
 
 
 #ifdef USERLAND_TEST
-void print_sl811(int start, int count) {
-    int x = 0;
-    int i = 0, j;
-    for (; i < 8; ++i) {
-        printf("0x%02x:  ", start + i * 16);
-        for (j = 0; j < 16; ++j) {
-            printf("%02x ", sl811_read(start + i * 16 + j));
-            x += 1;
-            if (x == count) {
-                printf("\n");
-                return;
-            }
-        }
-        printf("\n");
-    }
-}
 
-int isset(unsigned x, int bit) {
-    return (x & (1 << bit)) == 0 ? 0 : 1;
-}
-
-void print_sl811_info() {
-    int cr1 = sl811_read(SL11H_CTLREG1);
-    int ien = sl811_read(SL11H_IRQ_ENABLE);
-    int ist = sl811_read(SL11H_IRQ_STATUS);
-    int rev = sl811_read(SL11H_HWREVREG) >> 4;
-
-    int hcr = sl811_read(SL11H_HOSTCTLREG);
-    int addr = sl811_read(SL11H_BUFADDRREG);
-    int len = sl811_read(SL11H_BUFLNTHREG);
-    int st = sl811_read(SL11H_PKTSTATREG);
-    int n_tx = sl811_read(SL11H_XFERCNTREG);
-
-    printf("Ctrl Regs:\n");
-    printf("  CR1: (Sus,Speed,JK,RST,SOF)\n");
-    printf("       (%d,%d,%d,%d,%d)\n", 
-        isset(cr1, 6), isset(cr1, 5), isset(cr1,4), isset(cr1,3),isset(cr1,0));
-
-    printf("  IRQ_EN: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
-    printf("       (%d,%d,%d,%d,%d)\n", 
-        isset(ien, 6), isset(ien, 5), isset(ien,4), isset(ien,1),isset(ien,0));
-
-    printf("  IRQ_ST: (Detect,I/R,SOFTimer,B-Done,A-Done)\n");
-    printf("       (%d,%d,%d,%d,%d)\n", 
-        isset(ist, 6), isset(ist, 5), isset(ist,4), isset(ist,1),isset(ist,0));
-    printf("  REV: %x\n", rev);
-
-    printf("USB Regs:\n");
-    printf("  HCR: (Pre,D0/1,SyncSOF,ISO,Direction,En,Arm)\n");
-    printf("       (%d,%d,%d,%d,%d,%d,%d)\n", 
-        isset(hcr, 7), isset(hcr,6),isset(hcr,5),isset(hcr,4), isset(hcr,2),isset(hcr,1),isset(hcr,0));
-
-    printf("  Addr/Len: (%x, %x)\n", addr, len);
-    printf("  Status: (Stall,NAK,Overflow,Setup,Seq,Timeout,Err,ACK)\n");
-    printf("          (%d,%d,%d,%d,%d,%d,%d,%d)\n",
-        isset(st,7),isset(st,6),isset(st,5),isset(st,4),isset(st,3),isset(st,2),isset(st,1),isset(st,0));
-    printf("  N Transmitted %x\n", n_tx);
-}
 #endif
+
 
 
 #ifdef USERLAND_TEST

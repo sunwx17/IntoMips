@@ -95,7 +95,7 @@ always_ff @(posedge clk or posedge rst) begin
 
                 sl811_cs_n <= 1'b1;
                 sl811_rd_n <= 1'b1;
-                bus_data_read <= {4{sl811_d}};
+                bus_data_read <= {24'b0, {sl811_d}};
             end
 
             `USB_WAIT_STATES(cur_state, WRITE)
@@ -110,10 +110,13 @@ always_ff @(posedge clk or posedge rst) begin
             `USB_WAIT_STATES(cur_state, HOLD)
 
             `USB_LAST_WAIT_STATE(HOLD): begin
-                cur_state <= IDLE;
+                cur_state <= NOP;
 
                 write_op_inner <= 1'b0;
                 bus_stall <= 1'b0;
+            end
+            NOP: begin
+                cur_state <= IDLE;
             end
         endcase
     end
