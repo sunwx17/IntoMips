@@ -25,12 +25,13 @@
 // 0x1 橘黄
 // 0x2 shi黄
 // 0x3 yellow
-
+// 230 some green
 // with bg = 0xf, fg = 0xf, blue
 
-static const int lgreen = 230;
+
+static const int lgreen = 227;
 static const int lwhite = 0xf;
-static const int bgreen = 0x9;
+static const int bgreen = 61;
 #endif
 
 #define BUF_SIZE 4096
@@ -231,6 +232,41 @@ int map_index(int x, int y, int w)
     return x * w + y;
 }
 
+void show_snake_node(int x, int y) {
+#ifdef SHOW_VGA    
+    vga_write_c_bf_color(x, y << 1, ' ', bgreen, lgreen);
+    vga_write_c_bf_color(x, (y << 1) | 0x1, ' ', bgreen, lgreen);
+#else
+    put_c('*');
+#endif
+}
+
+void show_wall_node(int x, int y) {
+#ifdef SHOW_VGA
+    vga_write_c_bf_color(x, y << 1, ' ', bgreen, lgreen);
+    vga_write_c_bf_color(x, (y << 1) | 0x1, ' ', bgreen, lgreen);
+#else
+    put_c('*');
+#endif   
+}
+
+void show_food(int x, int y) {
+#ifdef SHOW_VGA
+    vga_write_c_color(x, y << 1, 'x', lgreen);
+#else
+    put_c('x');
+#endif
+}
+
+void blank_cover(int x, int y) {
+#ifdef SHOW_VGA
+    vga_write_c_color(x, y << 1, ' ', 0);
+    vga_write_c_color(x, (y << 1) | 1, ' ', 0);
+#else
+    put_c(' ');
+#endif
+}
+
 void show_map(unsigned char *map, int width, int height, int clear)
 {
     int i,j;
@@ -252,28 +288,17 @@ void show_map(unsigned char *map, int width, int height, int clear)
     for(i = 0; i < height + 2; ++i) {
         for(j = 0; j < width + 2; ++j) {
             if(i == 0 || i == height + 1 || j == 0 || j == width + 1) {
-            #ifdef SHOW_VGA
-                vga_write_c_bf_color(i, j, ' ', bgreen, lgreen);
-            #else
-                put_c('*');
-            #endif
+                show_wall_node(i, j);
             }
             else {
-            #ifdef SHOW_VGA
-                if(map[map_index(i - 1, j - 1, width)] == 1)
-                    vga_write_c_color(i, j, 'x', lgreen);
-                else if(map[map_index(i - 1,j - 1, width)] == 2)
-                    vga_write_c_color(i, j, '*', lgreen);
+                if(map[map_index(i - 1, j - 1, width)] == 1) {
+                    show_food(i, j);
+                }
+                else if(map[map_index(i - 1,j - 1, width)] == 2) {
+                    show_snake_node(i, j);
+                }
                 else if(map[map_index(i - 1, j - 1, width)] == 0)
-                    vga_write(i, j, ' ');
-            #else
-                if(map[map_index(i - 1, j - 1, width)] == 1)
-                    put_c('x');
-                else if(map[map_index(i - 1,j - 1, width)] == 2)
-                    put_c('*');
-                else if(map[map_index(i - 1, j - 1, width)] == 0)
-                    put_c(' ');
-            #endif
+                    blank_cover(i, j);
             }
         }
         #ifndef SHOW_VGA
@@ -288,22 +313,23 @@ void test_vga_color()
     int bg, fg;
     int i = 0, j = 0;
     int stop_flag = 0;
-    for(bg = 0; bg < 0xff; ++bg) {
+    for(bg = 0; bg < 0xff; bg += 1) {
         if(stop_flag)
             break;
-        for(fg = 0; fg < 0xff; ++fg) {
+        for(fg = 0; fg < 0xff; fg += 1) {
             vga_write_c_bf_color(i, j++, 'a', bg, fg);
-            // if(j >= VGA_HSIZE) {
-            //     j = 0;
-            //     i++;
-            // }
-            // if(i >= VGA_VSIZE) {
-            //     // vga_scroll();
-            //     stop_flag = 1;
-            //     break;
-            // }
+            if(j >= VGA_HSIZE) {
+                j = 0;
+                i++;
+            }
+            if(i >= VGA_VSIZE) {
+                // vga_scroll();
+                stop_flag = 1;
+                break;
+            }
         }
         i++;
+        j = 0;
         if(i >= VGA_VSIZE) {
             break;
         }
