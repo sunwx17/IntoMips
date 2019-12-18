@@ -165,6 +165,7 @@ assign video_de = ((hdata < `VGA_HSIZE) & (vdata < `VGA_VSIZE));
 //ascii rom
 //addra: 7bit
 //douta: 128bit
+Bit_t clk_100M;
 blk_mem_ascii_rom ascii_rom_instance(
     .clka(clk_100M),
     .addra(ascii_addr),
@@ -178,7 +179,6 @@ blk_mem_ascii_rom ascii_rom_instance(
 //clk_50M_in: 1bit
 //clk_100M_out: 1bit
 //locked
-Bit_t clk_100M;
 vga_clk_wiz vga_clk_wiz_instance(
     .clk_50M_in(clk_50M),
     .clk_100M_out(clk_100M)

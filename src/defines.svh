@@ -12,6 +12,7 @@
 
 //data format
 typedef logic       Bit_t;
+typedef logic[3:0]  Halfbyte_t;
 typedef logic[7:0]  Byte_t;
 typedef logic[15:0] Halfword_t;
 typedef logic[31:0] Word_t;
@@ -66,6 +67,8 @@ typedef Reg_data_t[`REG_NUM - 1:0]  Regs_t;
 `define ADDR_IN_BOOTROM(addr)       (addr >= 32'h8fc00000 && addr < 32'h8fc04000)
 `define ADDR_IN_FLASH(addr)         (addr >= 32'hBE000000 && addr < 32'hBF000000)
 `define ADDR_IN_USB(addr)           (addr >= 32'hbc020000 && addr < 32'hbc020008)
+`define ADDR_IN_DISPLAY(addr)       (addr >= 32'hbfd00400 && addr < 32'hbfd00414)
+
 
 
 
