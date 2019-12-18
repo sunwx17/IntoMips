@@ -643,7 +643,7 @@ display_controller display_controller_instance(
     leds, 
     dpy0,
     dpy1 
-)
+);
 
 //assign leds[7:0] = base_ram_data[7:0];
 
