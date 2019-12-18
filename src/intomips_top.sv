@@ -276,7 +276,7 @@ always_comb begin
     display_read_op <= `DISABLE;
     display_write_op <= `DISABLE;
     display_addr <= `ZERO_WORD;
-    display_write <= `ZEROW_WORD;
+    display_write <= `ZERO_WORD;
     
     if (data_in_uart_data || data_in_uart_status || data_in_vga || data_in_display) begin
         if (inst_in_ext) begin
