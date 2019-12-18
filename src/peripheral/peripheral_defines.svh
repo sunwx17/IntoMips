@@ -43,6 +43,12 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_BLUE                1:0
 
 
+`define ADDR_IN_LED(addr)       (addr == 32'hbfd00400)
+`define ADDR_IN_NUM(addr)       (addr == 32'hbfd00408)
+`define ADDR_IN_DIP_SW(addr)    (addr == 32'hbfd0040c)
+`define ADDR_IN_TOUCH_BTN(addr) (addr == 32'hbfd00410)
+
+
 //graphics
 typedef logic[0:127] Ascii_data_t;
 typedef logic[11:0] Graphics_block_addr_t;
