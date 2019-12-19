@@ -1,10 +1,10 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Thu Dec  5 18:59:07 2019
--- Host        : DESKTOP-SWX running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3 (lin64) Build 2405991 Thu Dec  6 23:36:41 MST 2018
+-- Date        : Thu Dec 19 11:09:51 2019
+-- Host        : monell-ubuntu running 64-bit Ubuntu 18.04.3 LTS
 -- Command     : write_vhdl -force -mode synth_stub
---               D:/Desktop/SECO/IntoMips/vivado/intomips.srcs/sources_1/ip/blk_mem_bootrom/blk_mem_bootrom_stub.vhdl
+--               /home/monell/code/IntoMips/vivado/intomips.srcs/sources_1/ip/blk_mem_bootrom/blk_mem_bootrom_stub.vhdl
 -- Design      : blk_mem_bootrom
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a100tfgg676-2L

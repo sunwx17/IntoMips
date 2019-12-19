@@ -47,7 +47,7 @@
 
 //32bit layout
 //[..8bit../ bg(8bit) / fg(8bit) / ascii(8bit)]
-#define VGA_COLOR_CHAR(bg, fg, ch)      ((((bg) & 0xff) << 16) | (((fg) & 0xff) << 8) | ((ch) & 0xff))
+#define VGA_COLOR_CHAR(cursor, bg, fg, ch)      ((((cursor) & 0x1) << 24) | (((bg) & 0xff) << 16) | (((fg) & 0xff) << 8) | ((ch) & 0xff))
 
 
 
@@ -55,5 +55,7 @@ void vga_putc(int c);
 void vga_putc_controll(int c);
 void vga_putc_visible(int c);
 
-void vga_write(int v, int h, int c);
+void vga_write(int v, int h, int c, int cursor_mode);
 void vga_scroll();
+
+void vga_set_cursor_mode();
