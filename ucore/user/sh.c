@@ -66,16 +66,24 @@ readline(const char *prompt) {
             return NULL;
         }
 
+        int isBackspace = 0;
+        if(c == '\b' || c == 127)
+            isBackspace = 1;
         if (c == 3) {
             return NULL;
         }
-        else if (c >= ' ' && i < BUFSIZE - 1) {
-            putc(c);
-            buffer[i ++] = c;
+        else if (isBackspace) {
+            if(i > 0) {
+                putc('\b');
+                putc(' ');
+                putc('\b');
+                // putc('c');
+                i --;
+            }
         }
-        else if (c == '\b' && i > 0) {
+        else if (c >= ' ' && i < BUFSIZE - 1) {
+            buffer[i ++] = c;
             putc(c);
-            i --;
         }
         else if (c == '\n' || c == '\r') {
             putc(c);
