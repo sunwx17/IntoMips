@@ -24,30 +24,30 @@ assign leds = leds_in;
 
 always_ff @ (posedge clk or posedge rst) begin
     if (rst) begin
-        high_lut_in <= `WORD_ZERO;
-        low_lut_in  <= `WORD_ZERO;
+        high_lut_in <= `ZERO_WORD;
+        low_lut_in  <= `ZERO_WORD;
 
-        bus_data_read <= `WORD_ZERO;
-        low_lut_in <= `WORD_ZERO;
-        high_lut_in <= `WORD_ZERO;
-        dpy0 <= `WORD_ZERO;
-        dpy1 <= `WORD_ZERO;
-        leds <= `WORD_ZERO;
+        bus_data_read <= `ZERO_WORD;
+        low_lut_in <= `ZERO_WORD;
+        high_lut_in <= `ZERO_WORD;
+        dpy0 <= `ZERO_WORD;
+        dpy1 <= `ZERO_WORD;
+        leds <= `ZERO_WORD;
     end else begin
-        if (read_op) {
-            if (`ADDR_IN_DIP_SW(bus_addr)) {
+        if (read_op) begin
+            if (`ADDR_IN_DIP_SW(bus_addr)) begin
                 bus_data_read <= dip_sw;
-            } else if (`ADDR_IN_TOUCH_BTN(bus_addr)) {
+            end else if (`ADDR_IN_TOUCH_BTN(bus_addr)) begin
                 bus_data_read <= {8{touch_btn}};
-            } 
-        } else if (write_op) {
-            if (`ADDR_IN_NUM(bus_addr)) {
+            end 
+        end else if (write_op) begin
+            if (`ADDR_IN_NUM(bus_addr)) begin
                 low_lut_in <= bus_data_write[3:0];
                 high_lut_in <= bus_data_write[7:4];
-            } else if (`ADDR_IN_LED(bus_addr)) {
+            end else if (`ADDR_IN_LED(bus_addr)) begin
                 leds_in <= bus_data_write[15:0];
-            }
-        }
+            end
+        end
     end
 end
 
@@ -60,6 +60,6 @@ seg7_lut high_lut(
 seg7_lut low_lut(
     .iDIG(low_lut_in),
     .oSEG1(dpy0)
-)
+);
 
 endmodule 
