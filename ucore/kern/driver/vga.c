@@ -38,6 +38,9 @@ void vga_putc_controll(int c) {
     switch (c) {
         //case LF:
             //换行
+        case DEL: {
+            //退格
+        }
         case BS: {
             //退格
             if (cursor_h != 0) {
@@ -48,6 +51,7 @@ void vga_putc_controll(int c) {
             }
             break;
         }
+
         case LF: {
             //回车
             int h;
