@@ -441,8 +441,8 @@ end
 
 Bit_t timer_int;
 
-assign leds[3] = timer_int;
-assign leds[2] = usb_interrupt;
+//assign leds[3] = timer_int;
+//assign leds[2] = usb_interrupt;
 
 cpu cpu_instance(
     .clk(clk_125),
@@ -575,8 +575,8 @@ serial_controller serial_controller_instance(
 
 //assign uart_mode = 2'b01;
 
-assign leds[0] = uart_mode[0];
-assign leds[1] = uart_mode[1];
+//assign leds[0] = uart_mode[0];
+//assign leds[1] = uart_mode[1];
 
 ext_serial_controller serial_controller_instance(
     .clk(clk_25M), 
