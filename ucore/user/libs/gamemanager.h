@@ -31,6 +31,8 @@ void end_game();
 // direction: 0,1,2,3 stands for up, right, down, left; -1 stands for the origin direction
 void update_game(int direction);
 
+void update_game_with_k_frame(int k);
+
 // 1 for over, 0 for not
 int is_game_over();
 
