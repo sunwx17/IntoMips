@@ -30,6 +30,8 @@ typedef unsigned int uint32_t;
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
 
+typedef unsigned int clock_t;
+
 /* *
  * Pointers and addresses are 32 bits long.
  * We use pointer types to represent addresses,

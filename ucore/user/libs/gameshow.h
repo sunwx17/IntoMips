@@ -13,6 +13,8 @@ void test_input();
 
 void begin_game();
 
+void multi_begin_game();
+
 #ifdef SHOW_VGA
 void test_vga_color();
 #endif

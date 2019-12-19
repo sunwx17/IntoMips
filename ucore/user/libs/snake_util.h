@@ -19,6 +19,8 @@
 
 #define SHOW_VGA
 
+// #define DEBUG_LOG
+
 /**
  * sleep time milliseconds
  * @param time
