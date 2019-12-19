@@ -15,6 +15,7 @@ void vga_putc(int c) {
 #ifdef VGA_NAIVE
 static int BUF[VGA_VSIZE][VGA_HSIZE] = {{0}};
 static int cursor_h = 0, cursor_v = 0;
+
 void vga_putc_visible(int c) {
     BUF[cursor_v][cursor_h] = c;
     vga_write(cursor_v, cursor_h, c);
@@ -37,6 +38,16 @@ void vga_putc_controll(int c) {
     switch (c) {
         //case LF:
             //换行
+        case BS: {
+            //退格
+            if (cursor_h != 0) {
+                //只支持同一行退格
+                BUF[cursor_v][cursor_h] = SPACE;
+                vga_write(cursor_v, cursor_h, SPACE);
+                cursor_h--;
+            }
+            break;
+        }
         case LF: {
             //回车
             int h;
