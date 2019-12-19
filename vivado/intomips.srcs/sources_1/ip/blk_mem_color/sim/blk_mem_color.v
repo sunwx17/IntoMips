@@ -71,14 +71,14 @@ input wire [0 : 0] wea;
 input wire [11 : 0] addra;
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME BRAM_PORTA, MEM_SIZE 8192, MEM_WIDTH 32, MEM_ECC NONE, MASTER_TYPE OTHER, READ_LATENCY 1" *)
 (* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTA DIN" *)
-input wire [15 : 0] dina;
+input wire [23 : 0] dina;
 (* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTB CLK" *)
 input wire clkb;
 (* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTB ADDR" *)
 input wire [11 : 0] addrb;
 (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME BRAM_PORTB, MEM_SIZE 8192, MEM_WIDTH 32, MEM_ECC NONE, MASTER_TYPE OTHER, READ_LATENCY 1" *)
 (* X_INTERFACE_INFO = "xilinx.com:interface:bram:1.0 BRAM_PORTB DOUT" *)
-output wire [15 : 0] doutb;
+output wire [23 : 0] doutb;
 
   blk_mem_gen_v8_4_2 #(
     .C_FAMILY("artix7"),
@@ -109,9 +109,9 @@ output wire [15 : 0] doutb;
     .C_HAS_REGCEA(0),
     .C_USE_BYTE_WEA(0),
     .C_WEA_WIDTH(1),
-    .C_WRITE_MODE_A("NO_CHANGE"),
-    .C_WRITE_WIDTH_A(16),
-    .C_READ_WIDTH_A(16),
+    .C_WRITE_MODE_A("WRITE_FIRST"),
+    .C_WRITE_WIDTH_A(24),
+    .C_READ_WIDTH_A(24),
     .C_WRITE_DEPTH_A(3700),
     .C_READ_DEPTH_A(3700),
     .C_ADDRA_WIDTH(12),
@@ -124,8 +124,8 @@ output wire [15 : 0] doutb;
     .C_USE_BYTE_WEB(0),
     .C_WEB_WIDTH(1),
     .C_WRITE_MODE_B("WRITE_FIRST"),
-    .C_WRITE_WIDTH_B(16),
-    .C_READ_WIDTH_B(16),
+    .C_WRITE_WIDTH_B(24),
+    .C_READ_WIDTH_B(24),
     .C_WRITE_DEPTH_B(3700),
     .C_READ_DEPTH_B(3700),
     .C_ADDRB_WIDTH(12),
@@ -153,9 +153,9 @@ output wire [15 : 0] doutb;
     .C_EN_SHUTDOWN_PIN(0),
     .C_EN_SAFETY_CKT(0),
     .C_DISABLE_WARN_BHV_RANGE(0),
-    .C_COUNT_36K_BRAM("2"),
+    .C_COUNT_36K_BRAM("3"),
     .C_COUNT_18K_BRAM("0"),
-    .C_EST_POWER_SUMMARY("Estimated Power for IP     :     9.0695 mW")
+    .C_EST_POWER_SUMMARY("Estimated Power for IP     :     14.586298 mW")
   ) inst (
     .clka(clka),
     .rsta(1'D0),
@@ -171,7 +171,7 @@ output wire [15 : 0] doutb;
     .regceb(1'D0),
     .web(1'B0),
     .addrb(addrb),
-    .dinb(16'B0),
+    .dinb(24'B0),
     .doutb(doutb),
     .injectsbiterr(1'D0),
     .injectdbiterr(1'D0),
@@ -193,7 +193,7 @@ output wire [15 : 0] doutb;
     .s_axi_awburst(2'B0),
     .s_axi_awvalid(1'D0),
     .s_axi_awready(),
-    .s_axi_wdata(16'B0),
+    .s_axi_wdata(24'B0),
     .s_axi_wstrb(1'B0),
     .s_axi_wlast(1'D0),
     .s_axi_wvalid(1'D0),

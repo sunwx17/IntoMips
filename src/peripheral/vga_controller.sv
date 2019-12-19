@@ -28,6 +28,12 @@ Graphics_block_addr_t graphics_write_addr, color_write_addr;
 Bit_t last_write_op;
 Graphics_block_addr_t last_graphics_write_addr;
 
+
+Word_t cnt;
+Word_t cursor_addr;
+Bit_t is_cover;
+
+
 always_comb begin
     //write_op在下降沿给出
     if (write_op) begin
@@ -45,6 +51,8 @@ always_ff @ (posedge clk_25M or posedge rst) begin
         color_in <= `ZERO_WORD;
         inner_color_write_op <= 1'b0;
         color_write_addr <= `ZERO_WORD;
+
+        cursor_addr <= `ZERO_WORD;
     end else begin
         //write ascii of the last period
         last_write_op <= 1'b0;
@@ -54,12 +62,16 @@ always_ff @ (posedge clk_25M or posedge rst) begin
         inner_color_write_op <= 1'b0;
         color_write_addr <= `ZERO_WORD;
         if (write_op) begin
-            last_write_op <= 1'b1;
-            last_graphics_write_addr <= bus_addr;
+            if (bus_addr == `VGA_CURSOR) begin
+                cursor_addr <= bus_data;
+            end else begin
+                last_write_op <= 1'b1;
+                last_graphics_write_addr <= bus_addr;
 
-            color_in <= bus_data[`VGA_COLOR_FIELD];
-            inner_color_write_op <= 1'b1;
-            color_write_addr <= bus_addr;
+                color_in <= bus_data[`VGA_COLOR_FIELD];
+                inner_color_write_op <= 1'b1;
+                color_write_addr <= bus_addr;
+            end 
         end
     end
 end
@@ -77,6 +89,19 @@ always_ff @ (posedge clk_25M) begin
     end 
 end
         
+always_ff @ (posedge clk_25M or posedge rst) begin
+    if (rst) begin
+        cnt <= 0;
+        is_cover <= 1'b0;
+    end else begin
+        if (cnt == 12500000) begin
+            cnt <= 0;
+            is_cover <= ~is_cover;
+        end else begin
+            cnt <= cnt + 1;
+        end
+    end
+end
 
 //高/宽
 logic[11:0] hdata;
@@ -92,6 +117,9 @@ Block_bit_addr_t pixel_addr;
 Vga_red_t red, red_in;
 Vga_green_t green, green_in;
 Vga_blue_t blue, blue_in;
+
+Graphics_block_addr_t cur_block_addr, cur_block_addr_in;
+Graphics_block_addr_t addr_4x;
 
 assign video_red = red_in;
 assign video_green = green_in;
@@ -113,22 +141,26 @@ end
 
 assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
 always_comb begin
-    if (graphics_out[pixel_addr]) begin
-        //foregroud
-        red <= ~color_out[`VGA_FG_RED];
-        green <= ~color_out[`VGA_FG_GREEN];
-        blue <= ~color_out[`VGA_FG_BLUE];
+    if (is_cover && cursor_addr == cur_block_addr_in) begin
+        red <= `ONE_WORD;
+        green <= `ONE_WORD;
+        blue <= `ONE_WORD;
     end else begin
-        //baskground:
-        red <= color_out[`VGA_BG_RED];
-        green <= color_out[`VGA_BG_GREEN];
-        blue <= color_out[`VGA_BG_BLUE];
+        if (graphics_out[pixel_addr]) begin
+            //foregroud
+            red <= ~color_out[`VGA_FG_RED];
+            green <= ~color_out[`VGA_FG_GREEN];
+            blue <= ~color_out[`VGA_FG_BLUE];
+        end else begin
+            //baskground:
+            red <= color_out[`VGA_BG_RED];
+            green <= color_out[`VGA_BG_GREEN];
+            blue <= color_out[`VGA_BG_BLUE];
+        end
     end
 end
 
 
-Graphics_block_addr_t cur_block_addr, cur_block_addr_in;
-Graphics_block_addr_t addr_4x;
 assign addr_4x = (vdata >> 4) << 2;
 assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
 assign cur_block_addr_in = cur_block_addr < `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr:0;

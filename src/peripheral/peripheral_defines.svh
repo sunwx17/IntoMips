@@ -28,7 +28,8 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_TEXT_FIELD          7:0
 `define VGA_FG_COLOR_FIELD      15:8
 `define VGA_BG_COLOR_FIELD      23:16
-`define VGA_COLOR_FIELD         23:8
+`define VGA_CURSOR_MODE_FIELD   24
+`define VGA_COLOR_FIELD         31:8
 
 `define VGA_FG_RED              7:5
 `define VGA_FG_GREEN            4:2
@@ -42,6 +43,8 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_GREEN               4:2
 `define VGA_BLUE                1:0
 
+`define VGA_CURSOR              (32'h00000e78)
+
 
 `define ADDR_IN_LED(addr)       (addr == 32'hbfd00400)
 `define ADDR_IN_NUM(addr)       (addr == 32'hbfd00408)
@@ -53,7 +56,7 @@ typedef logic[18:0] Vga_addr_t;
 typedef logic[0:127] Ascii_data_t;
 typedef logic[11:0] Graphics_block_addr_t;
 typedef logic[9:0] Block_bit_addr_t;
-typedef logic[15:0] Color_t;
+typedef logic[23:0] Color_t;
 
 //serial
 typedef logic[1:0]  Serial_mode_t;
