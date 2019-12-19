@@ -11,7 +11,7 @@ module display_controller (
     input Word_t    bus_addr,
 
     input  Halfbyte_t   touch_btn,  //BTN1~BTN4，按钮开关，按下时为1
-    input  Word_t       dip_sw,     //32位拨码开关，拨到“ON”时�?1
+    input  Word_t       dip_sw,     //32位拨码开关，拨到“ON”时�??1
     output Halfword_t   leds,       //16位LED，输出时1点亮
     output Byte_t       dpy0,       //数码管低位信号，包括小数点，输出1点亮
     output Byte_t       dpy1       //数码管高位信号，包括小数点，输出1点亮
@@ -30,9 +30,7 @@ always_ff @ (posedge clk or posedge rst) begin
         bus_data_read <= `ZERO_WORD;
         low_lut_in <= `ZERO_WORD;
         high_lut_in <= `ZERO_WORD;
-        dpy0 <= `ZERO_WORD;
-        dpy1 <= `ZERO_WORD;
-        leds <= `ZERO_WORD;
+        leds_in <= `ZERO_WORD;
     end else begin
         if (read_op) begin
             if (`ADDR_IN_DIP_SW(bus_addr)) begin
