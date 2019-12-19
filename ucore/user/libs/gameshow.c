@@ -32,6 +32,8 @@
 static const int lgreen = 227;
 static const int lwhite = 0xf;
 static const int bgreen = 61;
+static const int lred = 31;
+static const int lyellow = 3;
 #endif
 
 #define BUF_SIZE 4096
@@ -134,11 +136,13 @@ int read_direction()
 #endif
         {
             ret = -2;
+            // printf("read < 0\n");
             break;
         }
 
         else if(read_ret == 0) {
-            ret = -2;
+            ret = -1;
+            // printf("read == 0\n");
             break;
         }
         else {
@@ -196,6 +200,7 @@ int read_direction()
             }
             else if(ch == 27) {
                 ret = -2;
+                printf("get 27\n");
                 break;
             }
 #endif
@@ -252,7 +257,8 @@ void show_wall_node(int x, int y) {
 
 void show_food(int x, int y) {
 #ifdef SHOW_VGA
-    vga_write_c_color(x, y << 1, 'x', lgreen);
+    // vga_write_c_color(x, y << 1, 'x', lgreen);
+    vga_write_c_color(x, y << 1, 'O', lyellow);
 #else
     put_c('x');
 #endif
@@ -367,5 +373,87 @@ void begin_game() {
 
     }
     end_game();
+}
+
+#define update_frequency 5
+#define update_clock 200
+
+void child_update()
+{
+    int width = get_width();
+    int height = get_height();
+    while(1) {
+        unsigned char *map;
+        get_map(&map);
+        show_map(map, width, height, 0);
+        sleep(update_clock);
+        update_game(-1);
+
+    }
+}
+
+// multi_process
+void multi_begin_game()
+{
+    // 2Hz update frequency
+
+    default_init_game();
+    int width = get_width();
+    int height = get_height();
+#ifdef ON_X64
+    printf("\033c");
+#endif
+    clock_t clock1 = get_clock();
+    int count = 0;
+    while(!is_game_over()) {
+        unsigned char *map;
+        get_map(&map);
+        #ifndef SHOW_VGA
+        int should_clear = 1;
+        if(count++ == 0)
+            should_clear = 0;
+        #else
+        int should_clear = 0;
+        if(count++ == 0)
+            should_clear = 1;
+        #endif
+        if(count == 1)
+            show_map(map, width, height, should_clear);
+        int pid;
+        if((pid = fork()) == 0) {
+            child_update();
+            return;
+        }
+        int dir = read_direction();
+    #ifdef DEBUG_LOG
+        printf("before kill\n");
+    #endif
+        if(pid > 0)
+            kill(pid);
+    #ifdef DEBUG_LOG
+        printf("end kill\n");
+    #endif
+        clock_t clock2 = get_clock();
+        clock_t dur_clock = clock2 - clock1;
+        uint32_t frame_num = divm(dur_clock, update_clock);
+        clock1 = clock2;
+        if(dir == -2) {
+            printf("dir == -2\n");
+            break;
+        }
+//        int dir = -1;
+        // update_game(dir);
+    #ifdef DEBUG_LOG
+        printf("frame num %u\n", frame_num);
+    #endif
+        if(frame_num > 0)
+            update_game_with_k_frame(frame_num);
+        update_game(dir);
+    #ifdef DEBUG_LOG
+        printf("after update\n");
+    #endif
+    }
+    end_game();
+
 }
 

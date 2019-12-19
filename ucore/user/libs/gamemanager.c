@@ -16,8 +16,8 @@
 #define DEFAULT_HEIGHT 20
 #define MIN_WIDTH 3
 #define MIN_HEIGHT 3
-#define MAX_WIDTH 100
-#define MAX_HEIGHT 100
+#define MAX_WIDTH 30
+#define MAX_HEIGHT 30
 
 #define INIT_SNAKE_LEN 1
 #define INIT_DIRECTION 0
@@ -222,6 +222,22 @@ int will_eat_next_step(int direction)
     return 0;
 }
 
+int will_eat_in_k_step(int direction, int k)
+{
+    int dir = direction;
+    if(dir == -1)
+        dir = data_ptr->direction;
+    int i;
+    for(i = 0; i < k; ++i) {
+        int x = map_x(data_ptr->x_pos[0] + i * ux[dir]);
+        int y = map_y(data_ptr->y_pos[0] + i * uy[dir]);
+        if(x == data_ptr->food_x && y == data_ptr->food_y)
+            return 1;
+    }
+
+    return 0;
+}
+
 void game_win()
 {
 
@@ -282,6 +298,13 @@ void update_game(int direction)
                 }
                 data_ptr->x_pos[0] = map_x(data_ptr->x_pos[0] + ux[direction]);
                 data_ptr->y_pos[0] = map_y(data_ptr->y_pos[0] + uy[direction]);
+                // data_ptr->x_pos[data_ptr->snake_len] = data_ptr->x_pos[data_ptr->snake_len - 1];
+                // data_ptr->y_pos[data_ptr->snake_len] = data_ptr->y_pos[data_ptr->snake_len - 1];
+                // for(i = 0; i < data_ptr->snake_len; ++i) {
+                //     data_ptr->x_pos[i] = map_x(data_ptr->x_pos[i] + ux[direction]);
+                //     data_ptr->y_pos[i] = map_y(data_ptr->y_pos[i] + uy[direction]);
+                // }
+
                 data_ptr->snake_len++;
                 data_ptr->score++;
                 data_ptr->rounds++;
@@ -295,10 +318,68 @@ void update_game(int direction)
             }
             data_ptr->x_pos[0] = map_x(data_ptr->x_pos[0] + ux[direction]);
             data_ptr->y_pos[0] = map_y(data_ptr->y_pos[0] + uy[direction]);
+            // for(i = 0; i < data_ptr->snake_len; ++i) {
+            //     data_ptr->x_pos[i] = map_x(data_ptr->x_pos[i] + ux[direction]);
+            //     data_ptr->y_pos[i] = map_y(data_ptr->y_pos[i] + uy[direction]);
+            // }
             data_ptr->rounds++;
         }
         if (is_struck())
             data_ptr->game_over = 1;
         fill_map();
     }
+}
+
+// use the origin direction to update the game with k frame
+void update_game_with_k_frame(int k) 
+{
+    int i;
+    for(i = 0; i < k; ++i) {
+        update_game(-1);
+    }
+    // int direction = data_ptr->direction;
+    // if(!is_game_over()) {
+    //     int old_direction = data_ptr->direction;
+    //     int dir_changed = 0;
+    //     if (direction >= 0 && direction <= 3) {
+    //         if (direction != old_direction) {
+    //             dir_changed = 1;
+    //             data_ptr->direction = direction;
+    //         }
+    //     }
+    //     if (!dir_changed)
+    //         direction = old_direction;
+    //     else {
+    //         if(is_dir_opposite(old_direction, direction))
+    //             return;
+    //     }
+    //     if (will_eat_next_step(direction)) {
+    //         if (data_ptr->snake_len == data_ptr->width * data_ptr->height - 1) {
+    //             game_win();
+    //         } else {
+    //             int i;
+    //             data_ptr->x_pos[data_ptr->snake_len] = map_x(data_ptr->x_pos[data_ptr->snake_len - 1] + (k - 1) * ux[direction]);
+    //             data_ptr->y_pos[data_ptr->snake_len] = map_y(data_ptr->y_pos[data_ptr->snake_len - 1] + (k - 1) * uy[direction]);
+    //             for(i = 0; i < data_ptr->snake_len; ++i) {
+    //                 data_ptr->x_pos[i] = map_x(data_ptr->x_pos[i] + k * ux[direction]);
+    //                 data_ptr->y_pos[i] = map_y(data_ptr->y_pos[i] + k * uy[direction]);
+    //             }
+
+    //             data_ptr->snake_len++;
+    //             data_ptr->score++;
+    //             data_ptr->rounds += k;
+    //             get_new_food();
+    //         }
+    //     } else {
+    //         int i;
+    //         for(i = 0; i < data_ptr->snake_len; ++i) {
+    //             data_ptr->x_pos[i] = map_x(data_ptr->x_pos[i] + k * ux[direction]);
+    //             data_ptr->y_pos[i] = map_y(data_ptr->y_pos[i] + k * uy[direction]);
+    //         }
+    //         data_ptr->rounds += k;
+    //     }
+    //     if (is_struck())
+    //         data_ptr->game_over = 1;
+    //     fill_map();
+    // }
 }

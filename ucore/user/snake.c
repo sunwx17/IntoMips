@@ -35,7 +35,8 @@
 
 int main() {
 //    test_input();
-    begin_game();
+    // begin_game();
+    multi_begin_game();
 //    printf("%d\n", (-2 % 3));
     // test_vga_color();
     return 0;
