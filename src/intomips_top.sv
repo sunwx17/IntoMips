@@ -631,18 +631,18 @@ usb_controller usb_controller_instance(
 
 
 display_controller display_controller_instance(
-    clk(clk_25M),
-    rst(reset_btn),
-    read_op(display_read_op),
-    write_op(display_write_op),
-    bus_data_write(display_write),
-    bus_data_read(display_read),
-    bus_addr(display_addr),
-    touch_btn,
-    dip_sw,  
-    leds, 
-    dpy0,
-    dpy1 
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .read_op(display_read_op),
+    .write_op(display_write_op),
+    .bus_data_write(display_write),
+    .bus_data_read(display_read),
+    .bus_addr(display_addr),
+    .touch_btn,
+    .dip_sw,  
+    .leds, 
+    .dpy0,
+    .dpy1 
 );
 
 //assign leds[7:0] = base_ram_data[7:0];
