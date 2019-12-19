@@ -35,9 +35,9 @@ void vga_putc_visible(int c) {
 
 void vga_putc_controll(int c) {
     switch (c) {
-        case LF:
+        //case LF:
             //换行
-        case CR: {
+        case LF: {
             //回车
             int h;
             for (h = cursor_h; h < VGA_HSIZE; h++) {
