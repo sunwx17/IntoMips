@@ -71,6 +71,11 @@ gettime_msec(void) {
     return (unsigned int)sys_gettime();
 }
 
+unsigned int
+get_clock(void) {
+    return (unsigned int)sys_gettime();
+}
+
 int
 __exec(const char *name, const char **argv) {
     int argc = 0;
