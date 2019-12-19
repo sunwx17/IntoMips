@@ -35,4 +35,5 @@ void update_game(int direction);
 int is_game_over();
 
 
+
 #endif //SNAKE_GAMEMANAGER_H
