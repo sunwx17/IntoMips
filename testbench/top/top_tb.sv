@@ -13,9 +13,9 @@ end
 initial begin
     rst = 1'b1;
     $readmemh({"memory_byte", ".mem"}, ext_sram.sram_mem);
-    //$readmemh({"vga_ascii_demo", ".mem"}, ext_sram.sram_mem);
+    $readmemh({"vga_ascii_demo", ".mem"}, base_sram.sram_mem);
     //$readmemh({"kernel", ".mem"}, base_sram.sram_mem);
-    $readmemh({"save_load_test", ".mem"}, base_sram.sram_mem);
+    //$readmemh({"save_load_test", ".mem"}, base_sram.sram_mem);
     #100 rst = 1'b0;
     #1000000000 rst = 1'b1;
     #1000002000 $stop;

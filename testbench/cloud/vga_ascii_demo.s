@@ -6,12 +6,14 @@
 _start:
     lui     $1, 0xba00
     
-    ori     $2, $0, 0x0048
+    lui     $2, 0x0100
+    ori     $2, $2, 0x0048
     sw      $2, 0x0($1)
     lui     $2, 0xe0
     ori     $2, $2, 0xe065
     sw      $2, 0x1($1)
-    ori     $2, $0, 0xe06c
+    lui     $2, 0x0100
+    ori     $2, $2, 0xe06c
     sw      $2, 0x2($1)
     sw      $2, 0x3($1)
     ori     $2, $0, 0xe06f

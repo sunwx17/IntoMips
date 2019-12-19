@@ -30,7 +30,6 @@ Graphics_block_addr_t last_graphics_write_addr;
 
 
 Word_t cnt;
-Word_t cursor_addr;
 Bit_t is_cover;
 
 
@@ -52,7 +51,6 @@ always_ff @ (posedge clk_25M or posedge rst) begin
         inner_color_write_op <= 1'b0;
         color_write_addr <= `ZERO_WORD;
 
-        cursor_addr <= `ZERO_WORD;
     end else begin
         //write ascii of the last period
         last_write_op <= 1'b0;
@@ -62,16 +60,12 @@ always_ff @ (posedge clk_25M or posedge rst) begin
         inner_color_write_op <= 1'b0;
         color_write_addr <= `ZERO_WORD;
         if (write_op) begin
-            if (bus_addr == `VGA_CURSOR) begin
-                cursor_addr <= bus_data;
-            end else begin
-                last_write_op <= 1'b1;
-                last_graphics_write_addr <= bus_addr;
+            last_write_op <= 1'b1;
+            last_graphics_write_addr <= bus_addr;
 
-                color_in <= bus_data[`VGA_COLOR_FIELD];
-                inner_color_write_op <= 1'b1;
-                color_write_addr <= bus_addr;
-            end 
+            color_in <= bus_data[`VGA_COLOR_FIELD];
+            inner_color_write_op <= 1'b1;
+            color_write_addr <= bus_addr;
         end
     end
 end
@@ -141,7 +135,7 @@ end
 
 assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
 always_comb begin
-    if (is_cover && cursor_addr == cur_block_addr_in) begin
+    if (is_cover && color_out[`VGA_CURSOR_MODE_FIELD] == 1'b1) begin
         red <= `ONE_WORD;
         green <= `ONE_WORD;
         blue <= `ONE_WORD;
@@ -237,9 +231,9 @@ blk_mem_graphics graphics_instance(
 
 //color block ram
 //addra: 12bit
-//dina: 16bit
+//dina: 24bit
 //addrb: 12bit
-//doutb: 16bit
+//doutb: 24bit
 blk_mem_color color_instance(
     //write port
     .clka(clk_50M),
