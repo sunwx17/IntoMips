@@ -55,7 +55,7 @@ INCLUDES  += -I$(SRCDIR)/include
 
 # reserve 4MB for user app
 USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep echo snake pwd hello exit
-INITRD_BLOCK_CNT := 4000 
+INITRD_BLOCK_CNT := 3500 
 
 ifeq  ($(ON_FPGA), y)
 FPGA_LD_FLAGS += -S

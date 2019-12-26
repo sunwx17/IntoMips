@@ -1,10 +1,10 @@
 // Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2018.3 (lin64) Build 2405991 Thu Dec  6 23:36:41 MST 2018
-// Date        : Sun Dec  1 18:31:49 2019
+// Date        : Sun Dec  1 18:31:48 2019
 // Host        : monell-ubuntu running 64-bit Ubuntu 18.04.3 LTS
-// Command     : write_verilog -force -mode funcsim
-//               /home/monell/code/IntoMips/vivado/intomips.srcs/sources_1/ip/vga_clk_wiz/vga_clk_wiz_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim -rename_top vga_clk_wiz -prefix
+//               vga_clk_wiz_ vga_clk_wiz_sim_netlist.v
 // Design      : vga_clk_wiz
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -31,7 +31,6 @@ module vga_clk_wiz
         .locked(locked));
 endmodule
 
-(* ORIG_REF_NAME = "vga_clk_wiz_clk_wiz" *) 
 module vga_clk_wiz_vga_clk_wiz_clk_wiz
    (clk_100M_out,
     locked,
