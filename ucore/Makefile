@@ -53,9 +53,9 @@ OBJ       += $(patsubst $(SRCDIR)/%.S, $(OBJDIR)/%.o, $(ASMSRC))
 INCLUDES  := $(addprefix -I,$(SRC_DIR))
 INCLUDES  += -I$(SRCDIR)/include
 
-# reserve 1MB for user app
-USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep world
-INITRD_BLOCK_CNT := 4000 
+# reserve 4MB for user app
+USER_APPLIST     := cat sh ls forktest yield faultreadkernel faultread sleep echo snake pwd hello exit
+INITRD_BLOCK_CNT := 3500 
 
 ifeq  ($(ON_FPGA), y)
 FPGA_LD_FLAGS += -S
@@ -88,7 +88,7 @@ CONFIG_FILE := .config_$(ON_FPGA)_$(EN_INT)_$(EN_TLB)
 
 .PHONY: all checkdirs clean qemu
 
-all: checkdirs boot/loader.bin obj/ucore-kernel-initrd
+all: checkdirs boot/loader.bin obj/ucore-kernel-initrd obj/ucore-kernel-initrd.bin obj/ucore-kernel-initrd.dump obj/ucore-kernel-initrd.mem 
 
 $(shell mkdir -p $(DEP_DIR))
 
@@ -180,6 +180,15 @@ $(OBJDIR)/ucore-kernel-initrd: $(BUILD_DIR) $(TOOL_MKSFS) $(OBJ) $(USER_APP_BINS
 	$(LD) $(FPGA_LD_FLAGS) $(LDFLAGS_SCRIPT) $(OBJ) \
 				 $(USER_OBJDIR)/initrd.img.o -o $@
 	rm -rf $(ROOTFS_DIR)
+
+$(OBJDIR)/ucore-kernel-initrd.bin: $(OBJDIR)/ucore-kernel-initrd
+	$(OBJCOPY) -O binary $< $@
+
+$(OBJDIR)/ucore-kernel-initrd.dump: $(OBJDIR)/ucore-kernel-initrd
+	$(OBJDUMP) -D $< > $@
+
+$(OBJDIR)/ucore-kernel-initrd.mem: $(OBJDIR)/ucore-kernel-initrd.bin
+	cat $< | xxd -c 4 -g 1 | cut -d " " -f 2,3,4,5 > $@
 
 boot/loader.bin: boot/bootasm.S
 	$(CC) $(CFLAGS) -g -c -o boot/loader.o $^

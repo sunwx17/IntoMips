@@ -25,14 +25,44 @@ typedef logic[18:0] Vga_addr_t;
 `define VGA_BLOCK_HNUM          100
 `define VGA_BLOCK_VNUM          37
 
+`define VGA_TEXT_FIELD          7:0
+`define VGA_FG_COLOR_FIELD      15:8
+`define VGA_BG_COLOR_FIELD      23:16
+`define VGA_COLOR_FIELD         31:8
+
+`define VGA_FG_RED              7:5
+`define VGA_FG_GREEN            4:2
+`define VGA_FG_BLUE             1:0
+`define VGA_BG_RED              15:13
+`define VGA_BG_GREEN            12:10
+`define VGA_BG_BLUE             9:8
+`define VGA_CURSOR_MODE_FIELD   16
+
+
+`define VGA_RED                 7:5
+`define VGA_GREEN               4:2
+`define VGA_BLUE                1:0
+
+
+`define ADDR_IN_LED(addr)       (addr == 32'hbfd00400)
+`define ADDR_IN_NUM(addr)       (addr == 32'hbfd00408)
+`define ADDR_IN_DIP_SW(addr)    (addr == 32'hbfd0040c)
+`define ADDR_IN_TOUCH_BTN(addr) (addr == 32'hbfd00410)
+
+
 //graphics
 typedef logic[0:127] Ascii_data_t;
 typedef logic[11:0] Graphics_block_addr_t;
 typedef logic[9:0] Block_bit_addr_t;
+typedef logic[23:0] Color_t;
 
 //serial
 typedef logic[1:0]  Serial_mode_t;
 
+//vga
+typedef logic[2:0]  Vga_red_t;
+typedef logic[2:0]  Vga_green_t;
+typedef logic[1:0]  Vga_blue_t;
 
 
 //generate waiting state
@@ -53,5 +83,9 @@ typedef logic[1:0]  Serial_mode_t;
 `define FLASH_WAIT_CYCLE 2
 `define FLASH_WAIT_STATES(CUR_STATE, NAME) `WAIT_2_STATES(CUR_STATE, NAME)
 `define FLASH_LAST_WAIT_STATE(NAME) NAME``_``1
+
+`define USB_WAIT_CYCLE 4
+`define USB_WAIT_STATES(CUR_STATE, NAME) `WAIT_4_STATES(CUR_STATE, NAME)
+`define USB_LAST_WAIT_STATE(NAME) NAME``_``3
 
 `endif

@@ -218,6 +218,11 @@ proc_run(struct proc_struct *proc) {
 //       after switch_to, the current proc will execute here.
 static void
 forkret(void) {
+    //uint32_t next_pc = ((int)(current->tf) - 16 + 160);
+    //kprintf("## ## ## start forkret switch epc: %08x\n", ((int)(current->tf) - 16 + 160)); 
+    //kprintf("## ## ## what in epc: %08x\n", *(int*)next_pc);
+    //kprintf("## ## ## what in epc + 4: %08x\n", *(int*)(next_pc + 4));
+    //kprintf("## ## ## what in epc + 8: %08x\n", *(int*)(next_pc + 8));
     forkrets(current->tf);
 }
 

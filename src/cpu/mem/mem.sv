@@ -124,20 +124,30 @@ always_comb begin
                 exception_type_o <= EXC_OV;
             end else if (exception_type_i.eret) begin
                 exception_type_o <= EXC_ERET;
-            end else if (exception_type_i.data_tlb_refill) begin
-                exception_type_o <= EXC_DATA_TLB_REFILL;
+            end else if (exception_type_i.data_tlb_refill_load) begin
+                exception_type_o <= EXC_DATA_TLB_REFILL_LOAD;
                 bad_addr_v <= data_addr_v;
-            end else if (exception_type_i.data_tlb_invalid) begin
-                exception_type_o <= EXC_DATA_TLB_INVALID;
+            end else if (exception_type_i.data_tlb_invalid_load) begin
+                exception_type_o <= EXC_DATA_TLB_INVALID_LOAD;
                 bad_addr_v <= data_addr_v;
+            end else if (exception_type_i.data_tlb_refill_store) begin
+                exception_type_o <= EXC_DATA_TLB_REFILL_STORE;
+                bad_addr_v <= data_addr_v;
+            end else if (exception_type_i.data_tlb_invalid_store) begin
+                exception_type_o <= EXC_DATA_TLB_INVALID_STORE;
+                bad_addr_v <= data_addr_v;
+            end else if (exception_type_i.breakpoint) begin
+                exception_type_o <= EXC_BREAKPOINT;
             end
         end
     end
 end
 
-Bit_t   mem_we;
+Bit_t   mem_we, mem_re;
 
 assign mem_we_o = mem_we & (~(|exception_type_i));
+assign mem_re_o = mem_re & (~(|exception_type_i));
+
 
 always_comb begin
     if (rst == `ENABLE) begin 
@@ -151,7 +161,7 @@ always_comb begin
         mem_addr_o   <= `ZERO_WORD;
         mem_data_o   <= `ZERO_WORD;
         mem_we     <= `DISABLE;
-        mem_re_o     <= `DISABLE;
+        mem_re     <= `DISABLE;
         mem_mask_o   <= 4'b0;
 
         cp0_reg_we_o         <= `DISABLE;
@@ -174,12 +184,12 @@ always_comb begin
         cp0_reg_data_o       <= cp0_reg_data_i;
 
         mem_we     <= `DISABLE;
-        mem_re_o     <= `DISABLE;
+        mem_re     <= `DISABLE;
         mem_mask_o   <= 4'b0;
 
         case (oper_i)
             OP_LB  : begin
-                mem_re_o    <= `ENABLE;
+                mem_re    <= `ENABLE;
                 //mem_mask_o  <= 4'b0001;
                 case (mem_oper_addr[1:0])
                     2'b00 : begin
@@ -206,7 +216,7 @@ always_comb begin
                 //wreg_data_o <= { {24{mem_data_i[7]}}, mem_data_i[7:0] };
             end
             OP_LBU : begin
-                mem_re_o    <= `ENABLE;
+                mem_re    <= `ENABLE;
                 case (mem_oper_addr[1:0])
                     2'b00 : begin
                         wreg_data_o <= { 24'b0, mem_data_i[7:0] };
@@ -234,7 +244,7 @@ always_comb begin
                 //wreg_data_o <= { 24'b0, mem_data_i[7:0] };
             end
             OP_LH  : begin
-                mem_re_o    <= `ENABLE;
+                mem_re    <= `ENABLE;
                 case (mem_oper_addr[1:0])
                     2'b00 : begin
                         wreg_data_o <= { {16{mem_data_i[15]}}, mem_data_i[15:0] };
@@ -261,7 +271,7 @@ always_comb begin
                 //wreg_data_o <= { {16{mem_data_i[15]}}, mem_data_i[15:0] };
             end
             OP_LHU : begin
-                mem_re_o    <= `ENABLE;
+                mem_re    <= `ENABLE;
                 case (mem_oper_addr[1:0])
                     2'b00 : begin
                         wreg_data_o <= { 16'b0, mem_data_i[15:0] };
@@ -288,7 +298,7 @@ always_comb begin
                 //wreg_data_o <= { 16'b0, mem_data_i[15:0] };
             end
             OP_LW  : begin
-                mem_re_o    <= `ENABLE;
+                mem_re    <= `ENABLE;
                 mem_mask_o  <= 4'b1111;
                 wreg_data_o <= mem_data_i;
             end

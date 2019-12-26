@@ -46,7 +46,8 @@ module id(
     output  Inst_addr_t inst_addr_v_o,
 
     input   Excp_set_t  exception_type_i,
-    output  Excp_set_t  exception_type_o
+    output  Excp_set_t  exception_type_o,
+    input   Word_t      breakpoint_i
 );
 
 assign inst_addr_v_o = inst_addr_v_i;
@@ -117,6 +118,11 @@ always_comb begin
         exception_type_o.syscall      <= (oper == OP_SYSCALL);
         exception_type_o.invalid_inst <= (oper == OP_INVALID);
         exception_type_o.eret         <= (oper == OP_ERET);
+        if (pc == breakpoint_i) begin
+            exception_type_o.breakpoint <= `ENABLE;
+        end else begin
+            exception_type_o.breakpoint <= `DISABLE;
+        end
     end
 end
 

@@ -81,8 +81,10 @@ always_comb begin
         exception_type_o <= `NO_EXCP;
     end else begin
         exception_type_o <= exception_type_i;
-        exception_type_o.data_tlb_refill <= (`NEED_SAVE(oper) || `NEED_LOAD(oper)) && data_miss;
-        exception_type_o.data_tlb_invalid <= (`NEED_SAVE(oper) || `NEED_LOAD(oper)) && ~data_valid;
+        exception_type_o.data_tlb_refill_load <= `NEED_LOAD(oper) && data_miss;
+        exception_type_o.data_tlb_invalid_load <= `NEED_LOAD(oper) && ~data_valid;
+        exception_type_o.data_tlb_refill_store <= `NEED_SAVE(oper) && data_miss;
+        exception_type_o.data_tlb_invalid_store <= `NEED_SAVE(oper) && ~data_valid;
     end
 end
 
@@ -207,6 +209,7 @@ always_comb begin
         cp0_reg_data_o <= `ZERO_WORD;
         
     end else begin
+        stallreq <= `DISABLE;
         wreg_write_o <= wreg_write_i;
         wreg_addr_o  <= wreg_addr_i;
         wreg_data_o  <= `ZERO_WORD;

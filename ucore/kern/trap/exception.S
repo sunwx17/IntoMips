@@ -7,6 +7,7 @@
 
 .extern current # current pcb proc.h
 .extern mips_trap
+.extern monitor
    /* 
     * Do not allow the assembler to use $1 (at), because we need to be
     * able to save it.
@@ -14,6 +15,68 @@
    .set noat
    .set noreorder
    .section .text
+
+.global ramExcHandle_breakpoint
+ramExcHandle_breakpoint:
+   addiu sp, sp, -164
+   sw ra, 160(sp)	/* dummy for gdb */
+   sw s8, 156(sp)	/* save s8 */
+   sw sp, 152(sp)	/* dummy for gdb */
+   sw gp, 148(sp)	/* save gp */
+   sw k1, 144(sp)	/* dummy for gdb */
+   sw k0, 140(sp)	/* dummy for gdb */
+   sw k1, 152(sp)	/* real saved sp */
+   nop			/* delay slot for store */
+   mfc0 k1, CP0_EPC /* Copr.0 reg 13 == PC for exception */
+   sw k1, 160(sp)	/* real saved PC */
+   sw t9, 136(sp)
+   sw t8, 132(sp)
+   sw s7, 128(sp)
+   sw s6, 124(sp)
+   sw s5, 120(sp)
+   sw s4, 116(sp)
+   sw s3, 112(sp)
+   sw s2, 108(sp)
+   sw s1, 104(sp)
+   sw s0, 100(sp)
+   sw t7, 96(sp)
+   sw t6, 92(sp)
+   sw t5, 88(sp)
+   sw t4, 84(sp)
+   sw t3, 80(sp)
+   sw t2, 76(sp)
+   sw t1, 72(sp)
+   sw t0, 68(sp)
+   sw a3, 64(sp)
+   sw a2, 60(sp)
+   sw a1, 56(sp)
+   sw a0, 52(sp)
+   sw v1, 48(sp)
+   sw v0, 44(sp)
+   sw AT, 40(sp)
+   sw ra, 36(sp)
+   mfhi t0
+   mflo t1
+   sw t0, 32(sp)
+   sw t1, 28(sp)
+   sw   k0, 24(sp)               /* k0 was loaded with cause earlier */
+   mfc0 t1, CP0_STATUS /* Copr.0 reg 11 == status */
+   sw   t1, 20(sp)
+   mfc0 t2, CP0_BADVADDR /* Copr.0 reg 8 == faulting vaddr */
+   sw   t2, 16(sp)
+   sw $0, 12(sp)
+   la   t0, ~(ST0_KSU|ST0_EXL|ST0_IE)
+   and t1, t1, t0
+   mtc0 t1, CP0_STATUS /* Copr.0 reg 11 == status */
+   addiu a0, sp, 16             /* set argument */
+   la  t9, monitor
+   jal t9 /* call it */
+   nop				/* delay slot */
+   j exception_return
+   nop
+
+
+
 # +0x000: R4000 tlbmiss vector (user)
 .global ramExcHandle_tlbmiss
 ramExcHandle_tlbmiss:
@@ -249,6 +312,8 @@ exception_return:
    /* done */
 
    mtc0 k0, CP0_EPC /* Copr.0 reg 13 == PC for exception */
+   //lui k1, 0x8050
+   //sw k0, 0(k1)
    nop
    eret
    nop

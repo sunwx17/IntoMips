@@ -4,15 +4,16 @@
 `include "defines.svh"
 
 
-//`define PC_RESET_ADDR   32'h8fc00000
-`define PC_RESET_ADDR   32'h80000000
+`define PC_RESET_ADDR   32'h8fc00000
+//`define PC_RESET_ADDR   32'h80000000
 
-`define PC_INTERRUPT    32'h80001180
-`define PC_SYSCALL      32'h80001180
-`define PC_INVALID_INST 32'h80001180
-`define PC_OV           32'h80001180
-`define PC_TLB_INVALID  32'h80001180
-`define PC_TLB_REFILL   32'h80001000
+`define PC_INTERRUPT    32'h00000180
+`define PC_SYSCALL      32'h00000180
+`define PC_INVALID_INST 32'h00000180
+`define PC_OV           32'h00000180
+`define PC_TLB_INVALID  32'h00000180
+`define PC_TLB_REFILL   32'h00000000
+`define PC_BREAKPOINT   32'h00000200
 
 
 
@@ -45,6 +46,7 @@ typedef logic[`SEL_WIDTH - 1:0] Sel_t;
 `define CP0_CONTEXT     4
 `define CP0_PAGEMASK    5
 `define CP0_WIRED       6
+`define CP0_BADVADDR    8
 `define CP0_COUNT       9
 `define CP0_ENTRYHI     10
 `define CP0_COMPARE     11
@@ -57,10 +59,12 @@ typedef logic[`SEL_WIDTH - 1:0] Sel_t;
 `define CP0_EBASE       15
 //`define CP0_CONFIG_1    16
 
+`define CP0_BREAKPOINT  25
+
 `define CP0_STATUS_INIT 32'b0001_0000_0000_0000_0000_0000_0000_0000
 `define CP0_CONFIG_INIT 32'b0001_1110_0000_0000_0000_0000_0000_0000//16
 
-`define CP0_REGS_CAN_WRITE(waddr) (waddr == `CP0_COUNT  || waddr == `CP0_COMPARE || waddr == `CP0_STATUS || waddr == `CP0_EPC || waddr == `CP0_EBASE || waddr == `CP0_INDEX || waddr == `CP0_ENTRYLO0 || waddr == `CP0_ENTRYLO1 || waddr == `CP0_CONTEXT || waddr == `CP0_WIRED || waddr == `CP0_ENTRYHI)
+`define CP0_REGS_CAN_WRITE(waddr) (waddr == `CP0_COUNT  || waddr == `CP0_COMPARE || waddr == `CP0_STATUS || waddr == `CP0_EPC || waddr == `CP0_EBASE || waddr == `CP0_INDEX || waddr == `CP0_ENTRYLO0 || waddr == `CP0_ENTRYLO1 || waddr == `CP0_CONTEXT || waddr == `CP0_WIRED || waddr == `CP0_ENTRYHI || waddr == `CP0_BREAKPOINT)
 `define CP0_REGS_CAN_WRITE_WITH_MASK(waddr) (waddr == `CP0_CAUSE)
 
 `define CP0_CAUSE_MASK  32'b0000_0000_1100_0000_0000_0011_0000_0000
@@ -115,15 +119,21 @@ typedef struct packed {
     Bit_t   eret;
     Bit_t   inst_tlb_refill;
     Bit_t   inst_tlb_invalid;
-    Bit_t   data_tlb_refill;
-    Bit_t   data_tlb_invalid;
+    Bit_t   data_tlb_refill_load;
+    Bit_t   data_tlb_invalid_load;
+    Bit_t   data_tlb_refill_store;
+    Bit_t   data_tlb_invalid_store;
+    Bit_t   breakpoint;
 } Excp_set_t;
 
 `define NO_EXCP {$bits(Excp_set_t){1'b0}}
 
 typedef enum {
     EXC_INTERRUPT, EXC_SYSCALL, EXC_INVALID_INST, EXC_OV, EXC_ERET,
-    EXC_INST_TLB_REFILL, EXC_INST_TLB_INVALID, EXC_DATA_TLB_REFILL, EXC_DATA_TLB_INVALID,
+    EXC_INST_TLB_REFILL, EXC_INST_TLB_INVALID,
+    EXC_DATA_TLB_REFILL_LOAD, EXC_DATA_TLB_INVALID_LOAD, 
+    EXC_DATA_TLB_REFILL_STORE, EXC_DATA_TLB_INVALID_STORE,
+    EXC_BREAKPOINT,
     EXC_NO
 } Excp_t;
 
@@ -138,11 +148,13 @@ typedef enum {
 
 //`define NEED_CHANGE_BD(excp_code) ((excp_code == `EXCP_TYPE_INTERRUPT) || (((excp_code == `EXCP_TYPE_SYSCALL) || (excp_code == `EXCP_TYPE_INVALID_INST) || (excp_code == `EXCP_TYPE_OV)) && cp0_regs[`CP0_STATUS][`CP0_STATUS_EXL] == `DISABLE))
 
-`define ORDINARY_EXCEPTION(excp_code) ((excp_code == EXC_SYSCALL) || (excp_code == EXC_INVALID_INST) || (excp_code == EXC_OV) || (excp_code == EXC_INST_TLB_REFILL) || (excp_code == EXC_INST_TLB_INVALID) || (excp_code == EXC_DATA_TLB_REFILL) || (excp_code == EXC_DATA_TLB_INVALID))
+`define ORDINARY_EXCEPTION(excp_code) ((excp_code == EXC_SYSCALL) || (excp_code == EXC_INVALID_INST) || (excp_code == EXC_OV) || (excp_code == EXC_INST_TLB_REFILL) || (excp_code == EXC_INST_TLB_INVALID) || (excp_code == EXC_DATA_TLB_REFILL_LOAD) || (excp_code == EXC_DATA_TLB_INVALID_LOAD) || (excp_code == EXC_DATA_TLB_REFILL_STORE) || (excp_code == EXC_DATA_TLB_INVALID_STORE) || (excp_code == EXC_BREAKPOINT))
 
 `define EXC_CODE_INTERRUPT      5'b00000
 `define EXC_CODE_TLBL           5'b00010
+`define EXC_CODE_TLBS           5'b00011
 `define EXC_CODE_SYSCALL        5'b01000
+`define EXC_CODE_BREAKPOINT     5'b01001
 `define EXC_CODE_INVALID_INST   5'b01010
 `define EXC_CODE_OV             5'b01100
 //`define EXC_CODE_ERET           5'b00000

@@ -123,6 +123,8 @@ Bit_t       data_in_bootrom;
 Bit_t       data_in_uart_data;
 Bit_t       data_in_uart_status;
 Bit_t       data_in_vga;
+Bit_t       data_in_usb;
+Bit_t       data_in_display;
 
 Inst_addr_t inst_addr;
 Inst_addr_t data_addr;
@@ -172,6 +174,19 @@ Bit_t       vga_write_op;
 Word_t      vga_data_write;
 Word_t      vga_addr;
 
+Bit_t       usb_read_op;
+Bit_t       usb_write_op;
+Word_t      usb_addr;
+Word_t      usb_data_read;
+Word_t      usb_data_write;
+Bit_t       usb_interrupt;
+
+
+Bit_t       display_read_op;
+Bit_t       display_write_op;
+Word_t      display_read;
+Word_t      display_write;
+Word_t      display_addr;
 
 Bit_t       inst_read_op;
 Word_t      inst_data;
@@ -185,6 +200,7 @@ Mask_t      data_mask;
 Bit_t       ext_stallreq;
 Bit_t       base_stallreq;
 Bit_t       flash_stallreq;
+Bit_t       usb_stallreq;
 Bit_t       stallreq;
 
 
@@ -199,21 +215,22 @@ Word_t  bootrom_addr_ex;
 Word_t  bootrom_data_read_ex;
 
 
-
 assign inst_addr = {10'b0, inst_addr_v[21:0]};
 assign data_addr = {10'b0, data_addr_v[21:0]};
 
 always_comb begin
-    inst_in_ext <= `ADDR_IN_EXT(inst_addr_v);
-    inst_in_base <= `ADDR_IN_BASE(inst_addr_v);
-    inst_in_bootrom <= `ADDR_IN_BOOTROM(inst_addr_v);
-    data_in_ext <= `ADDR_IN_EXT(data_addr_v);
-    data_in_base <= `ADDR_IN_BASE(data_addr_v);
-    data_in_uart_data <= `ADDR_IN_UART_DATA(data_addr_v);
-    data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v);
-    data_in_vga <= `ADDR_IN_VGA(data_addr_v);
-    data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v);
-    data_in_flash <= `ADDR_IN_FLASH(data_addr_v);
+    inst_in_ext <= `ADDR_IN_EXT(inst_addr_v) && inst_read_op;
+    inst_in_base <= `ADDR_IN_BASE(inst_addr_v) && inst_read_op;
+    inst_in_bootrom <= `ADDR_IN_BOOTROM(inst_addr_v) && inst_read_op;
+    data_in_ext <= `ADDR_IN_EXT(data_addr_v) && (data_read_op || data_write_op);
+    data_in_base <= `ADDR_IN_BASE(data_addr_v) && (data_read_op || data_write_op);
+    data_in_uart_data <= `ADDR_IN_UART_DATA(data_addr_v) && (data_read_op || data_write_op);
+    data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v) && (data_read_op || data_write_op);
+    data_in_vga <= `ADDR_IN_VGA(data_addr_v) && (data_read_op || data_write_op);
+    data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v) && (data_read_op || data_write_op);
+    data_in_flash <= `ADDR_IN_FLASH(data_addr_v) && (data_read_op || data_write_op);
+    data_in_usb <= `ADDR_IN_USB(data_addr_v) && (data_read_op || data_write_op);
+    data_in_display <= `ADDR_IN_DISPLAY(data_addr_v) && (data_read_op || data_write_op);
 end
 
 always_comb begin
@@ -256,8 +273,12 @@ always_comb begin
     vga_data_write <= `HIGH_BYTE;
     vga_addr <= `ZERO_WORD;
 
+    display_read_op <= `DISABLE;
+    display_write_op <= `DISABLE;
+    display_addr <= `ZERO_WORD;
+    display_write <= `ZERO_WORD;
     
-    if (data_in_uart_data || data_in_uart_status || data_in_vga) begin
+    if (data_in_uart_data || data_in_uart_status || data_in_vga || data_in_display) begin
         if (inst_in_ext) begin
             ext_read_op <= inst_read_op;
             ext_write_op <= `DISABLE;
@@ -285,12 +306,20 @@ always_comb begin
             uart_write_op <= `DISABLE;
             uart_data_write <= `ZERO_WORD;
             data_data_read <= {30'b0, uart_mode};
-        end else begin
+        end else if (data_in_vga) begin
             //vga
             vga_write_op <= data_write_op;
             vga_data_write <= data_data_write;
             vga_addr <= data_addr_v & 32'h000fffff;
+        end else begin
+            //display
+            display_read_op <= data_read_op;
+            display_write_op <= data_write_op;
+            display_addr <= data_addr;
+            display_write <= data_data_write;
+            data_data_read <= display_read;
         end
+            
     end else if ((inst_in_ext ^ data_in_ext) && (inst_in_base ^ data_in_base)) begin
 
         ext_read_op <= inst_in_ext ? inst_read_op : data_read_op;
@@ -382,6 +411,16 @@ always_comb begin
 
             stallreq <= flash_stallreq;
         end
+
+        if (data_in_usb) begin
+            usb_read_op <= data_read_op;
+            usb_write_op <= data_write_op;
+            usb_addr <= data_addr;
+            usb_data_write <= data_data_write;
+            data_data_read <= usb_data_read;
+
+            stallreq <= usb_stallreq;
+        end
     end
 
 
@@ -400,6 +439,11 @@ always_comb begin
 end
 
 
+Bit_t timer_int;
+
+//assign leds[3] = timer_int;
+//assign leds[2] = usb_interrupt;
+
 cpu cpu_instance(
     .clk(clk_125),
     .rst(reset_btn),
@@ -413,8 +457,8 @@ cpu cpu_instance(
     .ram_we_o(data_write_op),
     .ram_mask_o(data_mask),
     .stallreq_from_bus(stallreq),
-    .int_i({3'b0, uart_mode[1], 2'b0})
-    //.timer_int_o
+    .int_i({timer_int, 2'b0, uart_mode[1], usb_interrupt, 1'b0}),
+    .timer_int_o(timer_int)
 );
 
 
@@ -531,11 +575,11 @@ serial_controller serial_controller_instance(
 
 //assign uart_mode = 2'b01;
 
-assign leds[0] = uart_mode[0];
-assign leds[1] = uart_mode[1];
+//assign leds[0] = uart_mode[0];
+//assign leds[1] = uart_mode[1];
 
 ext_serial_controller serial_controller_instance(
-    .clk(clk_50M), 
+    .clk(clk_25M), 
     .read_op(uart_read_op), 
     .write_op(uart_write_op),
     .bus_data_write(uart_data_write),
@@ -564,7 +608,42 @@ vga_controller vga_controller_instance(
     .video_de
 );
 
+usb_controller usb_controller_instance(
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .read_op(usb_read_op),
+    .write_op(usb_write_op),
+    .bus_data_addr(usb_addr),
+    .bus_data_write(usb_data_write),
+    .bus_data_read(usb_data_read),
+    .bus_stall(usb_stallreq),
+    .usb_interrupt(usb_interrupt),
+    .sl811_a0,
+    .sl811_d(dm9k_sd[7:0]),
+    .sl811_wr_n,
+    .sl811_rd_n,
+    .sl811_cs_n,
+    .sl811_rst_n,
+    .sl811_dack_n,
+    .sl811_intrq,
+    .sl811_drq_n    
+);
 
+
+display_controller display_controller_instance(
+    .clk(clk_25M),
+    .rst(reset_btn),
+    .read_op(display_read_op),
+    .write_op(display_write_op),
+    .bus_data_write(display_write),
+    .bus_data_read(display_read),
+    .bus_addr(display_addr),
+    .touch_btn,
+    .dip_sw,  
+    .leds, 
+    .dpy0,
+    .dpy1 
+);
 
 //assign leds[7:0] = base_ram_data[7:0];
 

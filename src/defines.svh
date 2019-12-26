@@ -12,6 +12,7 @@
 
 //data format
 typedef logic       Bit_t;
+typedef logic[3:0]  Halfbyte_t;
 typedef logic[7:0]  Byte_t;
 typedef logic[15:0] Halfword_t;
 typedef logic[31:0] Word_t;
@@ -22,6 +23,8 @@ typedef logic[63:0] Doubleword_t;
 `define ZERO_HWORD  16'h0
 `define ZERO_WORD   32'h0
 `define ZERO_DWORD  64'h0
+
+`define ONE_WORD    32'hffff
 
 `define HIGH_WORD   32'bZ
 `define HIGH_BYTE   8'bZ
@@ -60,9 +63,12 @@ typedef Reg_data_t[`REG_NUM - 1:0]  Regs_t;
 `define ADDR_IN_EXT(addr)           (addr >= 32'h80400000 && addr < 32'h80800000)
 `define ADDR_IN_UART_DATA(addr)     (addr == 32'hBFD003F8)
 `define ADDR_IN_UART_STATUS(addr)   (addr == 32'hBFD003FC)
-`define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA000e74)
+`define ADDR_IN_VGA(addr)           (addr >= 32'hBA000000 && addr < 32'hBA000E80)
 `define ADDR_IN_BOOTROM(addr)       (addr >= 32'h8fc00000 && addr < 32'h8fc04000)
-`define ADDR_IN_FLASH(addr)         (addr >= 32'h81000000 && addr < 32'h81800000)
+`define ADDR_IN_FLASH(addr)         (addr >= 32'hBE000000 && addr < 32'hBF000000)
+`define ADDR_IN_USB(addr)           (addr >= 32'hbc020000 && addr < 32'hbc020008)
+`define ADDR_IN_DISPLAY(addr)       (addr >= 32'hbfd00400 && addr < 32'hbfd00414)
+
 
 
 

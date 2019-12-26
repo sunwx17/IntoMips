@@ -3,8 +3,8 @@
 
 void
 sleepy(int pid) {
-    int i, time = 100;
-    for (i = 0; i < 10; i ++) {
+    int i, time = 1000;
+    for (i = 0; i < 6; i ++) {
         sleep(time);
         cprintf("sleep %d x %d slices.\n", i + 1, time);
     }

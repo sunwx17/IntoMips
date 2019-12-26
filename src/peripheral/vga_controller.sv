@@ -19,86 +19,152 @@ module vga_controller(
 );
 
 
-typedef enum {IDLE, WRITE} State_t;
-State_t cur_state;
-
-Bit_t inner_write_op;
+Bit_t inner_write_op, inner_color_write_op;
 Word_t ascii_addr;
 Ascii_data_t ascii_out;
 Ascii_data_t graphics_in;
-Graphics_block_addr_t graphics_write_addr;
+Color_t color_in;
+Graphics_block_addr_t graphics_write_addr, color_write_addr;
 Bit_t last_write_op;
 Graphics_block_addr_t last_graphics_write_addr;
+
+
+Word_t cnt;
+Bit_t is_cover;
+
 
 always_comb begin
     //write_op在下降沿给出
     if (write_op) begin
-        ascii_addr <= bus_data - 32;
+        ascii_addr <= bus_data[`VGA_TEXT_FIELD] >= 32? bus_data[`VGA_TEXT_FIELD] - 32: 0;
     end else begin
         ascii_addr <= `ZERO_WORD;
     end
 end
 
-always_ff @ (posedge clk_50M or posedge rst) begin
+always_ff @ (posedge clk_25M or posedge rst) begin
     if (rst) begin
         last_write_op <= 1'b0;
+        last_graphics_write_addr <= `ZERO_WORD;
+
+        color_in <= `ZERO_WORD;
+        inner_color_write_op <= 1'b0;
+        color_write_addr <= `ZERO_WORD;
+
     end else begin
         //write ascii of the last period
         last_write_op <= 1'b0;
         last_graphics_write_addr <= `ZERO_WORD;
+
+        color_in <= `ZERO_WORD;
+        inner_color_write_op <= 1'b0;
+        color_write_addr <= `ZERO_WORD;
         if (write_op) begin
             last_write_op <= 1'b1;
             last_graphics_write_addr <= bus_addr;
+
+            color_in <= bus_data[`VGA_COLOR_FIELD];
+            inner_color_write_op <= 1'b1;
+            color_write_addr <= bus_addr;
         end
     end
 end
 
 
-assign graphics_in = ascii_out;
-
-always_ff @ (posedge clk_50M) begin
+always_ff @ (posedge clk_25M) begin
     inner_write_op <= 1'b0;
     graphics_write_addr <= `ZERO_WORD;
+    graphics_in <= `ZERO_WORD;
+
     if (last_write_op) begin
         inner_write_op <= 1'b1;
         graphics_write_addr <= last_graphics_write_addr;
+        graphics_in <= ascii_out;
     end 
 end
         
-
-        
-
+always_ff @ (posedge clk_25M or posedge rst) begin
+    if (rst) begin
+        cnt <= 0;
+        is_cover <= 1'b0;
+    end else begin
+        if (cnt == 12500000) begin
+            cnt <= 0;
+            is_cover <= ~is_cover;
+        end else begin
+            cnt <= cnt + 1;
+        end
+    end
+end
 
 //高/宽
 logic[11:0] hdata;
 logic[11:0] vdata;
-//像素时钟为50MHz
+
 assign video_clk = clk_50M;
 
 
 Ascii_data_t graphics_out;
+Color_t color_out;
 Block_bit_addr_t pixel_addr;
-assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata & 6'b111) + (vdata & 4'b1111) * `VGA_BLOCK_HSIZE: 0;
-assign video_red = {3{graphics_out[pixel_addr]}};
-assign video_green = {3{graphics_out[pixel_addr]}};
-assign video_blue = {2{graphics_out[pixel_addr]}};
+
+Vga_red_t red, red_in;
+Vga_green_t green, green_in;
+Vga_blue_t blue, blue_in;
+
+Graphics_block_addr_t cur_block_addr, cur_block_addr_in;
+Graphics_block_addr_t addr_4x;
+
+assign video_red = red_in;
+assign video_green = green_in;
+assign video_blue = blue_in;
+
+always_ff @ (posedge clk_50M or posedge rst) begin
+    if (rst) begin
+        red_in <= `ZERO_WORD;
+        green_in <= `ZERO_WORD;
+        blue_in <= `ZERO_WORD;
+    end else begin
+        red_in <= red;
+        green_in <= green;
+        blue_in <= blue;
+    end
+end
 
 
 
+assign pixel_addr = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? {2'b00, vdata[3:0], hdata[2:0]}: 0;
+always_comb begin
+    if (is_cover && color_out[`VGA_CURSOR_MODE_FIELD] == 1'b1) begin
+        red <= `ONE_WORD;
+        green <= `ONE_WORD;
+        blue <= `ONE_WORD;
+    end else begin
+        if (graphics_out[pixel_addr]) begin
+            //foregroud
+            red <= ~color_out[`VGA_FG_RED];
+            green <= ~color_out[`VGA_FG_GREEN];
+            blue <= ~color_out[`VGA_FG_BLUE];
+        end else begin
+            //baskground:
+            red <= color_out[`VGA_BG_RED];
+            green <= color_out[`VGA_BG_GREEN];
+            blue <= color_out[`VGA_BG_BLUE];
+        end
+    end
+end
 
-//assign cur_addr = (hdata < `VGA_HSIZE && vdata < `VGA_VSIZE)? (vdata * `VGA_HSIZE + hdata): 0;
 
-Graphics_block_addr_t cur_block_addr, cur_block_addr_h, cur_block_addr_v;
-assign cur_block_addr_h = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (hdata >> 3): 0;
-assign cur_block_addr_v = hdata < `VGA_NORMAL_HSIZE && vdata < `VGA_NORMAL_VSIZE? (vdata >> 4): 0;
-assign cur_block_addr = cur_block_addr_v * `VGA_BLOCK_HNUM + cur_block_addr_h;
+assign addr_4x = (vdata >> 4) << 2;
+assign cur_block_addr = (addr_4x << 4) + (addr_4x << 3) + addr_4x + (hdata >> 3);
+assign cur_block_addr_in = cur_block_addr < `VGA_BLOCK_HNUM * `VGA_BLOCK_VNUM? cur_block_addr:0;
 
 
 // hdata
 always @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         hdata <= 0;
-    end else if (hdata == `VGA_HMAX) begin
+    end else if (hdata == (`VGA_HMAX - 1)) begin
         hdata <= 0;
     end else begin
         hdata <= hdata + 1;
@@ -109,8 +175,8 @@ end
 always @ (posedge clk_50M or posedge rst) begin
     if (rst) begin
         vdata <= 0;
-    end else if (hdata == `VGA_HMAX) begin
-        if (vdata == `VGA_VMAX) begin
+    end else if (hdata == (`VGA_HMAX - 1)) begin
+        if (vdata == (`VGA_VMAX - 1)) begin
             vdata <= 0;
         end else begin
             vdata <= vdata + 1;
@@ -122,48 +188,62 @@ assign video_hsync = ((hdata >= `VGA_HFP) && (hdata < `VGA_HSP)) ? 1'b1: 1'b0;
 assign video_vsync = ((vdata >= `VGA_VFP) && (vdata < `VGA_VSP)) ? 1'b1: 1'b0;
 assign video_de = ((hdata < `VGA_HSIZE) & (vdata < `VGA_VSIZE));
 
-
-//内部使用ip核 block memory generator
-//addr: 19bit
-//data: 32bit
-/*
-blk_mem_gen_0 blk_mem_gen_instance(
-    //write port
-    .clka(clk_25M),
-    .wea(write_op),
-    .addra(bus_addr[18:0]),
-    .dina(bus_data[7:0]),
-    //read port
-    .clkb(clk_50M),
-    .addrb(cur_addr[18:0]),
-    .doutb(pixel)
-);
-*/
-
 //ascii rom
 //addra: 7bit
 //douta: 128bit
+Bit_t clk_100M;
 blk_mem_ascii_rom ascii_rom_instance(
-    .clka(clk_50M),
+    .clka(clk_100M),
     .addra(ascii_addr),
     .douta(ascii_out)
 );
 
-//graphics block rom
+
+
+//it seems useless
+//vga clk wiz
+//clk_50M_in: 1bit
+//clk_100M_out: 1bit
+//locked
+vga_clk_wiz vga_clk_wiz_instance(
+    .clk_50M_in(clk_50M),
+    .clk_100M_out(clk_100M)
+    //.locked(???)
+);
+
+
+//graphics block ram
 //addra: 12bit
 //dina: 128bit
 //addrb: 12bit
 //doutb: 128bit
-blk_mem_graphics graphics_instrance(
+blk_mem_graphics graphics_instance(
     //write port
     .clka(clk_50M),
     .wea(inner_write_op),
     .addra(graphics_write_addr),
     .dina(graphics_in),
     //read port
-    .clkb(clk_50M),
-    .addrb(cur_block_addr),
+    .clkb(clk_100M),
+    .addrb(cur_block_addr_in),
     .doutb(graphics_out)
+);
+
+//color block ram
+//addra: 12bit
+//dina: 24bit
+//addrb: 12bit
+//doutb: 24bit
+blk_mem_color color_instance(
+    //write port
+    .clka(clk_50M),
+    .wea(inner_color_write_op),
+    .addra(color_write_addr),
+    .dina(color_in),
+    //read port
+    .clkb(clk_100M),
+    .addrb(cur_block_addr_in),
+    .doutb(color_out)
 );
 
 

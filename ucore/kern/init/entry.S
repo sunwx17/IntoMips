@@ -30,6 +30,9 @@ reset:
 	mtc0	$zero, CP0_CAUSE
   /* clear SR(ERL), which is 1 after reset */
 	mtc0	$zero, CP0_STATUS
+  //lui $k0, 0x8000
+  //ori $k0, 0x8d40
+  //mtc0 $k0, $25  
 
   jal 1f
   nop

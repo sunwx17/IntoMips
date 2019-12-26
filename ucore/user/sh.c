@@ -66,9 +66,6 @@ readline(const char *prompt) {
             return NULL;
         }
 
-        // printf("ret = %d, ch is %d\n", ret, c);
-        // if(c == 127)
-        //     printf("ch = 127\n");
         int isBackspace = 0;
         if(c == '\b' || c == 127)
             isBackspace = 1;

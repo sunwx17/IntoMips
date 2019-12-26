@@ -981,6 +981,9 @@ do {									\
 #define read_c0_ebase()		__read_32bit_c0_register($15, 1)
 #define write_c0_ebase(val)	__write_32bit_c0_register($15, 1, val)
 
+
+#define read_break_point()	__read_32bit_c0_register($25, 0)
+#define write_break_point(val)	__write_32bit_c0_register($25, 0, val)
 /*
  * Macros to access the floating point coprocessor control registers
  */

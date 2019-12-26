@@ -22,7 +22,7 @@ assign bus_data_read = ext_uart_buffer;
 assign mode[0] = ~ext_uart_busy;
 assign mode[1] = ext_uart_ready;
 
-async_receiver #(.ClkFrequency(50000000),.Baud(9600)) //接收模块，9600无检验位
+async_receiver #(.ClkFrequency(25000000),.Baud(115200)) //接收模块，9600无检验位
     ext_uart_r(
         .clk(clk),                       //外部时钟信号
         .RxD(rxd),                           //外部串行信号输入
@@ -49,7 +49,7 @@ always @(posedge clk) begin
     end
 end
 
-async_transmitter #(.ClkFrequency(50000000),.Baud(9600)) //发送模块，9600无检验位
+async_transmitter #(.ClkFrequency(25000000),.Baud(115200)) //发送模块，9600无检验位
     ext_uart_t(
         .clk(clk),                  //外部时钟信号
         .TxD(txd),                      //串行信号输出

@@ -30,6 +30,7 @@ kern_init(void) {
     pic_init();                 // init interrupt controller
     cons_init();                // init the console
     clock_init();               // init clock interrupt
+    //usb_int_init();
 
     check_initrd();
 
