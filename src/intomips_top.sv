@@ -92,6 +92,35 @@ assign leds[6] = uart_mode[1];*/
 
 //reg a = 1'b0;
 
+
+
+
+// PLL分频示例
+logic locked, clk_per, clk_per_temp, clk_cpu;
+pll_example clock_gen 
+ (
+  // Clock in ports
+  .clk_in1(clk_50M),  // 外部时钟输入
+  // Clock out ports
+  .clk_out1(clk_cpu), // 时钟输出1，频率在IP配置界面中设置
+  .clk_out2(clk_per_temp), // 时钟输出2，频率在IP配置界面中设置
+  // Status and control signals
+  .reset(reset_btn), // PLL复位输入
+  .locked(locked)    // PLL锁定指示输出，"1"表示时钟稳定，
+                     // 后级电路复位信号应当由它生成（见下）
+ );
+
+assign clk_per = ~clk_per_temp;
+
+logic reset;
+// 异步复位，同步释放，将locked信号转为后级电路的复位reset_of_clk10M
+always@(posedge clk_cpu or negedge locked) begin
+    if(~locked) reset <= 1'b1;
+    else        reset <= 1'b0;
+end
+
+
+
 reg clk_25M = 1'b0;
 reg clk_125 = 1'b0;
 //cpu导入
@@ -157,29 +186,11 @@ Word_t      base_data_read_ex;
 Word_t      base_data_write_ex;
 Mask_t      base_mask_ex;
 
-Bit_t       flash_read_op;
-Bit_t       flash_write_op;
-Word_t      flash_addr;
-Word_t      flash_data_read;
-Word_t      flash_data_write;
-
-
 Bit_t       uart_read_op;
 Bit_t       uart_write_op;
 Byte_t      uart_data_read;
 Byte_t      uart_data_write;
 Serial_mode_t   uart_mode;
-
-Bit_t       vga_write_op;
-Word_t      vga_data_write;
-Word_t      vga_addr;
-
-Bit_t       usb_read_op;
-Bit_t       usb_write_op;
-Word_t      usb_addr;
-Word_t      usb_data_read;
-Word_t      usb_data_write;
-Bit_t       usb_interrupt;
 
 
 Bit_t       display_read_op;
@@ -206,30 +217,16 @@ Bit_t       stallreq;
 
 
 
-Bit_t   bootrom_read_op;
-Word_t  bootrom_addr;
-Word_t  bootrom_data_read;
-
-Bit_t   bootrom_read_op_ex;
-Word_t  bootrom_addr_ex;
-Word_t  bootrom_data_read_ex;
-
-
 assign inst_addr = {10'b0, inst_addr_v[21:0]};
 assign data_addr = {10'b0, data_addr_v[21:0]};
 
 always_comb begin
     inst_in_ext <= `ADDR_IN_EXT(inst_addr_v) && inst_read_op;
     inst_in_base <= `ADDR_IN_BASE(inst_addr_v) && inst_read_op;
-    inst_in_bootrom <= `ADDR_IN_BOOTROM(inst_addr_v) && inst_read_op;
     data_in_ext <= `ADDR_IN_EXT(data_addr_v) && (data_read_op || data_write_op);
     data_in_base <= `ADDR_IN_BASE(data_addr_v) && (data_read_op || data_write_op);
     data_in_uart_data <= `ADDR_IN_UART_DATA(data_addr_v) && (data_read_op || data_write_op);
     data_in_uart_status <= `ADDR_IN_UART_STATUS(data_addr_v) && (data_read_op || data_write_op);
-    data_in_vga <= `ADDR_IN_VGA(data_addr_v) && (data_read_op || data_write_op);
-    data_in_bootrom <= `ADDR_IN_BOOTROM(data_addr_v) && (data_read_op || data_write_op);
-    data_in_flash <= `ADDR_IN_FLASH(data_addr_v) && (data_read_op || data_write_op);
-    data_in_usb <= `ADDR_IN_USB(data_addr_v) && (data_read_op || data_write_op);
     data_in_display <= `ADDR_IN_DISPLAY(data_addr_v) && (data_read_op || data_write_op);
 end
 
@@ -262,23 +259,15 @@ always_comb begin
     base_data_write_ex <=  `ZERO_WORD;
     base_mask_ex <= 4'b0000;
 
-    flash_read_op <= `DISABLE;
-    flash_write_op <= `DISABLE;
-    flash_addr <= `ZERO_WORD;
-    flash_data_write <= `ZERO_WORD;
-
     stallreq <= `DISABLE;
 
-    vga_write_op <= `DISABLE;
-    vga_data_write <= `HIGH_BYTE;
-    vga_addr <= `ZERO_WORD;
 
     display_read_op <= `DISABLE;
     display_write_op <= `DISABLE;
     display_addr <= `ZERO_WORD;
     display_write <= `ZERO_WORD;
     
-    if (data_in_uart_data || data_in_uart_status || data_in_vga || data_in_display) begin
+    if (data_in_uart_data || data_in_uart_status || data_in_display) begin
         if (inst_in_ext) begin
             ext_read_op <= inst_read_op;
             ext_write_op <= `DISABLE;
@@ -306,11 +295,6 @@ always_comb begin
             uart_write_op <= `DISABLE;
             uart_data_write <= `ZERO_WORD;
             data_data_read <= {30'b0, uart_mode};
-        end else if (data_in_vga) begin
-            //vga
-            vga_write_op <= data_write_op;
-            vga_data_write <= data_data_write;
-            vga_addr <= data_addr_v & 32'h000fffff;
         end else begin
             //display
             display_read_op <= data_read_op;
@@ -398,43 +382,8 @@ always_comb begin
         inst_data <= inst_in_ext ? ext_data_read : (inst_in_base ? base_data_read : `ZERO_WORD);
         data_data_read <= data_in_ext ? ext_data_read : (data_in_base ? base_data_read : `ZERO_WORD);
         
-
-        if (data_in_flash) begin
-            //data in flash
-            //inst must be in ext_ram or base_ram or bootrom
-            //can only use "lh"
-            flash_read_op <= data_read_op;
-            flash_write_op <= data_write_op;
-            flash_addr <= data_addr;
-            flash_data_write <= data_data_write;
-            data_data_read <= flash_data_read;
-
-            stallreq <= flash_stallreq;
-        end
-
-        if (data_in_usb) begin
-            usb_read_op <= data_read_op;
-            usb_write_op <= data_write_op;
-            usb_addr <= data_addr;
-            usb_data_write <= data_data_write;
-            data_data_read <= usb_data_read;
-
-            stallreq <= usb_stallreq;
-        end
     end
 
-
-    if (inst_in_bootrom) begin
-        bootrom_read_op <= inst_read_op;
-        bootrom_addr <= { 4'b0001, inst_addr_v[27:0] };
-        inst_data <= bootrom_data_read;
-    end
-
-    if (data_in_bootrom) begin
-        bootrom_read_op_ex <= data_read_op;
-        bootrom_addr_ex <= { 4'b0001, data_addr_v[27:0] };
-        data_data_read <= bootrom_data_read_ex;
-    end
 
 end
 
@@ -445,8 +394,8 @@ Bit_t timer_int;
 //assign leds[2] = usb_interrupt;
 
 cpu cpu_instance(
-    .clk(clk_125),
-    .rst(reset_btn),
+    .clk(clk_cpu),
+    .rst(reset),
     .rom_data_i(inst_data),
     .rom_addr_o(inst_addr_v),
     .rom_ce_o(inst_read_op),
@@ -462,28 +411,10 @@ cpu cpu_instance(
 );
 
 
-bootrom_controller bootrom_controller_instance (
-    .clk(clk_25M),
-    .rst(reset_btn),
-
-    .read_op(bootrom_read_op),
-    .bus_addr(bootrom_addr),
-    .bus_data_read(bootrom_data_read),
-
-    .read_op_ex(bootrom_read_op_ex),
-    .bus_addr_ex(bootrom_addr_ex),
-    .bus_data_read_ex(bootrom_data_read_ex) 
-);
-
-
-
-
-
-
 //base ram
 sram_controller base_sram_controller(
-    .clk(clk_25M),
-    .rst(reset_btn),
+    .clk(clk_per),
+    .rst(reset),
     .read_op(base_read_op),
     .write_op(base_write_op),
     .bus_data_write(base_data_write),
@@ -510,8 +441,8 @@ sram_controller base_sram_controller(
 
 //ext ram store instructions
 sram_controller ext_ram_controller(
-    .clk(clk_25M),
-    .rst(reset_btn),
+    .clk(clk_per),
+    .rst(reset),
     .read_op(ext_read_op),
     .write_op(ext_write_op),
     .bus_data_write(ext_data_write),
@@ -532,26 +463,6 @@ sram_controller ext_ram_controller(
     .ram_ce_n(ext_ram_ce_n),
     .ram_oe_n(ext_ram_oe_n),
     .ram_we_n(ext_ram_we_n)
-);
-
-flash_controller flash_controller_instance (
-    //it CANNOT work in 50MHz(tested)
-    .clk(clk_25M),
-    .rst(reset_btn),
-    .bus_addr(flash_addr),
-    .read_op(flash_read_op),
-    .write_op(flash_write_op),
-    .bus_data_read(flash_data_read),
-    .bus_data_write(flash_data_write),
-    .bus_stall(flash_stallreq),
-    .flash_a,
-    .flash_d,
-    .flash_rp_n,
-    .flash_vpen,
-    .flash_ce_n,
-    .flash_oe_n,
-    .flash_we_n,
-    .flash_byte_n
 );
 
 /*
@@ -579,7 +490,7 @@ serial_controller serial_controller_instance(
 //assign leds[1] = uart_mode[1];
 
 ext_serial_controller serial_controller_instance(
-    .clk(clk_25M), 
+    .clk(clk_per), 
     .read_op(uart_read_op), 
     .write_op(uart_write_op),
     .bus_data_write(uart_data_write),
@@ -592,47 +503,9 @@ ext_serial_controller serial_controller_instance(
 
 
 
-vga_controller vga_controller_instance(
-    .clk_25M,
-    .clk_50M,
-    .rst(reset_btn),
-    .write_op(vga_write_op),
-    .bus_addr(vga_addr),
-    .bus_data(vga_data_write),
-    .video_red,
-    .video_green,
-    .video_blue,
-    .video_hsync,
-    .video_vsync,
-    .video_clk,
-    .video_de
-);
-
-usb_controller usb_controller_instance(
-    .clk(clk_25M),
-    .rst(reset_btn),
-    .read_op(usb_read_op),
-    .write_op(usb_write_op),
-    .bus_data_addr(usb_addr),
-    .bus_data_write(usb_data_write),
-    .bus_data_read(usb_data_read),
-    .bus_stall(usb_stallreq),
-    .usb_interrupt(usb_interrupt),
-    .sl811_a0,
-    .sl811_d(dm9k_sd[7:0]),
-    .sl811_wr_n,
-    .sl811_rd_n,
-    .sl811_cs_n,
-    .sl811_rst_n,
-    .sl811_dack_n,
-    .sl811_intrq,
-    .sl811_drq_n    
-);
-
-
 display_controller display_controller_instance(
-    .clk(clk_25M),
-    .rst(reset_btn),
+    .clk(clk_per),
+    .rst(reset),
     .read_op(display_read_op),
     .write_op(display_write_op),
     .bus_data_write(display_write),

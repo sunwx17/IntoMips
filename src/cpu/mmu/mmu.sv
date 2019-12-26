@@ -101,12 +101,12 @@ end else begin: generate_non_mmu
         inst_paddr <= inst_vaddr;
         miss1 <= 0;
         d1 <= 0;
-        v1 <= 0;
+        v1 <= 1;
         c1 <= 0;
         data_paddr <= data_vaddr;
         miss2 <= 0;
         d2 <= 1;
-        v2 <= 0;
+        v2 <= 1;
         c2 <= 0;
     end
 end

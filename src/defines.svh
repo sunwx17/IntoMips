@@ -30,7 +30,7 @@ typedef logic[63:0] Doubleword_t;
 `define HIGH_BYTE   8'bZ
 
 //mmu
-`define USE_MMU     1
+`define USE_MMU     0
 
 
 //instruction
